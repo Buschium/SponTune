@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -36,6 +35,12 @@ import com.google.android.gms.maps.model.PointOfInterest;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import com.spontune.android.spontune.Data.Event;
+import com.spontune.android.spontune.Data.DatabaseInitializer;
+import com.spontune.android.spontune.Data.AppDatabase;
+import com.spontune.android.spontune.Data.EventDAO;
+
+
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnPoiClickListener{
 
     private final String LOG_TAG = MapsActivity.class.getSimpleName();
@@ -57,12 +62,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
 
+    private static AppDatabase mAppDatabase;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         final Toast mToast = Toast.makeText(getApplicationContext(), "Sorry, daran wird noch gebaut", Toast.LENGTH_SHORT);
+        mAppDatabase = AppDatabase.getAppDatabase(this);
 
         ActionBar mActionBar = getSupportActionBar();
         if(mActionBar != null) {
@@ -82,7 +90,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 @Override
                 public void onClick(View view) {
                     //TODO
-                    mToast.show();
+                    //Used to initialize the test database for now
+                    DatabaseInitializer.populateAsync(mAppDatabase);
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    int rows = mAppDatabase.eventDao().getAll().size();
+                    if(rows > 0){
+                        String msg = "Successfully initialized " + rows + " rows";
+                        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+                    }
                 }
             });
 
@@ -231,6 +250,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onPoiClick(PointOfInterest poi) {
         Toast.makeText(getApplicationContext(), "Keine Sorge, das kommt auch noch", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        for(Event event : mAppDatabase.eventDao().getAll()){
+            mAppDatabase.eventDao().deleteEvent(event);
+        }
+        AppDatabase.destroyInstance();
+        super.onDestroy();
     }
 
 }
