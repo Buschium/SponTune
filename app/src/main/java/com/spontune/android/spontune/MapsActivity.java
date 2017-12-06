@@ -1,5 +1,12 @@
 package com.spontune.android.spontune;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.os.Bundle;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -26,6 +33,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Marker;
@@ -39,6 +48,8 @@ import com.spontune.android.spontune.Data.Event;
 import com.spontune.android.spontune.Data.DatabaseInitializer;
 import com.spontune.android.spontune.Data.AppDatabase;
 import com.spontune.android.spontune.Data.EventDAO;
+
+import java.util.List;
 
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnPoiClickListener{
@@ -62,11 +73,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
 
+    //Database for storing events
     private static AppDatabase mAppDatabase;
+
+    //Category selection button states
+    private boolean mFoodAndDrinkActivated = false;
+    private boolean mPartyActivated = false;
+    private boolean mMusicActivated = false;
+    private boolean mSportsActivated = false;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         final Toast mToast = Toast.makeText(getApplicationContext(), "Sorry, daran wird noch gebaut", Toast.LENGTH_SHORT);
@@ -90,18 +109,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 @Override
                 public void onClick(View view) {
                     //TODO
-                    //Used to initialize the test database for now
-                    DatabaseInitializer.populateAsync(mAppDatabase);
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    int rows = mAppDatabase.eventDao().getAll().size();
-                    if(rows > 0){
-                        String msg = "Successfully initialized " + rows + " rows";
-                        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
-                    }
+                    mToast.show();
                 }
             });
 
@@ -114,6 +122,56 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             });
         }
+
+        Toolbar mBottomToolbar = findViewById(R.id.toolbar_bottom);
+        mBottomToolbar.setPadding(0,0,0,0);
+        mBottomToolbar.setContentInsetsAbsolute(0,0);
+
+        final ImageButton mButtonFoodAndDrink = findViewById(R.id.action_category_food_and_drink);
+        final ImageButton mButtonParty = findViewById(R.id.action_category_party);
+        final ImageButton mButtonMusic = findViewById(R.id.action_category_music);
+        final ImageButton mButtonSports = findViewById(R.id.action_category_sports);
+
+        mButtonFoodAndDrink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mFoodAndDrinkActivated = !mFoodAndDrinkActivated;
+                if(everyCategoryActivated()) setAllButtonsFalse();
+                toggleButtonsGreyed(mButtonFoodAndDrink, mButtonParty, mButtonMusic, mButtonSports);
+                updateEventMarkers();
+            }
+        });
+
+        mButtonParty.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPartyActivated = !mPartyActivated;
+                if(everyCategoryActivated()) setAllButtonsFalse();
+                toggleButtonsGreyed(mButtonFoodAndDrink, mButtonParty, mButtonMusic, mButtonSports);
+                updateEventMarkers();
+            }
+        });
+
+        mButtonMusic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mMusicActivated = !mMusicActivated;
+                if(everyCategoryActivated()) setAllButtonsFalse();
+                toggleButtonsGreyed(mButtonFoodAndDrink, mButtonParty, mButtonMusic, mButtonSports);
+                updateEventMarkers();
+            }
+        });
+
+        mButtonSports.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSportsActivated = ! mSportsActivated;
+                if(everyCategoryActivated()) setAllButtonsFalse();
+                toggleButtonsGreyed(mButtonFoodAndDrink, mButtonParty, mButtonMusic, mButtonSports);
+                updateEventMarkers();
+            }
+        });
+
 
         //If the status of the app was saved beforehand, retrieve the saved location and camera position
         if (savedInstanceState != null) {
@@ -154,6 +212,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         updateLocationUI();
         getDeviceLocation();
         mMap.setOnPoiClickListener(this);
+
+        //Used to initialize the test database for now
+        DatabaseInitializer.populateAsync(mAppDatabase);
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        int rows = mAppDatabase.eventDao().getAll().size();
+        if(rows > 0){
+            String msg = "Successfully initialized " + rows + " rows";
+            Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+            updateEventMarkers();
+        }
     }
 
 
@@ -247,9 +319,97 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+
+    private void updateEventMarkers(){
+        EventDAO eventDAO = mAppDatabase.eventDao();
+        List<Event> mEventsList = eventDAO.getAll();
+        mMap.clear();
+        for(Event event : mEventsList){
+            if((event.category == 1 && mFoodAndDrinkActivated)
+                    || (event.category == 2 && mPartyActivated)
+                    || (event.category == 3 && mMusicActivated)
+                    || (event.category == 4 && mSportsActivated)
+                    || noCategoryActivated()) {
+                int mResourceID;
+                switch (event.category) {
+                    case 1:
+                        mResourceID = R.drawable.category_food_and_drink;
+                        break;
+                    case 2:
+                        mResourceID = R.drawable.category_party;
+                        break;
+                    case 3:
+                        mResourceID = R.drawable.category_music;
+                        break;
+                    default:
+                        mResourceID = R.drawable.category_sports;
+                }
+                mMap.addMarker(new MarkerOptions().position(new LatLng(event.lat, event.lng)).icon(bitmapDescriptorFromVector(getApplicationContext(), mResourceID)));
+            }
+        }
+    }
+
+    private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
+        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
+        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
+    private static Drawable convertDrawableToGrayScale(Drawable drawable) {
+        if (drawable == null) return null;
+        Drawable res = drawable.mutate();
+        res.setColorFilter(Color.rgb(0xd3, 0xd3, 0xd3), PorterDuff.Mode.SCREEN);
+        return res;
+    }
+
+    private void toggleButtonsGreyed(ImageButton mFoodAndDrinkButton, ImageButton mPartyButton, ImageButton mMusicButton, ImageButton mSportsButton){
+        Drawable foodAndDrinkIcon = this.getResources().getDrawable(R.drawable.category_food_and_drink);
+        Drawable partyIcon = this.getResources().getDrawable(R.drawable.category_party);
+        Drawable musicIcon = this.getResources().getDrawable(R.drawable.category_music);
+        Drawable sportsIcon = this.getResources().getDrawable(R.drawable.category_sports);
+
+        if(noCategoryActivated()){
+            mFoodAndDrinkButton.setImageDrawable(foodAndDrinkIcon);
+            mPartyButton.setImageDrawable(partyIcon);
+            mMusicButton.setImageDrawable(musicIcon);
+            mSportsButton.setImageDrawable(sportsIcon);
+        }else{
+            Drawable newIcon = mFoodAndDrinkActivated ? foodAndDrinkIcon : convertDrawableToGrayScale(foodAndDrinkIcon);
+            mFoodAndDrinkButton.setImageDrawable(newIcon);
+
+            newIcon = mPartyActivated ? partyIcon : convertDrawableToGrayScale(partyIcon);
+            mPartyButton.setImageDrawable(newIcon);
+
+            newIcon = mMusicActivated ? musicIcon : convertDrawableToGrayScale(musicIcon);
+            mMusicButton.setImageDrawable(newIcon);
+
+            newIcon = mSportsActivated ? sportsIcon : convertDrawableToGrayScale(sportsIcon);
+            mSportsButton.setImageDrawable(newIcon);
+        }
+
+    }
+
     @Override
     public void onPoiClick(PointOfInterest poi) {
         Toast.makeText(getApplicationContext(), "Keine Sorge, das kommt auch noch", Toast.LENGTH_LONG).show();
+    }
+
+    private boolean noCategoryActivated(){
+        return (!mFoodAndDrinkActivated && !mPartyActivated && !mMusicActivated && !mSportsActivated);
+    }
+
+    private boolean everyCategoryActivated(){
+        return (mFoodAndDrinkActivated && mPartyActivated && mMusicActivated && mSportsActivated);
+    }
+
+    private void setAllButtonsFalse(){
+        mFoodAndDrinkActivated = false;
+        mPartyActivated = false;
+        mMusicActivated = false;
+        mSportsActivated = false;
     }
 
     @Override

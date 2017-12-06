@@ -30,10 +30,12 @@ public class DatabaseInitializer {
         Event eventOne = new Event(48.220615, 11.572844, "TestWizard", "Grillen im Park", "Grillen im Park", 1500, 2000, 1);
         Event eventTwo = new Event(48.213545, 11.557243, "TestWizard", "Straßenkonzert", "Irgendwas mit Musik", 1900, 2030, 3);
         Event eventThree = new Event(48.199209, 11.555369, "TestWizard", "Fußball im Park", "Fußball im Park", 1300, 1430, 4);
+        Event eventFour = new Event(48.209956, 11.564070, "TestWizard", "Hausparty", "Klein aber fein", 2000, 300, 2);
 
         addEvent(db, eventOne);
         addEvent(db, eventTwo);
         addEvent(db, eventThree);
+        addEvent(db, eventFour);
 
         List<Event> userList = db.eventDao().getAll();
         Log.d(DatabaseInitializer.TAG, "Rows Count: " + userList.size());
