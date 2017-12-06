@@ -1,18 +1,20 @@
 package com.spontune.android.spontune;
 
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.google.android.gms.location.LocationServices;
@@ -30,10 +32,11 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import com.google.android.gms.maps.model.PointOfInterest;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback{
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnPoiClickListener{
 
     private final String LOG_TAG = MapsActivity.class.getSimpleName();
 
@@ -59,6 +62,39 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        final Toast mToast = Toast.makeText(getApplicationContext(), "Sorry, daran wird noch gebaut", Toast.LENGTH_SHORT);
+
+        ActionBar mActionBar = getSupportActionBar();
+        if(mActionBar != null) {
+            mActionBar.setDisplayShowHomeEnabled(false);
+            mActionBar.setDisplayShowTitleEnabled(false);
+            LayoutInflater mLayoutInflater = LayoutInflater.from(this);
+            View customView = mLayoutInflater.inflate(R.layout.activity_maps_menu, null);
+            mActionBar.setCustomView(customView);
+            mActionBar.setDisplayShowCustomEnabled(true);
+
+            Toolbar mParent =(Toolbar) customView.getParent();
+            mParent.setPadding(0,0,0,0);
+            mParent.setContentInsetsAbsolute(0,0);
+
+            final ImageButton mButtonList = customView.findViewById(R.id.action_list);
+            mButtonList.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    //TODO
+                    mToast.show();
+                }
+            });
+
+            final ImageButton mButtonProfile = customView.findViewById(R.id.action_user_profile);
+            mButtonProfile.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    //TODO
+                    mToast.show();
+                }
+            });
+        }
 
         //If the status of the app was saved beforehand, retrieve the saved location and camera position
         if (savedInstanceState != null) {
@@ -98,6 +134,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         getLocationPermission();
         updateLocationUI();
         getDeviceLocation();
+        mMap.setOnPoiClickListener(this);
     }
 
 
@@ -190,4 +227,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.e("Exception: %s", e.getMessage());
         }
     }
+
+    @Override
+    public void onPoiClick(PointOfInterest poi) {
+        Toast.makeText(getApplicationContext(), "Keine Sorge, das kommt auch noch", Toast.LENGTH_LONG).show();
+    }
+
 }

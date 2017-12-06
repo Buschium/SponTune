@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">SponTune</string>
     <string name="title_activity_maps">SponTune</string>
+    <string name="activity_main_menu_user">Profile</string>
 </resources>
