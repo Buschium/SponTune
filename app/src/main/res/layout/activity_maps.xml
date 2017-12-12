@@ -89,4 +89,47 @@
 
     </android.support.v7.widget.Toolbar>
 
+    <LinearLayout android:id="@+id/overlay"
+        android:tag=""
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="#99000000"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:clickable="false"
+            android:focusable="false"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="45dp"
+            android:background="@drawable/layout_bg">
+
+            <TextView
+                android:id="@+id/overlay_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:gravity="center_horizontal"
+                android:textSize="25sp" />
+
+            <TextView
+                android:id="@+id/overlay_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:layout_gravity="center_horizontal"
+                android:textSize="20sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
 </RelativeLayout>

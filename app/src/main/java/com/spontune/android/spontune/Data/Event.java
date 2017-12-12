@@ -8,7 +8,7 @@ import android.graphics.Bitmap;
 public class Event {
     @PrimaryKey(autoGenerate = true)
     public int ID;
-    public String creator;
+    public final String creator;
     //public LatLng location;
     public double lat;
     public double lng;

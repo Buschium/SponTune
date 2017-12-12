@@ -20,6 +20,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -49,10 +51,12 @@ import com.spontune.android.spontune.Data.DatabaseInitializer;
 import com.spontune.android.spontune.Data.AppDatabase;
 import com.spontune.android.spontune.Data.EventDAO;
 
+import org.w3c.dom.Text;
+
 import java.util.List;
 
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnPoiClickListener{
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnPoiClickListener, GoogleMap.OnMarkerClickListener{
 
     private final String LOG_TAG = MapsActivity.class.getSimpleName();
 
@@ -88,8 +92,33 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        final Toast mToast = Toast.makeText(getApplicationContext(), "Sorry, daran wird noch gebaut", Toast.LENGTH_SHORT);
         mAppDatabase = AppDatabase.getAppDatabase(this);
+
+        //Set up category buttons and action bar
+        setUpActionBar();
+        setUpCategoryButtons();
+
+        //If the status of the app was saved beforehand, retrieve the saved location and camera position
+        if (savedInstanceState != null) {
+            mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
+            mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
+        }
+
+        //Get a Fused Location Provider Client
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+        //Get the map fragment and jump to onMapReady when the map is set up
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this); //calls onMapReady
+    }
+
+
+    /**
+     * Sets up the action bar with the list and profile buttons on top of the screen
+     */
+    private void setUpActionBar(){
+        //Toast to show when the user tries to use a function that hasn't been implemented yet
+        final Toast mToast = Toast.makeText(getApplicationContext(), "Sorry, daran wird noch gebaut", Toast.LENGTH_SHORT);
 
         ActionBar mActionBar = getSupportActionBar();
         if(mActionBar != null) {
@@ -108,7 +137,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             mButtonList.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    //TODO
+                    //TODO create event list activity and intent that activity with this button
                     mToast.show();
                 }
             });
@@ -117,12 +146,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             mButtonProfile.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    //TODO
+                    //TODO create user profile activity and intent that activity with this button
                     mToast.show();
                 }
             });
         }
+    }
 
+
+    /**
+     * Sets up the logic for the category buttons on the bottom of the screen
+     * If all categories are deactivated (un-selected), the system acts like all categories are selected
+     * By default, all categories are deactivated
+     */
+    private void setUpCategoryButtons(){
         Toolbar mBottomToolbar = findViewById(R.id.toolbar_bottom);
         mBottomToolbar.setPadding(0,0,0,0);
         mBottomToolbar.setContentInsetsAbsolute(0,0);
@@ -171,20 +208,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 updateEventMarkers();
             }
         });
-
-
-        //If the status of the app was saved beforehand, retrieve the saved location and camera position
-        if (savedInstanceState != null) {
-            mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
-            mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
-        }
-
-        //Get a Fused Location Provider Client
-        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-
-        //Get the map fragment and jump to onMapReady when the map is set up
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this); //calls onMapReady
     }
 
 
@@ -212,6 +235,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         updateLocationUI();
         getDeviceLocation();
         mMap.setOnPoiClickListener(this);
+        mMap.setOnMarkerClickListener(this);
 
         //Used to initialize the test database for now
         DatabaseInitializer.populateAsync(mAppDatabase);
@@ -320,6 +344,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
+    /**
+     * Updates the event markers on the map based on selected categories and fetches new events from the database
+     */
     private void updateEventMarkers(){
         EventDAO eventDAO = mAppDatabase.eventDao();
         List<Event> mEventsList = eventDAO.getAll();
@@ -344,11 +371,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     default:
                         mResourceID = R.drawable.category_sports;
                 }
-                mMap.addMarker(new MarkerOptions().position(new LatLng(event.lat, event.lng)).icon(bitmapDescriptorFromVector(getApplicationContext(), mResourceID)));
+                Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(event.lat, event.lng)).icon(bitmapDescriptorFromVector(getApplicationContext(), mResourceID)));
+                marker.setTag(event.ID);
             }
         }
     }
 
+
+    /**
+     * @param context current context
+     * @param vectorResId resource ID of the vector graphic
+     * @return BitmapDescriptor from a locally saved vector graphic
+     */
     private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
         Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
         vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
@@ -358,6 +392,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
+
+    /**
+     * @param drawable Drawable that should be converted to grey
+     * @return A grey scaled image
+     */
     private static Drawable convertDrawableToGrayScale(Drawable drawable) {
         if (drawable == null) return null;
         Drawable res = drawable.mutate();
@@ -365,6 +404,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         return res;
     }
 
+
+    /**
+     * Greys out category buttons based on which categories are selected
+     * @param mFoodAndDrinkButton Button for category "Food and Drink"
+     * @param mPartyButton Button for category "Party"
+     * @param mMusicButton Button for category "Music"
+     * @param mSportsButton Button for category "Sports"
+     */
     private void toggleButtonsGreyed(ImageButton mFoodAndDrinkButton, ImageButton mPartyButton, ImageButton mMusicButton, ImageButton mSportsButton){
         Drawable foodAndDrinkIcon = this.getResources().getDrawable(R.drawable.category_food_and_drink);
         Drawable partyIcon = this.getResources().getDrawable(R.drawable.category_party);
@@ -392,19 +439,66 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+
+    @Override
+    public boolean onMarkerClick(Marker marker){
+        if(marker.getTag() != null) {
+            EventDAO eventDAO = mAppDatabase.eventDao();
+            int clickedEventID = (Integer) marker.getTag();
+            Event clickedEvent = eventDAO.getEventByID(clickedEventID);
+            final LinearLayout overlay = findViewById(R.id.overlay);
+            overlay.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    overlay.setVisibility(View.GONE);
+                }
+            });
+
+            TextView overlayTitle = findViewById(R.id.overlay_title);
+            overlayTitle.setText(clickedEvent.summary);
+
+            TextView overlayDescription = findViewById(R.id.overlay_description);
+            overlayDescription.setText(clickedEvent.description);
+
+            overlay.setVisibility(View.VISIBLE);
+
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Handles clicks on Points of Interest (POIs) on the map like stores, restaurants etc.
+     * @param poi Clicked POI
+     */
     @Override
     public void onPoiClick(PointOfInterest poi) {
+        //TODO
         Toast.makeText(getApplicationContext(), "Keine Sorge, das kommt auch noch", Toast.LENGTH_LONG).show();
     }
 
+
+    /**
+     * Checks whether no category is selected
+     * @return true if no category is selected
+     */
     private boolean noCategoryActivated(){
         return (!mFoodAndDrinkActivated && !mPartyActivated && !mMusicActivated && !mSportsActivated);
     }
 
+
+    /**
+     * Checks whether all categories are selected
+     * @return true if all categories are selected
+     */
     private boolean everyCategoryActivated(){
         return (mFoodAndDrinkActivated && mPartyActivated && mMusicActivated && mSportsActivated);
     }
 
+
+    /**
+     * Un-selects all categories and thus puts category system back in idle mode
+     */
     private void setAllButtonsFalse(){
         mFoodAndDrinkActivated = false;
         mPartyActivated = false;
@@ -412,6 +506,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mSportsActivated = false;
     }
 
+
+    /**
+     * Deletes the example database when the app is halted (not exited)
+     */
     @Override
     protected void onDestroy() {
         for(Event event : mAppDatabase.eventDao().getAll()){
