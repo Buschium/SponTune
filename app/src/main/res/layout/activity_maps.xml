@@ -1,135 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context="com.spontune.android.spontune.MapsActivity" />
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/toolbar_bottom"
+        tools:context="de.spontune.android.spontune.MapsActivity" />
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar_bottom"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/category_bar_height"
         android:layout_width="match_parent"
         android:background="?attr/colorPrimary"
-        android:layout_alignParentBottom="true"
-        android:minHeight="?attr/actionBarSize" >
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:minHeight="?attr/actionBarSize"
+        android:elevation="15dp">
 
-        <RelativeLayout
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:weightSum="5"
+            android:orientation="horizontal"
+            android:elevation="15dp">
 
             <ImageButton
                 android:id="@+id/action_category_food_and_drink"
-                android:layout_marginStart="10dp"
-                android:layout_width="?attr/actionBarSize"
-                android:layout_height="?attr/actionBarSize"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
                 android:background="?android:attr/selectableItemBackground"
-                android:paddingStart="5dp"
-                android:paddingEnd="5dp"
-                android:paddingBottom="5dp"
-                android:paddingTop="5dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="20dp"
+                android:paddingTop="20dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/category_food_and_drink" />
 
             <ImageButton
                 android:id="@+id/action_category_party"
-                android:layout_marginStart="104dp"
-                android:layout_width="?attr/actionBarSize"
-                android:layout_height="?attr/actionBarSize"
-                android:layout_alignParentTop="true"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
                 android:background="?android:attr/selectableItemBackground"
-                android:paddingStart="5dp"
-                android:paddingEnd="5dp"
-                android:paddingBottom="5dp"
-                android:paddingTop="5dp"
+                android:padding="20dp"
                 android:scaleType="fitCenter"
-                android:src="@drawable/category_party" />
+                android:src="@drawable/category_party"/>
 
             <ImageButton
                 android:id="@+id/action_category_music"
-                android:layout_marginEnd="104dp"
-                android:layout_width="?attr/actionBarSize"
-                android:layout_height="?attr/actionBarSize"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentTop="true"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
                 android:background="?android:attr/selectableItemBackground"
-                android:paddingStart="5dp"
-                android:paddingEnd="5dp"
-                android:paddingBottom="5dp"
-                android:paddingTop="5dp"
+                android:padding="20dp"
                 android:scaleType="fitCenter"
-                android:src="@drawable/category_music" />
+                android:src="@drawable/category_music"/>
 
             <ImageButton
                 android:id="@+id/action_category_sports"
-                android:layout_marginEnd="10dp"
-                android:layout_width="?attr/actionBarSize"
-                android:layout_height="?attr/actionBarSize"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentTop="true"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
                 android:background="?android:attr/selectableItemBackground"
-                android:paddingStart="5dp"
-                android:paddingEnd="5dp"
-                android:paddingBottom="5dp"
-                android:paddingTop="5dp"
+                android:padding="20dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/category_sports" />
 
-        </RelativeLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/colorAccent">
 
-    </android.support.v7.widget.Toolbar>
+                <ImageButton
+                    android:id="@+id/add_event"
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:paddingBottom="20dp"
+                    android:paddingTop="20dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/activity_maps_add" />
 
-    <LinearLayout android:id="@+id/overlay"
-        android:tag=""
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:background="#99000000"
-        android:clickable="true"
-        android:focusable="true"
-        android:visibility="gone"
-        android:orientation="vertical">
-
-        <LinearLayout
-            android:clickable="false"
-            android:focusable="false"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="45dp"
-            android:background="@drawable/layout_bg">
-
-            <TextView
-                android:id="@+id/overlay_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginStart="15dp"
-                android:layout_marginEnd="15dp"
-                android:gravity="center_horizontal"
-                android:textSize="25sp" />
-
-            <TextView
-                android:id="@+id/overlay_description"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="15dp"
-                android:layout_marginEnd="15dp"
-                android:layout_gravity="center_horizontal"
-                android:textSize="20sp" />
+            </LinearLayout>
 
         </LinearLayout>
 
-    </LinearLayout>
+    </android.support.v7.widget.Toolbar>
 
-</RelativeLayout>
+</android.support.constraint.ConstraintLayout>

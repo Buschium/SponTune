@@ -2,4 +2,22 @@
     <string name="app_name">SponTune</string>
     <string name="title_activity_maps">SponTune</string>
     <string name="activity_main_menu_user">Profile</string>
+    <string name="title_activity_event">EventActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="activity_event_time">%02d:%02d - %02d:%02d Uhr</string>
+    <string name="activity_event_people">Aktuell %d von max. %d Besuchern</string>
+    <string name="join_event">Bin dabei!</string>
+    <string name="title_activity_scrolling">ScrollingActivity</string>
+    <string name="title_activity_create">CreateActivity</string>
+    <string name="input_title">TITEL</string>
+    <string name="input_description">Beschreibung</string>
+    <string name="input_address">Adresse (optional)</string>
+    <string name="starting_time">Start</string>
+    <string name="ending_time">Ende</string>
+    <string name="max_persons_title">Max. Besucher</string>
+    <string name="max_persons_text">Lege die maximale Anzahl an Besuchern für dein Event fest</string>
+    <string name="current_persons_title">Aktuelle Besucher</string>
+    <string name="current_persons_text">Wie viele Besucher sind schon bei deinem Event?</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
 </resources>
