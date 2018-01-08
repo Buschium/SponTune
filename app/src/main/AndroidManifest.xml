@@ -34,6 +34,11 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCKANNAJvJ5wPEAgYlxmt2pGknGen6Nwyg" />
 
+        <service
+            android:name="de.spontune.android.spontune.Input.FetchLocationIntentService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
+
         <activity
             android:name="de.spontune.android.spontune.MapsActivity"
             android:label="@string/title_activity_maps"

@@ -1,0 +1,2 @@
+configurations.maybeCreate("default")
+artifacts.add("default", file('jcoord-1.1-b.jar'))

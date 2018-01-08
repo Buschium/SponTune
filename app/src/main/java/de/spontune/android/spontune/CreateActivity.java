@@ -1,5 +1,6 @@
 package de.spontune.android.spontune;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -7,6 +8,8 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.ResultReceiver;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
@@ -14,20 +17,28 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.NumberPicker;
 import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.AutocompleteFilter;
+import com.google.android.gms.location.places.AutocompletePrediction;
+import com.google.android.gms.location.places.GeoDataClient;
+import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -43,6 +54,8 @@ import java.util.Locale;
 
 import de.spontune.android.spontune.Data.Event;
 import de.spontune.android.spontune.Input.DatePickerFragment;
+import de.spontune.android.spontune.Input.FetchLocationIntentService;
+import de.spontune.android.spontune.Input.PlacesAutoCompleteAdapter;
 import de.spontune.android.spontune.Input.TimePickerFragment;
 
 import static de.spontune.android.spontune.MapsActivity.bitmapDescriptorFromDrawable;
@@ -55,12 +68,16 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
     private static FirebaseAuth mFirebaseAuth;
     private static DatabaseReference mDatabaseReference;
     private static GoogleMap mMap;
+    private static PlacesAutoCompleteAdapter mAdapter;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private Location mLastKnownLocation;
+    private GeoDataClient mGeoDataClient;
+
     private static final LatLng mDefaultLocation = new LatLng(48.1500593,11.5662206);
     private static final int DEFAULT_ZOOM = 16;
+    private static final LatLngBounds BOUNDS_GREATER_MUNICH = new LatLngBounds(new LatLng(48.034211, 11.281276), new LatLng(48.346808, 11.879760));
 
-
+    //Properties for the created event
     private String mUserID;
     private String title;
     private String description;
@@ -92,6 +109,7 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
     private ImageButton mButtonMusic;
     private ImageButton mButtonSports;
 
+    //Calendars for the starting and ending times
     private final Calendar mStartingCalendar = GregorianCalendar.getInstance();
     private final Calendar mEndingCalendar = GregorianCalendar.getInstance();
 
@@ -99,6 +117,7 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        mGeoDataClient = Places.getGeoDataClient(this, null);
         setContentView(R.layout.activity_create);
 
         if(getSupportActionBar() != null) {
@@ -106,6 +125,7 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
         }
         mScrollView = findViewById(R.id.scroll_view_create);
 
+        //Set up the FireBase reference and get the UID
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mFirebaseAuth = FirebaseAuth.getInstance();
         mDatabaseReference = mFirebaseDatabase.getReference().child("events");
@@ -124,11 +144,13 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_create);
         mapFragment.getMapAsync(this); //calls onMapReady
 
+        //Set up the input fields and buttons
         setUpStartingButtons();
         setUpEndingButtons();
         setUpVisitorButtons();
         setUpCategoryButtons();
         setUpAcceptButton();
+        setUpAddressInput();
     }
 
 
@@ -136,6 +158,8 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setOnMapClickListener(this);
+
+        //By default, the new event is going to take place at the creator's current position
         getDeviceLocation();
         if(mLastKnownLocation != null) {
             lat = mLastKnownLocation.getLatitude();
@@ -148,6 +172,9 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
     }
 
 
+    /**
+     * Set up the input fields for the starting time and starting date
+     */
     private void setUpStartingButtons(){
         mStartingDateEdit = findViewById(R.id.starting_date);
         mStartingTimeEdit = findViewById(R.id.starting_time);
@@ -195,6 +222,9 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
     }
 
 
+    /**
+     * Set up the input fields for the ending time and ending date
+     */
     private void setUpEndingButtons(){
         mEndingCalendar.add(Calendar.HOUR, 1);
         mEndingCalendar.add(Calendar.MINUTE, 30);
@@ -245,6 +275,9 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
     }
 
 
+    /**
+     * Set up the input fields for the maximum number of visitors and the current number of visitors
+     */
     private void setUpVisitorButtons(){
         mMaxPersons = findViewById(R.id.max_persons);
         mCurrentPersons = findViewById(R.id.current_persons);
@@ -287,6 +320,9 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
     }
 
 
+    /**
+     * Set up the buttons for selecting the category the new event should belong to
+     */
     private void setUpCategoryButtons(){
         mButtonFoodAndDrink = findViewById(R.id.create_category_food_and_drink);
         mButtonParty = findViewById(R.id.create_category_party);
@@ -331,6 +367,9 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
     }
 
 
+    /**
+     * Set up the button for creating the new event, writing it to the database and leaving the create view
+     */
     private void setUpAcceptButton(){
         ImageButton acceptButton = findViewById(R.id.create_accept);
         acceptButton.setOnClickListener(new View.OnClickListener() {
@@ -341,16 +380,35 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
 
                 EditText inputTitle = findViewById(R.id.input_title);
                 EditText inputDescription = findViewById(R.id.input_description);
+                AutoCompleteTextView inputAddress = findViewById(R.id.input_address);
                 title = inputTitle.getText().toString();
                 description = inputDescription.getText().toString();
+                String address = inputAddress.getText().toString();
 
-                Event event = new Event(lat, lng, mUserID, title, description, startingTime, endingTime, selectedCategory, maxPersons, currentPersons);
+                if(address.equals("")){
+                    address = null;
+                }
+
+                Event event = new Event(lat, lng, mUserID, title, description, startingTime,
+                        endingTime, selectedCategory, maxPersons, currentPersons, address);
                 String key = mDatabaseReference.push().getKey();
                 event.setID(key);
                 mDatabaseReference.child(key).setValue(event);
                 finish();
             }
         });
+    }
+
+
+    /**
+     * Set up the text field for the optional address
+     */
+    private void setUpAddressInput(){
+        AutoCompleteTextView autoCompleteTextView = findViewById(R.id.input_address);
+        AutocompleteFilter filter = new AutocompleteFilter.Builder().setTypeFilter(AutocompleteFilter.TYPE_FILTER_ADDRESS).build();
+        mAdapter = new PlacesAutoCompleteAdapter(this, mGeoDataClient, BOUNDS_GREATER_MUNICH, filter);
+        autoCompleteTextView.setAdapter(mAdapter);
+        autoCompleteTextView.setOnItemClickListener(mAutocompleteClickListener);
     }
 
 
@@ -381,6 +439,10 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
     }
 
 
+    /**
+     * Updates the event marker of the new event based on the selected location, category, and values
+     * for the maximum number of visitors and the current number of visitors
+     */
     private void updateEventMarker(){
         mMap.clear();
         Resources r = getResources();
@@ -430,9 +492,13 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
         mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng))
                 .anchor(0.5f, 0.5f)
                 .icon(bitmapDescriptorFromDrawable(getApplicationContext(), layerDrawable)));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), DEFAULT_ZOOM));
     }
 
 
+    /**
+     * Shows the dialog for selecting the starting date
+     */
     private void showStartingDateDialog(){
         isStartingDate = true;
         Bundle bundle = new Bundle();
@@ -445,6 +511,9 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
     }
 
 
+    /**
+     * Shows the dialog for selecting the starting time
+     */
     private void showStartingTimeDialog(){
         isStartingTime = true;
         Bundle bundle = new Bundle();
@@ -456,6 +525,9 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
     }
 
 
+    /**
+     * Shows the dialog for selecting the ending date
+     */
     private void showEndingDateDialog(){
         isStartingDate = false;
         Bundle bundle = new Bundle();
@@ -468,6 +540,9 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
     }
 
 
+    /**
+     * Shows the dialog for selecting the ending time
+     */
     private void showEndingTimeDialog(){
         isStartingTime = false;
         Bundle bundle = new Bundle();
@@ -478,6 +553,10 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
         newFragment.show(getSupportFragmentManager(), "endingTimePicker");
     }
 
+
+    /**
+     * Shows a dialog for selecting either the maximum number of visitors or the current number of visitors
+     */
     private void showNumberPickerDialog(){
         View view = getLayoutInflater().inflate(R.layout.number_picker, null);
         final AlertDialog d = new AlertDialog.Builder(this).setView(view).create();
@@ -487,9 +566,16 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
         final NumberPicker np = view.findViewById(R.id.number_picker);
         assert np != null;
 
-        np.setMaxValue(200);
-        np.setMinValue(1);
-        np.setValue(maxPersons);
+        if(!isMaxPersons){
+            TextView title = findViewById(R.id.number_picker_title);
+            TextView text = findViewById(R.id.number_picker_text);
+            title.setText(R.string.current_persons_title);
+            text.setText(R.string.current_persons_text);
+        }
+
+        np.setMaxValue(isMaxPersons? 200 : maxPersons - 1);
+        np.setMinValue(isMaxPersons? 1 : 0);
+        np.setValue(isMaxPersons? maxPersons : currentPersons);
         np.setWrapSelectorWheel(false);
 
         numberPickerSet.setOnClickListener(new View.OnClickListener()
@@ -518,6 +604,13 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
     }
 
 
+    /**
+     * Gets called when the user has picked a starting/ending date via the respective dialog
+     * and updates the respective calendar accordingly
+     * @param year selected year
+     * @param month selected month
+     * @param day selected day
+     */
     @Override
     public void onFinishPickDateDialog(int year, int month, int day){
         String date = String.format(Locale.GERMAN, "%02d. %02d. %4d", day, month + 1, year);
@@ -583,11 +676,46 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
         lat = latLng.latitude;
         lng = latLng.longitude;
         updateEventMarker();
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM));
     }
 
 
     private long getUnixTime(Calendar calendar){
         return calendar.getTime().getTime();
+    }
+
+
+    private AdapterView.OnItemClickListener mAutocompleteClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            final AutocompletePrediction item = mAdapter.getItem(position);
+            startJobIntentService(item.getFullText(null).toString());
+        }
+    };
+
+
+    private void startJobIntentService(String address){
+        Intent intent = new Intent(this, FetchLocationIntentService.class);
+        LocationResultReceiver receiver = new LocationResultReceiver(new Handler());
+        intent.putExtra("resultReceiver", receiver);
+        intent.putExtra("address", address);
+        FetchLocationIntentService.enqueueWork(this, intent);
+    }
+
+
+    class LocationResultReceiver extends ResultReceiver {
+
+        public LocationResultReceiver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+            double lat = resultData.getDouble("lat");
+            double lng = resultData.getDouble("lng");
+            CreateActivity.this.lat = lat;
+            CreateActivity.this.lng = lng;
+            updateEventMarker();
+        }
     }
 }

@@ -33,11 +33,11 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation 'com.android.support:design:27.0.2'
-
     implementation 'com.google.firebase:firebase-core:11.6.2'
     implementation 'com.google.firebase:firebase-database:11.6.2'
-    implementation "com.google.firebase:firebase-auth:11.6.2"
+    implementation 'com.google.firebase:firebase-auth:11.6.2'
     implementation 'com.firebaseui:firebase-ui-auth:3.1.2'
+    implementation project(':jcoord-1.1-b')
 }
 
 apply plugin: 'com.google.gms.google-services'
