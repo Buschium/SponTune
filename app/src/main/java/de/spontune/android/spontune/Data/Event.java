@@ -12,11 +12,13 @@ public class Event {
     private int maxPersons;
     private long startingTime;
     private String summary;
+    private String address;
     //public byte[] picture;
 
     public Event(){}
 
-    public Event(double lat, double lng, String creator, String summary, String description, long startingTime, long endingTime, int category, int maxPersons, int currentPersons){
+    public Event(double lat, double lng, String creator, String summary, String description, long startingTime,
+                 long endingTime, int category, int maxPersons, int currentPersons, String address){
         this.lat = lat;
         this.lng = lng;
         this.creator = creator;
@@ -28,6 +30,7 @@ public class Event {
         //this.picture = picture;
         this.maxPersons = maxPersons;
         this.currentPersons = currentPersons;
+        this.address = address;
     }
 
     public String getID() {

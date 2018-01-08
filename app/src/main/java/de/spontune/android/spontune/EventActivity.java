@@ -14,8 +14,11 @@ import android.widget.TextView;
 
 import com.spontune.android.spontune.R;
 
+import org.w3c.dom.Text;
+
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 
 public class EventActivity extends AppCompatActivity {
@@ -28,9 +31,7 @@ public class EventActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setPadding(0,0,0,0);
-        toolbar.setContentInsetsAbsolute(0,0);
-        toolbar.setTitle(bundle.getString("summary"));
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
 
         Toolbar bottomToolbar = findViewById(R.id.event_toolbar_bottom);
@@ -38,7 +39,23 @@ public class EventActivity extends AppCompatActivity {
         bottomToolbar.setContentInsetsAbsolute(0,0);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        TextView mEventTimeTextView = findViewById(R.id.event_metadata_time);
+        setUpTimeAndDate(bundle);
+
+        TextView maxPersonsTextView = findViewById(R.id.event_metadata_max_persons);
+        maxPersonsTextView.setText(String.format(Locale.getDefault(), "%d", bundle.getInt("maxPersons")));
+
+        TextView currentPersonsTextView = findViewById(R.id.event_metadata_current_persons);
+        currentPersonsTextView.setText(String.format(Locale.getDefault(), "%d", bundle.getInt("currentPersons")));
+
+        TextView mEventDescriptionTextView = findViewById(R.id.event_description_textview);
+        mEventDescriptionTextView.setText(bundle.getString("description"));
+    }
+
+    private void setUpTimeAndDate(Bundle bundle){
+        TextView startingTimeTextView = findViewById(R.id.event_metadata_starting_time);
+        TextView startingDateTextView = findViewById(R.id.event_metadata_starting_date);
+        TextView endingTimeTextView = findViewById(R.id.event_metadata_ending_time);
+        TextView endingDateTextView = findViewById(R.id.event_metadata_ending_date);
         long startingTime = bundle.getLong("startingTime");
         long endingTime = bundle.getLong("endingTime");
 
@@ -46,26 +63,22 @@ public class EventActivity extends AppCompatActivity {
         calendar.setTimeInMillis(startingTime);
         int startingHour = calendar.get(Calendar.HOUR_OF_DAY);
         int startingMinute = calendar.get(Calendar.MINUTE);
+        int startingYear = calendar.get(Calendar.YEAR);
+        int startingMonth = calendar.get(Calendar.MONTH) + 1;
+        int startingDay = calendar.get(Calendar.DAY_OF_MONTH);
 
         calendar.setTimeInMillis(endingTime);
         int endingHour = calendar.get(Calendar.HOUR_OF_DAY);
         int endingMinute = calendar.get(Calendar.MINUTE);
+        int endingYear = calendar.get(Calendar.YEAR);
+        int endingMonth = calendar.get(Calendar.MONTH) + 1;
+        int endingDay = calendar.get(Calendar.DAY_OF_MONTH);
 
-        mEventTimeTextView.setText(getResources().getString(R.string.activity_event_time,
-                startingHour,
-                startingMinute,
-                endingHour,
-                endingMinute));
-
-        TextView mEventPeopleTextView = findViewById(R.id.event_metadata_people);
-        mEventPeopleTextView.setText(getResources().getString(R.string.activity_event_people,
-                bundle.getInt("currentPersons"),
-                bundle.getInt("maxPersons")));
-
-        TextView mEventDescriptionTextView = findViewById(R.id.event_description_textview);
-        mEventDescriptionTextView.setText(bundle.getString("description"));
+        startingTimeTextView.setText(getResources().getString(R.string.activity_event_time, startingHour, startingMinute));
+        startingDateTextView.setText(getResources().getString(R.string.activity_event_date, startingDay, startingMonth, startingYear));
+        endingTimeTextView.setText(getResources().getString(R.string.activity_event_time, endingHour, endingMinute));
+        endingDateTextView.setText(getResources().getString(R.string.activity_event_date, endingDay, endingMonth, endingYear));
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

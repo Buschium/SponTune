@@ -4,7 +4,8 @@
     <string name="activity_main_menu_user">Profile</string>
     <string name="title_activity_event">EventActivity</string>
     <string name="action_settings">Settings</string>
-    <string name="activity_event_time">%02d:%02d - %02d:%02d Uhr</string>
+    <string name="activity_event_time">%02d:%02d Uhr</string>
+    <string name="activity_event_date">%02d.%02d.%4d</string>
     <string name="activity_event_people">Aktuell %d von max. %d Besuchern</string>
     <string name="join_event">Bin dabei!</string>
     <string name="title_activity_scrolling">ScrollingActivity</string>
@@ -20,4 +21,7 @@
     <string name="current_persons_text">Wie viele Besucher sind schon bei deinem Event?</string>
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
+    <string name="service_not_available">The background geocoding service is not available due to a network error or IO exception</string>
+    <string name="invalid_address_used">The address value that is provided was invalid</string>
+    <string name="no_location_found">The address could not be mapped to any known location</string>
 </resources>

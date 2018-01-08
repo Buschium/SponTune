@@ -38,7 +38,8 @@
                 android:inputType="textMultiLine"
                 android:maxLength="40"
                 android:scrollHorizontally="false"
-                android:textSize="24sp" />
+                android:textSize="24sp"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <EditText
                 android:id="@+id/input_description"
@@ -52,7 +53,7 @@
                 android:scrollHorizontally="false"
                 app:layout_constraintTop_toBottomOf="@+id/input_title" />
 
-            <EditText
+            <AutoCompleteTextView
                 android:id="@+id/input_address"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -74,6 +75,17 @@
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/input_address" />
 
+            <ImageView
+                android:id="@+id/starting_date_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/activity_event_date"
+                app:layout_constraintRight_toLeftOf="@+id/starting_date"
+                app:layout_constraintTop_toTopOf="@+id/starting_date"
+                app:layout_constraintBottom_toBottomOf="@+id/starting_date"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="5dp"/>
+
             <EditText
                 android:id="@+id/starting_date"
                 android:layout_width="wrap_content"
@@ -86,6 +98,17 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/input_address" />
 
+            <ImageView
+                android:id="@+id/starting_time_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/activity_event_time"
+                app:layout_constraintRight_toLeftOf="@+id/starting_time"
+                app:layout_constraintTop_toTopOf="@+id/starting_time"
+                app:layout_constraintBottom_toBottomOf="@+id/starting_time"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="5dp"/>
+
             <EditText
                 android:id="@+id/starting_time"
                 android:layout_width="wrap_content"
@@ -95,7 +118,7 @@
                 android:inputType="none"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                app:layout_constraintRight_toLeftOf="@id/starting_date"
+                app:layout_constraintRight_toLeftOf="@id/starting_date_image"
                 app:layout_constraintTop_toBottomOf="@+id/input_address" />
 
             <TextView
@@ -106,6 +129,17 @@
                 android:textSize="20sp"
                 app:layout_constraintBaseline_toBaselineOf="@+id/ending_date"
                 app:layout_constraintLeft_toLeftOf="parent" />
+
+            <ImageView
+                android:id="@+id/ending_date_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/activity_event_date"
+                app:layout_constraintRight_toLeftOf="@+id/ending_date"
+                app:layout_constraintTop_toTopOf="@+id/ending_date"
+                app:layout_constraintBottom_toBottomOf="@+id/ending_date"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="5dp"/>
 
             <EditText
                 android:id="@+id/ending_date"
@@ -119,6 +153,17 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/starting_date" />
 
+            <ImageView
+                android:id="@+id/ending_time_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/activity_event_time"
+                app:layout_constraintRight_toLeftOf="@+id/ending_time"
+                app:layout_constraintTop_toTopOf="@+id/ending_time"
+                app:layout_constraintBottom_toBottomOf="@+id/ending_time"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="5dp"/>
+
             <EditText
                 android:id="@+id/ending_time"
                 android:layout_width="wrap_content"
@@ -128,7 +173,7 @@
                 android:inputType="none"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                app:layout_constraintRight_toLeftOf="@id/ending_date"
+                app:layout_constraintRight_toLeftOf="@id/ending_date_image"
                 app:layout_constraintTop_toBottomOf="@+id/starting_time" />
 
             <TextView
