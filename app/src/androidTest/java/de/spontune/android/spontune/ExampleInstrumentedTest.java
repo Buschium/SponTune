@@ -1,4 +1,4 @@
-package com.spontune.android.spontune;
+package de.spontune.android.spontune;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="de.spontune.android.spontune.CreateActivity">
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/map_create"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/app_bar_height"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/scroll_view_create"
+        tools:context="de.spontune.android.spontune.CreateActivity" />
+
+    <ScrollView
+        android:id="@+id/scroll_view_create"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toTopOf="@+id/create_bottom_toolbar"
+        app:layout_constraintTop_toBottomOf="@+id/map_create">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/input_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:hint="@string/input_title"
+                android:inputType="textMultiLine"
+                android:maxLength="40"
+                android:scrollHorizontally="false"
+                android:textSize="24sp" />
+
+            <EditText
+                android:id="@+id/input_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:hint="@string/input_description"
+                android:inputType="textMultiLine"
+                android:lineSpacingExtra="2dp"
+                android:maxLength="2000"
+                android:scrollHorizontally="false"
+                app:layout_constraintTop_toBottomOf="@+id/input_title" />
+
+            <EditText
+                android:id="@+id/input_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:hint="@string/input_address"
+                android:inputType="textMultiLine"
+                android:lineSpacingExtra="2dp"
+                android:maxLength="2000"
+                android:scrollHorizontally="false"
+                app:layout_constraintTop_toBottomOf="@+id/input_description" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:text="@string/starting_time"
+                android:textSize="20sp"
+                app:layout_constraintBaseline_toBaselineOf="@+id/starting_date"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/input_address" />
+
+            <EditText
+                android:id="@+id/starting_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:editable="false"
+                android:inputType="none"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/input_address" />
+
+            <EditText
+                android:id="@+id/starting_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:editable="false"
+                android:inputType="none"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintRight_toLeftOf="@id/starting_date"
+                app:layout_constraintTop_toBottomOf="@+id/input_address" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:text="@string/ending_time"
+                android:textSize="20sp"
+                app:layout_constraintBaseline_toBaselineOf="@+id/ending_date"
+                app:layout_constraintLeft_toLeftOf="parent" />
+
+            <EditText
+                android:id="@+id/ending_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:editable="false"
+                android:inputType="none"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/starting_date" />
+
+            <EditText
+                android:id="@+id/ending_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:editable="false"
+                android:inputType="none"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintRight_toLeftOf="@id/ending_date"
+                app:layout_constraintTop_toBottomOf="@+id/starting_time" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:text="@string/max_persons_title"
+                android:textSize="20sp"
+                app:layout_constraintBaseline_toBaselineOf="@+id/max_persons"
+                app:layout_constraintLeft_toLeftOf="parent" />
+
+            <EditText
+                android:id="@+id/max_persons"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:editable="false"
+                android:inputType="none"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ending_date" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:text="@string/current_persons_title"
+                android:textSize="20sp"
+                app:layout_constraintBaseline_toBaselineOf="@+id/current_persons"
+                app:layout_constraintLeft_toLeftOf="parent" />
+
+            <EditText
+                android:id="@+id/current_persons"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:editable="false"
+                android:inputType="none"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/max_persons" />
+
+        </android.support.constraint.ConstraintLayout>
+
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/create_bottom_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/category_bar_height"
+        android:background="?attr/colorPrimary"
+        android:orientation="horizontal"
+        android:weightSum="5"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ImageButton
+            android:id="@+id/create_category_food_and_drink"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:paddingBottom="20dp"
+            android:paddingEnd="20dp"
+            android:paddingStart="20dp"
+            android:paddingTop="20dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/category_food_and_drink" />
+
+        <ImageButton
+            android:id="@+id/create_category_party"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:padding="20dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/category_party_deactivated" />
+
+        <ImageButton
+            android:id="@+id/create_category_music"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:padding="20dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/category_music_deactivated" />
+
+        <ImageButton
+            android:id="@+id/create_category_sports"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:padding="20dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/category_sports_deactivated" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/colorAccent">
+
+            <ImageButton
+                android:id="@+id/create_accept"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:background="?android:attr/selectableItemBackground"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="20dp"
+                android:paddingTop="20dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/activity_create_accept" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>
