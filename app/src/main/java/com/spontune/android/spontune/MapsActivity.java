@@ -440,6 +440,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
+    /**
+     * Handles clicks on (event-)markers on the map
+     * @param marker Clicked marker
+     * @return true if click was consumed, else false
+     */
     @Override
     public boolean onMarkerClick(Marker marker){
         if(marker.getTag() != null) {
@@ -466,6 +471,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         return false;
     }
+
 
     /**
      * Handles clicks on Points of Interest (POIs) on the map like stores, restaurants etc.
