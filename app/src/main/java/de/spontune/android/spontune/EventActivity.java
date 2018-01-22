@@ -1,22 +1,17 @@
 package de.spontune.android.spontune;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.NavUtils;
-import android.support.v4.app.TaskStackBuilder;
+import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.format.DateFormat;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.spontune.android.spontune.R;
-
-import org.w3c.dom.Text;
-
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
@@ -30,14 +25,62 @@ public class EventActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("");
-        setSupportActionBar(toolbar);
+        final Toolbar toolbar = findViewById(R.id.toolbar);
+        TextView toolbarTitle = findViewById(R.id.toolbar_title);
+        toolbarTitle.setText(bundle.getString("summary"));
+        ImageView categoryImage = findViewById(R.id.category_image);
+
+        ImageView toolbarImage = findViewById(R.id.toolbar_image);
+        switch (bundle.getInt("category")){
+            case 1:
+                toolbarImage.setBackgroundColor(getResources().getColor(R.color.foodAndDrink));
+                toolbarImage.setImageResource(R.drawable.category_food_and_drink_light);
+                break;
+            case 2:
+                toolbarImage.setBackgroundColor(getResources().getColor(R.color.party));
+                toolbarImage.setImageResource(R.drawable.category_party_light);
+                categoryImage.setImageResource(R.drawable.party_default);
+                break;
+            case 3:
+                toolbarImage.setBackgroundColor(getResources().getColor(R.color.music));
+                toolbarImage.setImageResource(R.drawable.category_music_light);
+                break;
+            default:
+                toolbarImage.setBackgroundColor(getResources().getColor(R.color.sports));
+                toolbarImage.setImageResource(R.drawable.category_sports_light);
+                break;
+        }
+
+        final Toolbar topToolbar = findViewById(R.id.toolbar_top);
+        topToolbar.setTitle("");
+        setSupportActionBar(topToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        AppBarLayout appBarLayout = findViewById(R.id.app_bar);
+        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            boolean isShow = false;
+            int scrollRange = -1;
+
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                if (scrollRange == -1) {
+                    scrollRange = appBarLayout.getTotalScrollRange();
+                }
+                if (scrollRange + verticalOffset == 0) {
+                    setSupportActionBar(toolbar);
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                    isShow = true;
+                } else if(isShow) {
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                    setSupportActionBar(topToolbar);
+                    isShow = false;
+                }
+            }
+        });
 
         Toolbar bottomToolbar = findViewById(R.id.event_toolbar_bottom);
         bottomToolbar.setPadding(0,0,0,0);
         bottomToolbar.setContentInsetsAbsolute(0,0);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         setUpTimeAndDate(bundle);
 
@@ -47,10 +90,23 @@ public class EventActivity extends AppCompatActivity {
         TextView currentPersonsTextView = findViewById(R.id.event_metadata_current_persons);
         currentPersonsTextView.setText(String.format(Locale.getDefault(), "%d", bundle.getInt("currentPersons")));
 
+        if(bundle.getString("address") != null) {
+            ImageView locationImageView = findViewById(R.id.location_image_view);
+            locationImageView.setVisibility(View.VISIBLE);
+            TextView locationTextView = findViewById(R.id.location_text_view);
+            locationTextView.setText(bundle.getString("address"));
+            locationTextView.setVisibility(View.VISIBLE);
+        }
+
         TextView mEventDescriptionTextView = findViewById(R.id.event_description_textview);
         mEventDescriptionTextView.setText(bundle.getString("description"));
     }
 
+
+    /**
+     * Converts the starting and ending times (which are stored in unix milliseconds on the database)
+     * to human-readable time formats.
+     */
     private void setUpTimeAndDate(Bundle bundle){
         TextView startingTimeTextView = findViewById(R.id.event_metadata_starting_time);
         TextView startingDateTextView = findViewById(R.id.event_metadata_starting_date);
@@ -60,24 +116,26 @@ public class EventActivity extends AppCompatActivity {
         long endingTime = bundle.getLong("endingTime");
 
         Calendar calendar = GregorianCalendar.getInstance();
-        calendar.setTimeInMillis(startingTime);
-        int startingHour = calendar.get(Calendar.HOUR_OF_DAY);
-        int startingMinute = calendar.get(Calendar.MINUTE);
-        int startingYear = calendar.get(Calendar.YEAR);
-        int startingMonth = calendar.get(Calendar.MONTH) + 1;
-        int startingDay = calendar.get(Calendar.DAY_OF_MONTH);
 
-        calendar.setTimeInMillis(endingTime);
-        int endingHour = calendar.get(Calendar.HOUR_OF_DAY);
-        int endingMinute = calendar.get(Calendar.MINUTE);
-        int endingYear = calendar.get(Calendar.YEAR);
-        int endingMonth = calendar.get(Calendar.MONTH) + 1;
-        int endingDay = calendar.get(Calendar.DAY_OF_MONTH);
+        Date startingDate = new Date(startingTime);
+        String startingDateString = DateFormat.getDateFormat(getApplicationContext()).format(startingDate);
+        String startingTimeString = DateFormat.getTimeFormat(getApplicationContext()).format(startingDate);
 
-        startingTimeTextView.setText(getResources().getString(R.string.activity_event_time, startingHour, startingMinute));
-        startingDateTextView.setText(getResources().getString(R.string.activity_event_date, startingDay, startingMonth, startingYear));
-        endingTimeTextView.setText(getResources().getString(R.string.activity_event_time, endingHour, endingMinute));
-        endingDateTextView.setText(getResources().getString(R.string.activity_event_date, endingDay, endingMonth, endingYear));
+        Date endingDate = new Date(endingTime);
+        String endingDateString = DateFormat.getDateFormat(getApplicationContext()).format(endingDate);
+        String endingTimeString = DateFormat.getTimeFormat(getApplicationContext()).format(endingTime);
+
+        startingTimeTextView.setText(startingTimeString);
+        endingTimeTextView.setText(endingTimeString);
+
+        if(calendar.get(Calendar.DAY_OF_MONTH) != startingDate.getDate() || startingDate.getDate() != endingDate.getDate()){
+            findViewById(R.id.image_view_starting_date).setVisibility(View.VISIBLE);
+            findViewById(R.id.image_view_ending_date).setVisibility(View.VISIBLE);
+            startingDateTextView.setText(startingDateString);
+            startingDateTextView.setVisibility(View.VISIBLE);
+            endingDateTextView.setText(endingDateString);
+            endingDateTextView.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -85,21 +143,7 @@ public class EventActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
-                Intent upIntent = NavUtils.getParentActivityIntent(this);
-                if (NavUtils.shouldUpRecreateTask(this, upIntent)) {
-                    // This activity is NOT part of this app's task, so create a new task
-                    // when navigating up, with a synthesized back stack.
-                    TaskStackBuilder.create(this)
-                            // Add all of this activity's parents to the back stack
-                            .addNextIntentWithParentStack(upIntent)
-                            // Navigate up to the closest parent
-                            .startActivities();
-                } else {
-                    // This activity is part of this app's task, so simply
-                    // navigate up to the logical parent activity.
-                    NavUtils.navigateUpTo(this, upIntent);
-                }
-                return true;
+                finish();
         }
         return super.onOptionsItemSelected(item);
     }

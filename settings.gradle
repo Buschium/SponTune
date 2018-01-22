@@ -1,1 +1,1 @@
-include ':app', ':jcoord-1.1-b'
+include ':app'

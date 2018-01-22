@@ -6,24 +6,51 @@
     android:layout_height="match_parent"
     tools:context="de.spontune.android.spontune.CreateActivity">
 
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/map_create"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/coordinator_layout"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/app_bar_height"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/scroll_view_create"
-        tools:context="de.spontune.android.spontune.CreateActivity" />
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
 
-    <ScrollView
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/create_bar_height"
+        android:fitsSystemWindows="true"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/toolbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            app:contentScrim="?attr/colorPrimary"
+            app:layout_scrollFlags="snap|scroll|exitUntilCollapsed"
+            app:toolbarId="@+id/toolbar">
+
+            <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/map_create"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/create_bar_height"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/scroll_view_create"
+                tools:context="de.spontune.android.spontune.CreateActivity" />
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.NestedScrollView
         android:id="@+id/scroll_view_create"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:scrollbars="none"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layout_constraintBottom_toTopOf="@+id/create_bottom_toolbar"
-        app:layout_constraintTop_toBottomOf="@+id/map_create">
+        app:layout_constraintTop_toBottomOf="@+id/app_bar">
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
@@ -38,7 +65,7 @@
                 android:inputType="textMultiLine"
                 android:maxLength="40"
                 android:scrollHorizontally="false"
-                android:textSize="24sp"
+                android:textSize="20sp"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <EditText
@@ -51,7 +78,8 @@
                 android:lineSpacingExtra="2dp"
                 android:maxLength="2000"
                 android:scrollHorizontally="false"
-                app:layout_constraintTop_toBottomOf="@+id/input_title" />
+                android:textSize="20sp"
+                app:layout_constraintTop_toBottomOf="@+id/input_title"/>
 
             <AutoCompleteTextView
                 android:id="@+id/input_address"
@@ -62,6 +90,7 @@
                 android:inputType="textMultiLine"
                 android:lineSpacingExtra="2dp"
                 android:maxLength="2000"
+                android:textSize="20sp"
                 android:scrollHorizontally="false"
                 app:layout_constraintTop_toBottomOf="@+id/input_description" />
 
@@ -70,9 +99,9 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="20dp"
                 android:text="@string/starting_time"
-                android:textSize="20sp"
+                android:textSize="16sp"
                 app:layout_constraintBaseline_toBaselineOf="@+id/starting_date"
-                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/input_address" />
 
             <ImageView
@@ -80,7 +109,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/activity_event_date"
-                app:layout_constraintRight_toLeftOf="@+id/starting_date"
+                app:layout_constraintEnd_toStartOf="@+id/starting_date"
                 app:layout_constraintTop_toTopOf="@+id/starting_date"
                 app:layout_constraintBottom_toBottomOf="@+id/starting_date"
                 android:layout_marginStart="10dp"
@@ -93,9 +122,9 @@
                 android:layout_margin="15dp"
                 android:editable="false"
                 android:inputType="none"
-                android:textSize="20sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
-                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/input_address" />
 
             <ImageView
@@ -103,7 +132,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/activity_event_time"
-                app:layout_constraintRight_toLeftOf="@+id/starting_time"
+                app:layout_constraintEnd_toStartOf="@+id/starting_time"
                 app:layout_constraintTop_toTopOf="@+id/starting_time"
                 app:layout_constraintBottom_toBottomOf="@+id/starting_time"
                 android:layout_marginStart="10dp"
@@ -116,9 +145,9 @@
                 android:layout_margin="15dp"
                 android:editable="false"
                 android:inputType="none"
-                android:textSize="20sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
-                app:layout_constraintRight_toLeftOf="@id/starting_date_image"
+                app:layout_constraintEnd_toStartOf="@id/starting_date_image"
                 app:layout_constraintTop_toBottomOf="@+id/input_address" />
 
             <TextView
@@ -126,16 +155,16 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="20dp"
                 android:text="@string/ending_time"
-                android:textSize="20sp"
+                android:textSize="16sp"
                 app:layout_constraintBaseline_toBaselineOf="@+id/ending_date"
-                app:layout_constraintLeft_toLeftOf="parent" />
+                app:layout_constraintStart_toStartOf="parent" />
 
             <ImageView
                 android:id="@+id/ending_date_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/activity_event_date"
-                app:layout_constraintRight_toLeftOf="@+id/ending_date"
+                app:layout_constraintEnd_toStartOf="@+id/ending_date"
                 app:layout_constraintTop_toTopOf="@+id/ending_date"
                 app:layout_constraintBottom_toBottomOf="@+id/ending_date"
                 android:layout_marginStart="10dp"
@@ -148,9 +177,9 @@
                 android:layout_margin="15dp"
                 android:editable="false"
                 android:inputType="none"
-                android:textSize="20sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
-                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/starting_date" />
 
             <ImageView
@@ -158,7 +187,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/activity_event_time"
-                app:layout_constraintRight_toLeftOf="@+id/ending_time"
+                app:layout_constraintEnd_toStartOf="@+id/ending_time"
                 app:layout_constraintTop_toTopOf="@+id/ending_time"
                 app:layout_constraintBottom_toBottomOf="@+id/ending_time"
                 android:layout_marginStart="10dp"
@@ -171,9 +200,9 @@
                 android:layout_margin="15dp"
                 android:editable="false"
                 android:inputType="none"
-                android:textSize="20sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
-                app:layout_constraintRight_toLeftOf="@id/ending_date_image"
+                app:layout_constraintEnd_toStartOf="@id/ending_date_image"
                 app:layout_constraintTop_toBottomOf="@+id/starting_time" />
 
             <TextView
@@ -181,9 +210,9 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="20dp"
                 android:text="@string/max_persons_title"
-                android:textSize="20sp"
+                android:textSize="16sp"
                 app:layout_constraintBaseline_toBaselineOf="@+id/max_persons"
-                app:layout_constraintLeft_toLeftOf="parent" />
+                app:layout_constraintStart_toStartOf="parent" />
 
             <EditText
                 android:id="@+id/max_persons"
@@ -192,9 +221,9 @@
                 android:layout_margin="15dp"
                 android:editable="false"
                 android:inputType="none"
-                android:textSize="20sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
-                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/ending_date" />
 
             <TextView
@@ -202,9 +231,9 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="20dp"
                 android:text="@string/current_persons_title"
-                android:textSize="20sp"
+                android:textSize="16sp"
                 app:layout_constraintBaseline_toBaselineOf="@+id/current_persons"
-                app:layout_constraintLeft_toLeftOf="parent" />
+                app:layout_constraintStart_toStartOf="parent" />
 
             <EditText
                 android:id="@+id/current_persons"
@@ -213,14 +242,16 @@
                 android:layout_margin="15dp"
                 android:editable="false"
                 android:inputType="none"
-                android:textSize="20sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/max_persons" />
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/max_persons"/>
 
         </android.support.constraint.ConstraintLayout>
 
-    </ScrollView>
+    </android.support.v4.widget.NestedScrollView>
+
+    </android.support.design.widget.CoordinatorLayout>
 
     <LinearLayout
         android:id="@+id/create_bottom_toolbar"

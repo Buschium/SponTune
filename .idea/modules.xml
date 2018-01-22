@@ -4,7 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SponTune.iml" filepath="$PROJECT_DIR$/SponTune.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/jcoord-1.1-b/jcoord-1.1-b.iml" filepath="$PROJECT_DIR$/jcoord-1.1-b/jcoord-1.1-b.iml" />
     </modules>
   </component>
 </project>

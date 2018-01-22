@@ -10,11 +10,11 @@ import android.support.v4.app.JobIntentService;
 import android.os.ResultReceiver;
 import android.util.Log;
 
-import com.spontune.android.spontune.R;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+
+import de.spontune.android.spontune.R;
 
 public class FetchLocationIntentService extends JobIntentService {
 

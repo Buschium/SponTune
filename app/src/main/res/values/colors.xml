@@ -4,4 +4,9 @@
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#00BFFF</color>
     <color name="white">#FFFFFF</color>
+    <color name="red">#FF0000</color>
+    <color name="party">#FF0000</color>
+    <color name="foodAndDrink">#FFFF00</color>
+    <color name="sports">#000080</color>
+    <color name="music">#AAFFCC</color>
 </resources>

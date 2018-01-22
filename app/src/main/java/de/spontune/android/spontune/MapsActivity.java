@@ -53,7 +53,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.spontune.android.spontune.R;
 
 import de.spontune.android.spontune.Data.Event;
 
@@ -67,11 +66,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private static final String LOG_TAG = MapsActivity.class.getSimpleName();
 
+    //Google Maps API stuff
     private static GoogleMap mMap;
     private CameraPosition mCameraPosition;
     private FusedLocationProviderClient mFusedLocationProviderClient;
 
-    //Set the seminary room as default location to make it look like it worked when something goes wrong
+    //Set the seminary room as default location to make it look like it worked when something goes wrong ;)
     private static final LatLng mDefaultLocation = new LatLng(48.1500593,11.5662206);
     private static final int DEFAULT_ZOOM = 15;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
@@ -95,19 +95,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ImageButton mButtonParty;
     private ImageButton mButtonMusic;
     private ImageButton mButtonSports;
-    private ImageButton mButtonAdd;
 
-    private static FirebaseDatabase mFirebaseDatabase;
-    private static DatabaseReference mMessagesDatabaseReference;
+    //Firebase stuff
+    private static DatabaseReference mEventsDatabaseReference;
     private static ChildEventListener mChildEventListener;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
-    private String mUserID;
-    private static final int RC_SIGN_IN = 123;
+    private static final int RC_SIGN_IN = 123; //Request code for the Firebase UI sign in
 
-    private ArrayList<Event> selectedEvents = new ArrayList<>();
-    private ArrayList<Event> deselectedEvents = new ArrayList<>();
-    private boolean lock = false;
+    //Lists of currently selected and unselected events
+    private ArrayList<Event> mSelectedEvents = new ArrayList<>();
+    private ArrayList<Event> mUnselectedEvents = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,9 +115,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         //Set up Firebase
         FirebaseApp.initializeApp(this);
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         mFirebaseAuth = FirebaseAuth.getInstance();
-        mMessagesDatabaseReference = mFirebaseDatabase.getReference().child("events");
+        mEventsDatabaseReference = firebaseDatabase.getReference().child("events");
 
         //Set up category buttons and action bar
         setUpActionBar();
@@ -139,13 +137,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Get the map fragment and jump to onMapReady when the map is set up
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this); //calls onMapReady
+        setUpAuthStateListener();
+    }
 
+
+    /**
+     * Set up the Firebase AuthStateListener for initializing the sign in if the user is currently
+     * not logged in.
+     */
+    private void setUpAuthStateListener(){
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if(user != null){
-                    onSignedInInitialize(user);
+                    onSignedInInitialize();
                     Toast.makeText(MapsActivity.this, "Hallo, " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
                 }else{
                     onSignedOutCleanup();
@@ -164,37 +170,48 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
+    /**
+     * What to do when the user cancels the sign-in process.
+     * As of now, he will be taken back to the main screen and the connection to the Firebase
+     * database will be interrupted.
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == RC_SIGN_IN){
             if(resultCode == RESULT_CANCELED){
+                onSignedOutCleanup();
                 Toast.makeText(this, "Anmeldung abgebrochen", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
 
+    /**
+     * Interrupts the connection to the Firebase database if the user is not signed in.
+     */
     private void onSignedOutCleanup() {
         mMap.clear();
         if(mChildEventListener != null) {
-            mMessagesDatabaseReference.removeEventListener(mChildEventListener);
+            mEventsDatabaseReference.removeEventListener(mChildEventListener);
             mChildEventListener = null;
         }
     }
 
 
-    private void onSignedInInitialize(FirebaseUser user) {
-        mUserID = user.getUid();
+    /**
+     * If the user is signed in, connect to the Firebase database and retrieve events.
+     */
+    private void onSignedInInitialize() {
         if(mChildEventListener == null) {
             mChildEventListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    if(!lock) {
-                        Event event = dataSnapshot.getValue(Event.class);
-                        selectedEvents.add(event);
-                        updateEventMarkers();
-                    }
+                    Event event = dataSnapshot.getValue(Event.class);
+                    assert event != null;
+                    event.setID(dataSnapshot.getKey());
+                    mSelectedEvents.add(event);
+                    updateSelectedEvents();
                 }
 
                 @Override
@@ -217,14 +234,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 }
             };
-
-            mMessagesDatabaseReference.addChildEventListener(mChildEventListener);
         }
+        mEventsDatabaseReference.addChildEventListener(mChildEventListener);
     }
 
 
     /**
-     * Sets up the action bar with the list and profile buttons on top of the screen
+     * Sets up the action bar with the list and profile buttons on top of the screen.
      */
     private void setUpActionBar(){
         //Toast to show when the user tries to use a function that hasn't been implemented yet
@@ -243,17 +259,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             mParent.setPadding(0,0,0,0);
             mParent.setContentInsetsAbsolute(0,0);
 
-            final ImageButton mButtonList = customView.findViewById(R.id.action_list);
-            mButtonList.setOnClickListener(new View.OnClickListener() {
+            final ImageButton buttonList = customView.findViewById(R.id.action_list);
+            buttonList.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    //TODO create event list activity and intent that activity with this button
-                    mToast.show();
+                    Intent intent = new Intent(MapsActivity.this, ListActivity.class);
+                    startActivity(intent);
                 }
             });
 
-            final ImageButton mButtonProfile = customView.findViewById(R.id.action_user_profile);
-            mButtonProfile.setOnClickListener(new View.OnClickListener() {
+            final ImageButton buttonProfile = customView.findViewById(R.id.action_user_profile);
+            buttonProfile.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     //TODO create user profile activity and intent that activity with this button
@@ -265,9 +281,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     /**
-     * Sets up the logic for the category buttons on the bottom of the screen
-     * If all categories are deactivated (un-selected), the system acts like all categories are selected
-     * By default, all categories are deactivated
+     * Sets up the logic for the category buttons on the bottom of the screen.
+     * If all categories are deactivated (un-selected), the system acts like all categories are selected.
+     * By default, all categories are deactivated.
      */
     private void setUpCategoryButtons(){
         Toolbar mBottomToolbar = findViewById(R.id.toolbar_bottom);
@@ -278,7 +294,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mButtonParty = findViewById(R.id.action_category_party);
         mButtonMusic = findViewById(R.id.action_category_music);
         mButtonSports = findViewById(R.id.action_category_sports);
-        mButtonAdd = findViewById(R.id.add_event);
+        ImageButton buttonAdd = findViewById(R.id.add_event);
 
         mButtonFoodAndDrink.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -320,7 +336,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-        mButtonAdd.setOnClickListener(new View.OnClickListener() {
+        buttonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(MapsActivity.this, CreateActivity.class);
@@ -332,7 +348,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     /**
-     * Saves the state of the map when the activity is exited (not halted)
+     * Saves the state of the map when the activity is exited (not halted).
      */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -345,34 +361,37 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     /**
-     * When the map is ready, get the location permission, update the map UI and set the camera to the current position
+     * When the map is ready, get the location permission, update the map UI and set the camera to the current position.
      * @param googleMap Map created by some mysterious forces
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        getLocationPermission();
-        updateLocationUI();
-        getDeviceLocation();
+        if(getLocationPermission()){
+            updateLocationUI();
+            getDeviceLocation();
+        }
         mMap.setOnPoiClickListener(this);
         mMap.setOnMarkerClickListener(this);
     }
 
 
     /**
-     * Requests the location permission from the user
+     * Requests the location permission from the user.
      */
-    private void getLocationPermission(){
+    private boolean getLocationPermission(){
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
+            return true;
         } else {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+            return false;
         }
     }
 
 
     /**
-     * Mandatory part of the run time permission request system implemented with Android 6.0 (API level 23)
+     * Mandatory part of the run time permission request system implemented with Android 6.0 (API level 23).
      * @param requestCode code of the request sent. Always PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION for now
      * @param permissions permissions requested
      * @param grantResults permissions granted
@@ -386,19 +405,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 // If request is denied, the result arrays are empty
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mLocationPermissionGranted = true;
+                    setUpAuthStateListener();
+                    updateLocationUI();
+                    getDeviceLocation();
                 }else{
                     //The app is not going to work without location permission, so we'll just kill it for now (HAS to be changed)
-                    //TODO: replacement for the brute force murder of the app
-                    System.exit(0);
+                    System.exit(1);
                 }
             }
         }
-        updateLocationUI();
     }
 
 
     /**
-     * Update the UI of the map (actually, just enable the "My Location"-Button)
+     * Update the UI of the map (actually, just enable the "My Location"-Button).
      */
     private void updateLocationUI() {
         if (mMap == null) {
@@ -422,7 +442,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     /**
-     * Get the current device location
+     * Get the current device location.
      */
     private void getDeviceLocation() {
         try {
@@ -435,11 +455,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         if (task.isSuccessful() && task.getResult() != null) {
                             // Set the map's camera position to the current location of the device.
                             mLastKnownLocation = task.getResult();
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
                         } else {
                             Log.d(LOG_TAG, "Current location is null. Using defaults.");
                             Log.e(LOG_TAG, "Exception: " + task.getException());
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
                         }
                     }
                 });
@@ -450,41 +470,48 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
+    /**
+     * Updates the lists of selected and unselected events after the user presses one of the
+     * category buttons.
+     */
     private void updateSelectedEvents(){
-        lock = true;
-        for(Event event : selectedEvents){
+        for(int i = 0; i < mSelectedEvents.size(); i++){
+            Event event = mSelectedEvents.get(i);
             int cat = event.getCategory();
-            if(cat == 1 && !mFoodAndDrinkActivated
+            if((cat == 1 && !mFoodAndDrinkActivated
                     || cat == 2 && !mPartyActivated
                     || cat == 3 && !mMusicActivated
-                    || cat == 4 && !mSportsActivated){
-                deselectedEvents.add(event);
-                selectedEvents.remove(event);
+                    || cat == 4 && !mSportsActivated)
+                    && !noCategoryActivated()){
+                mUnselectedEvents.add(event);
+                mSelectedEvents.remove(event);
+                i--;
             }
         }
 
-        for(Event event : deselectedEvents){
+        for(int i = 0; i < mUnselectedEvents.size(); i++){
+            Event event = mUnselectedEvents.get(i);
             int cat = event.getCategory();
             if(cat == 1 && mFoodAndDrinkActivated
                     || cat == 2 && mPartyActivated
                     || cat == 3 && mMusicActivated
                     || cat == 4 && mSportsActivated
                     || noCategoryActivated()){
-                deselectedEvents.remove(event);
-                selectedEvents.add(event);
+                mUnselectedEvents.remove(event);
+                mSelectedEvents.add(event);
+                i--;
             }
         }
-        lock = false;
         updateEventMarkers();
     }
 
 
     /**
-     * Updates the event markers on the map based on selected categories and fetches new events from the database
+     * Updates the event markers on the map based on selected categories.
      */
     private void updateEventMarkers(){
         mMap.clear();
-        for(Event event : selectedEvents){
+        for(Event event : mSelectedEvents){
             Resources r = getResources();
             Drawable[] layers = new Drawable[3];
             Bitmap center;
@@ -538,7 +565,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     /**
-     * Transforms a VectorDrawable into a Bitmap
+     * Transforms a VectorDrawable into a Bitmap.
      * @param vectorDrawable the SVG to convert
      * @return a Bitmap
      */
@@ -563,7 +590,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     /**
-     * @param context current context
+     * @param context current context.
      * @param vectorResId resource ID of the vector graphic
      * @return BitmapDescriptor from a locally saved vector graphic
      */
@@ -590,7 +617,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     /**
-     * Greys out category buttons based on which categories are selected
+     * Greys out category buttons based on which categories are selected.
      */
     private void toggleButtonsGreyed(){
         Drawable foodAndDrinkIcon = this.getResources().getDrawable(R.drawable.category_food_and_drink);
@@ -624,7 +651,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     /**
-     * Handles clicks on (event-)markers on the map
+     * Handles clicks on (event-)markers on the map.
      * @param marker Clicked marker
      * @return true if click was consumed, else false
      */
@@ -633,7 +660,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if(marker.getTag() != null) {
             String clickedEventID = (String) marker.getTag();
             Event clickedEvent = null;
-            for(Event event : selectedEvents){
+            for(Event event : mSelectedEvents){
                 if(event.getID().equals(marker.getTag())){
                     clickedEvent = event;
                 }
@@ -653,6 +680,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 b.putInt("category", clickedEvent.getCategory());
                 b.putInt("maxPersons", clickedEvent.getMaxPersons());
                 b.putInt("currentPersons", clickedEvent.getCurrentPersons());
+                b.putString("address", clickedEvent.getAddress());
                 i.putExtras(b);
                 startActivity(i);
             }
@@ -675,7 +703,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     /**
-     * Checks whether no category is selected
+     * Checks whether no category is selected.
      * @return true if no category is selected
      */
     private boolean noCategoryActivated(){
@@ -684,7 +712,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     /**
-     * Checks whether all categories are selected
+     * Checks whether all categories are selected.
      * @return true if all categories are selected
      */
     private boolean everyCategoryActivated(){
@@ -693,7 +721,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     /**
-     * Un-selects all categories and thus puts category system back in idle mode
+     * Un-selects all categories and thus puts category system back in idle mode.
      */
     private void setAllButtonsFalse(){
         mFoodAndDrinkActivated = false;
@@ -713,8 +741,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
         if(mChildEventListener != null) {
-            mMessagesDatabaseReference.removeEventListener(mChildEventListener);
-            mChildEventListener = null;
+            mEventsDatabaseReference.removeEventListener(mChildEventListener);
         }
     }
 
@@ -722,18 +749,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onResume(){
         super.onResume();
+        mSelectedEvents = new ArrayList<>();
         if(mCameraPosition != null) {
             mMap.moveCamera(CameraUpdateFactory.newCameraPosition(mCameraPosition));
         }
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
-    }
-
-    public GoogleMap getmMap(){
-        return mMap;
-    }
-
-    public static Location getmLastKnownLocation(){
-        return mLastKnownLocation;
     }
 
 }

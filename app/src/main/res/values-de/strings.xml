@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SponTune</string>
+    <string name="input_title">TITEL</string>
+    <string name="input_description">Beschreibung</string>
+    <string name="input_address">Adresse (optional)</string>
+    <string name="starting_time">Start</string>
+    <string name="ending_time">Ende</string>
+    <string name="max_persons_title">Max. Teilnehmer</string>
+    <string name="max_persons_text">Lege die maximale Anzahl an Teilnehmern  für dein Event fest</string>
+    <string name="current_persons_title">Aktuelle Teilnehmer</string>
+    <string name="current_persons_text">Wie viele Teilnehmer sind schon bei deinem Event?</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="ok">OK</string>
+    <string name="no_title_input">Dein Event muss einen Titel haben</string>
+    <string name="no_description_input">Dein Event muss eine Beschreibung haben</string>
+    <string name="join_event">Bin Dabei!</string>
+    <string name="new_event">Neues Event</string>
+    <string name="starting_time_over">Dein Event kann nicht in der Vergangenheit beginnen</string>
+    <string name="ending_time_before_starting_time">Dein Event kann nicht enden bevor es begonnen hat</string>
+    <string name="today">Heute</string>
+    <string name="tomorrow">Morgen</string>
+    <string name="week">Woche</string>
+</resources>

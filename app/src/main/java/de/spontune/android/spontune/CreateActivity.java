@@ -3,6 +3,7 @@ package de.spontune.android.spontune;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
@@ -11,9 +12,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
 import android.support.annotation.NonNull;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -23,7 +30,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.NumberPicker;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,13 +48,13 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import com.spontune.android.spontune.R;
-
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
@@ -68,7 +74,7 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
     private static FirebaseAuth mFirebaseAuth;
     private static DatabaseReference mDatabaseReference;
     private static GoogleMap mMap;
-    private static PlacesAutoCompleteAdapter mAdapter;
+    private PlacesAutoCompleteAdapter mAdapter;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private Location mLastKnownLocation;
     private GeoDataClient mGeoDataClient;
@@ -81,10 +87,6 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
     private String mUserID;
     private String title;
     private String description;
-    private String startingTime;
-    private String startingDate;
-    private String endingTime;
-    private String endingDate;
     private int maxPersons = 10;
     private int currentPersons = 1;
     private int selectedCategory = 1;
@@ -101,7 +103,6 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
     private EditText mEndingTimeEdit;
     private EditText mMaxPersons;
     private EditText mCurrentPersons;
-    private ScrollView mScrollView;
 
     //category buttons
     private ImageButton mButtonFoodAndDrink;
@@ -121,9 +122,9 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
         setContentView(R.layout.activity_create);
 
         if(getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("Neues Event");
+            getSupportActionBar().setTitle(getResources().getString(R.string.new_event));
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-        mScrollView = findViewById(R.id.scroll_view_create);
 
         //Set up the FireBase reference and get the UID
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -136,6 +137,17 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
             Toast.makeText(this, "Authentifizierungsfehler", Toast.LENGTH_SHORT).show();
             finish();
         }
+
+        AppBarLayout appBar = findViewById(R.id.app_bar);
+        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBar.getLayoutParams();
+        AppBarLayout.Behavior behavior = new AppBarLayout.Behavior();
+        behavior.setDragCallback(new AppBarLayout.Behavior.DragCallback() {
+            @Override
+            public boolean canDrag(AppBarLayout appBarLayout) {
+                return false;
+            }
+        });
+        params.setBehavior(behavior);
 
         //Get a Fused Location Provider Client
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -161,32 +173,19 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
 
         //By default, the new event is going to take place at the creator's current position
         getDeviceLocation();
-        if(mLastKnownLocation != null) {
-            lat = mLastKnownLocation.getLatitude();
-            lng = mLastKnownLocation.getLongitude();
-        }else{
-            lat = mDefaultLocation.latitude;
-            lng = mDefaultLocation.longitude;
-        }
-        updateEventMarker();
     }
 
 
     /**
-     * Set up the input fields for the starting time and starting date
+     * Set up the input fields for the starting time and starting date.
      */
     private void setUpStartingButtons(){
         mStartingDateEdit = findViewById(R.id.starting_date);
         mStartingTimeEdit = findViewById(R.id.starting_time);
+        Date startingDate = new Date(mStartingCalendar.getTimeInMillis());
 
-        mStartingDateEdit.setText(String.format(Locale.GERMAN, "%02d. %02d. %4d",
-                mStartingCalendar.get(Calendar.DAY_OF_MONTH),
-                mStartingCalendar.get(Calendar.MONTH) + 1,
-                mStartingCalendar.get(Calendar.YEAR)));
-
-        mStartingTimeEdit.setText(String.format(Locale.GERMAN, "%02d:%02d Uhr",
-                mStartingCalendar.get(Calendar.HOUR_OF_DAY),
-                mStartingCalendar.get(Calendar.MINUTE)));
+        mStartingDateEdit.setText(DateFormat.getDateFormat(getApplicationContext()).format(startingDate));
+        mStartingTimeEdit.setText(DateFormat.getTimeFormat(getApplicationContext()).format(startingDate));
 
         mStartingDateEdit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -223,23 +222,17 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
 
 
     /**
-     * Set up the input fields for the ending time and ending date
+     * Set up the input fields for the ending time and ending date.
      */
     private void setUpEndingButtons(){
         mEndingCalendar.add(Calendar.HOUR, 1);
         mEndingCalendar.add(Calendar.MINUTE, 30);
+        Date endingDate = new Date(mEndingCalendar.getTimeInMillis());
 
         mEndingDateEdit = findViewById(R.id.ending_date);
         mEndingTimeEdit = findViewById(R.id.ending_time);
-
-        mEndingDateEdit.setText(String.format(Locale.GERMAN, "%02d. %02d. %4d",
-                mEndingCalendar.get(Calendar.DAY_OF_MONTH),
-                mEndingCalendar.get(Calendar.MONTH) + 1,
-                mEndingCalendar.get(Calendar.YEAR)));
-
-        mEndingTimeEdit.setText(String.format(Locale.GERMAN, "%02d:%02d Uhr",
-                mEndingCalendar.get(Calendar.HOUR_OF_DAY),
-                mEndingCalendar.get(Calendar.MINUTE)));
+        mEndingDateEdit.setText(DateFormat.getDateFormat(getApplicationContext()).format(endingDate));
+        mEndingTimeEdit.setText(DateFormat.getTimeFormat(getApplicationContext()).format(endingDate));
 
         mEndingDateEdit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -276,7 +269,7 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
 
 
     /**
-     * Set up the input fields for the maximum number of visitors and the current number of visitors
+     * Set up the input fields for the maximum number of visitors and the current number of visitors.
      */
     private void setUpVisitorButtons(){
         mMaxPersons = findViewById(R.id.max_persons);
@@ -313,15 +306,17 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
         mCurrentPersons.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
-                isMaxPersons = false;
-                showNumberPickerDialog();
+                if(hasFocus) {
+                    isMaxPersons = false;
+                    showNumberPickerDialog();
+                }
             }
         });
     }
 
 
     /**
-     * Set up the buttons for selecting the category the new event should belong to
+     * Set up the buttons for selecting the category the new event should belong to.
      */
     private void setUpCategoryButtons(){
         mButtonFoodAndDrink = findViewById(R.id.create_category_food_and_drink);
@@ -368,33 +363,90 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
 
 
     /**
-     * Set up the button for creating the new event, writing it to the database and leaving the create view
+     * Set up the button for creating the new event, writing it to the database and leaving the create view.
+     * It also inspects the input, assuring that all requirements are met.
      */
     private void setUpAcceptButton(){
         ImageButton acceptButton = findViewById(R.id.create_accept);
         acceptButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                final EditText inputTitle = findViewById(R.id.input_title);
+                final EditText inputDescription = findViewById(R.id.input_description);
+                Calendar now = GregorianCalendar.getInstance();
+                title = inputTitle.getText().toString();
+                description = inputDescription.getText().toString();
                 long startingTime = getUnixTime(mStartingCalendar);
                 long endingTime = getUnixTime(mEndingCalendar);
 
-                EditText inputTitle = findViewById(R.id.input_title);
-                EditText inputDescription = findViewById(R.id.input_description);
-                AutoCompleteTextView inputAddress = findViewById(R.id.input_address);
-                title = inputTitle.getText().toString();
-                description = inputDescription.getText().toString();
-                String address = inputAddress.getText().toString();
+                if(title.equals("") || title == null) {
+                    Snackbar.make(view, getResources().getString(R.string.no_title_input), Snackbar.LENGTH_LONG).show();
+                    inputTitle.getBackground().setColorFilter(getResources().getColor(R.color.red), PorterDuff.Mode.SRC_ATOP);
+                    inputTitle.requestFocus();
+                    inputTitle.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-                if(address.equals("")){
-                    address = null;
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                            if(!charSequence.equals("")){
+                                inputTitle.getBackground().setColorFilter(null);
+                            }else{
+                                inputTitle.getBackground().setColorFilter(getResources().getColor(R.color.red), PorterDuff.Mode.SRC_ATOP);
+                            }
+                        }
+
+                        @Override
+                        public void afterTextChanged(Editable editable) {
+
+                        }
+                    });
+                }else if(description.equals("") || description == null) {
+                    Snackbar.make(view, getResources().getString(R.string.no_description_input), Snackbar.LENGTH_LONG).show();
+                    inputDescription.getBackground().setColorFilter(getResources().getColor(R.color.red), PorterDuff.Mode.SRC_ATOP);
+                    inputDescription.requestFocus();
+                    inputDescription.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                            if (!charSequence.equals("")) {
+                                inputDescription.getBackground().setColorFilter(null);
+                            } else {
+                                inputDescription.getBackground().setColorFilter(getResources().getColor(R.color.red), PorterDuff.Mode.SRC_ATOP);
+                            }
+                        }
+
+                        @Override
+                        public void afterTextChanged(Editable editable) {
+
+                        }
+                    });
+                }else if(startingTime <= now.getTimeInMillis()) {
+                    Snackbar.make(view, getResources().getString(R.string.starting_time_over), Snackbar.LENGTH_LONG).show();
+                    mStartingTimeEdit.getBackground().setColorFilter(getResources().getColor(R.color.red), PorterDuff.Mode.SRC_ATOP);
+                    mStartingDateEdit.getBackground().setColorFilter(getResources().getColor(R.color.red), PorterDuff.Mode.SRC_ATOP);
+                }else if(endingTime <= startingTime){
+                    Snackbar.make(view, getResources().getString(R.string.ending_time_before_starting_time), Snackbar.LENGTH_LONG).show();
+                    mEndingTimeEdit.getBackground().setColorFilter(getResources().getColor(R.color.red), PorterDuff.Mode.SRC_ATOP);
+                    mEndingDateEdit.getBackground().setColorFilter(getResources().getColor(R.color.red), PorterDuff.Mode.SRC_ATOP);
+                }else {
+                    AutoCompleteTextView inputAddress = findViewById(R.id.input_address);
+                    String address = inputAddress.getText().toString();
+                    if (address.equals("")) {
+                        address = null;
+                    }
+
+                    Event event = new Event(lat, lng, mUserID, title, description, startingTime, endingTime, selectedCategory, maxPersons, currentPersons, address);
+                    String key = mDatabaseReference.push().getKey();
+                    mDatabaseReference.child(key).setValue(event);
+                    finish();
                 }
-
-                Event event = new Event(lat, lng, mUserID, title, description, startingTime,
-                        endingTime, selectedCategory, maxPersons, currentPersons, address);
-                String key = mDatabaseReference.push().getKey();
-                event.setID(key);
-                mDatabaseReference.child(key).setValue(event);
-                finish();
             }
         });
     }
@@ -567,8 +619,8 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
         assert np != null;
 
         if(!isMaxPersons){
-            TextView title = findViewById(R.id.number_picker_title);
-            TextView text = findViewById(R.id.number_picker_text);
+            TextView title = view.findViewById(R.id.number_picker_title);
+            TextView text = view.findViewById(R.id.number_picker_text);
             title.setText(R.string.current_persons_title);
             text.setText(R.string.current_persons_text);
         }
@@ -613,36 +665,39 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
      */
     @Override
     public void onFinishPickDateDialog(int year, int month, int day){
-        String date = String.format(Locale.GERMAN, "%02d. %02d. %4d", day, month + 1, year);
         if(isStartingDate){
-            startingDate = date;
-            mStartingDateEdit.setText(startingDate);
             mStartingCalendar.set(Calendar.YEAR, year);
             mStartingCalendar.set(Calendar.MONTH, month);
             mStartingCalendar.set(Calendar.DAY_OF_MONTH, day);
+            mStartingDateEdit.setText(DateFormat.getDateFormat(getApplicationContext()).format(new Date(mStartingCalendar.getTimeInMillis())));
+            mStartingDateEdit.getBackground().setColorFilter(null);
+            mStartingTimeEdit.getBackground().setColorFilter(null);
         }else{
-            endingDate = date;
-            mEndingDateEdit.setText(endingDate);
             mEndingCalendar.set(Calendar.YEAR, year);
             mEndingCalendar.set(Calendar.MONTH, month);
             mEndingCalendar.set(Calendar.DAY_OF_MONTH, day);
+            mEndingDateEdit.setText(DateFormat.getDateFormat(getApplicationContext()).format(new Date(mEndingCalendar.getTimeInMillis())));
+            mEndingDateEdit.getBackground().setColorFilter(null);
+            mEndingTimeEdit.getBackground().setColorFilter(null);
         }
     }
 
 
     @Override
     public void onFinishPickTimeDialog(int hour, int minute){
-        String time = String.format(Locale.GERMAN, "%02d:%02d", hour, minute);
         if(isStartingTime){
-            startingTime = time;
-            mStartingTimeEdit.setText(String.format("%s %s", startingTime, "Uhr"));
             mStartingCalendar.set(Calendar.HOUR_OF_DAY, hour);
             mStartingCalendar.set(Calendar.MINUTE, minute);
+            mStartingTimeEdit.setText(DateFormat.getTimeFormat(getApplicationContext()).format(new Date(mStartingCalendar.getTimeInMillis())));
+            mStartingDateEdit.getBackground().setColorFilter(null);
+            mStartingTimeEdit.getBackground().setColorFilter(null);
+
         }else{
-            endingTime = time;
-            mEndingTimeEdit.setText(String.format("%s %s", endingTime, "Uhr"));
             mEndingCalendar.set(Calendar.HOUR_OF_DAY, hour);
             mEndingCalendar.set(Calendar.MINUTE, minute);
+            mEndingTimeEdit.setText(DateFormat.getTimeFormat(getApplicationContext()).format(new Date(mEndingCalendar.getTimeInMillis())));
+            mEndingDateEdit.getBackground().setColorFilter(null);
+            mEndingTimeEdit.getBackground().setColorFilter(null);
         }
     }
 
@@ -660,10 +715,15 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
                     if (task.isSuccessful() && task.getResult() != null) {
                         // Set the map's camera position to the current location of the device.
                         mLastKnownLocation = task.getResult();
+                        lat = mLastKnownLocation.getLatitude();
+                        lng = mLastKnownLocation.getLongitude();
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
                     } else {
+                        lat = mDefaultLocation.latitude;
+                        lng = mDefaultLocation.longitude;
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
                     }
+                    updateEventMarker();
                 }
             });
         } catch (SecurityException e)  {

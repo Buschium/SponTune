@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.spontune.android.spontune">
+    package="de.spontune.android.spontune">
 
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
@@ -37,7 +37,7 @@
         <service
             android:name="de.spontune.android.spontune.Input.FetchLocationIntentService"
             android:exported="false"
-            android:permission="android.permission.BIND_JOB_SERVICE"/>
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <activity
             android:name="de.spontune.android.spontune.MapsActivity"
@@ -54,15 +54,21 @@
             android:label="@string/title_activity_event"
             android:parentActivityName="de.spontune.android.spontune.MapsActivity"
             android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+            android:name="de.spontune.android.spontune.CreateActivity"
+            android:label="@string/title_activity_create"
+            android:parentActivityName="de.spontune.android.spontune.MapsActivity"
+            android:windowSoftInputMode="adjustPan">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="de.spontune.android.spontune.MapsActivity" />
         </activity>
         <activity
-            android:name="de.spontune.android.spontune.CreateActivity"
-            android:label="@string/title_activity_create"
-            android:windowSoftInputMode="adjustPan"
-            android:parentActivityName="de.spontune.android.spontune.MapsActivity">
+            android:name="de.spontune.android.spontune.ListActivity"
+            android:label="@string/title_activity_list"
+            android:parentActivityName="de.spontune.android.spontune.MapsActivity"
+            android:launchMode="singleTop">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="de.spontune.android.spontune.MapsActivity" />
