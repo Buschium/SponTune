@@ -53,11 +53,14 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 
 import de.spontune.android.spontune.Data.Event;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import static android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT;
 
@@ -103,6 +106,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private static final int RC_SIGN_IN = 123; //Request code for the Firebase UI sign in
 
+    //Milliseconds for securing that only events which start today are shown on the map
+    private long mNowMillis;
+    private long mEndOfDayMillis;
+
     //Lists of currently selected and unselected events
     private ArrayList<Event> mSelectedEvents = new ArrayList<>();
     private ArrayList<Event> mUnselectedEvents = new ArrayList<>();
@@ -123,13 +130,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         setUpActionBar();
         setUpCategoryButtons();
 
+        //Set up the Calendar for now and the end of the day and set up the milliseconds
+        Calendar now = GregorianCalendar.getInstance();
+        Calendar endOfDay = GregorianCalendar.getInstance();
+        endOfDay.set(Calendar.HOUR_OF_DAY, 23);
+        endOfDay.set(Calendar.MINUTE, 59);
+        endOfDay.set(Calendar.SECOND, 59);
+        mNowMillis = now.getTimeInMillis();
+        mEndOfDayMillis = endOfDay.getTimeInMillis();
+
         //If the status of the app was saved beforehand, retrieve the saved location and camera position
         if (savedInstanceState != null) {
             mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
-
-        Toast.makeText(this, "onCreate() called", Toast.LENGTH_SHORT).show();
 
         //Get a Fused Location Provider Client
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -152,13 +166,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if(user != null){
                     onSignedInInitialize();
-                    Toast.makeText(MapsActivity.this, "Hallo, " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
                 }else{
                     onSignedOutCleanup();
                     startActivityForResult(
                             AuthUI.getInstance()
                                     .createSignInIntentBuilder()
                                     .setIsSmartLockEnabled(true)
+                                    .setTheme(R.style.AppTheme)
                                     .setAvailableProviders(
                                             Arrays.asList(new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
                                                     new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build()))
@@ -209,9 +223,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     Event event = dataSnapshot.getValue(Event.class);
                     assert event != null;
-                    event.setID(dataSnapshot.getKey());
-                    mSelectedEvents.add(event);
-                    updateSelectedEvents();
+                    if(event.getStartingTime() >= mNowMillis && event.getStartingTime() <= mEndOfDayMillis) {
+                        event.setID(dataSnapshot.getKey());
+                        mSelectedEvents.add(event);
+                        updateSelectedEvents();
+                    }
                 }
 
                 @Override
@@ -255,7 +271,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             mActionBar.setCustomView(customView);
             mActionBar.setDisplayShowCustomEnabled(true);
 
-            Toolbar mParent =(Toolbar) customView.getParent();
+            Toolbar mParent = (Toolbar) customView.getParent();
             mParent.setPadding(0,0,0,0);
             mParent.setContentInsetsAbsolute(0,0);
 
@@ -670,6 +686,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Intent i = new Intent(this, EventActivity.class);
                 Bundle b = new Bundle();
                 b.putString("id", clickedEventID);
+                b.putString("uid", mFirebaseAuth.getCurrentUser().getUid());
                 b.putString("creator", clickedEvent.getCreator());
                 b.putDouble("lat", clickedEvent.getLat());
                 b.putDouble("lng", clickedEvent.getLng());
@@ -728,6 +745,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mPartyActivated = false;
         mMusicActivated = false;
         mSportsActivated = false;
+    }
+
+
+    public Query getQuery(DatabaseReference databaseReference){
+        return databaseReference.child("events").limitToFirst(100).orderByChild("startingTime");
     }
 
 

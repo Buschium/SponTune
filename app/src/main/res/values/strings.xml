@@ -25,6 +25,7 @@
     <string name="invalid_address_used" translatable="false">The address value that is provided was invalid</string>
     <string name="no_location_found" translatable="false">The address could not be mapped to any known location</string>
     <string name="join_event">I\'m in!</string>
+    <string name="edit_event">Edit</string>
     <string name="title_activity_list" translatable="false">ListActivity</string>
     <string name="today">Today</string>
     <string name="tomorrow">Tomorrow</string>

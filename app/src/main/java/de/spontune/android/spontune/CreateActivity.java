@@ -59,10 +59,10 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 
 import de.spontune.android.spontune.Data.Event;
-import de.spontune.android.spontune.Input.DatePickerFragment;
+import de.spontune.android.spontune.fragments.DatePickerFragment;
 import de.spontune.android.spontune.Input.FetchLocationIntentService;
 import de.spontune.android.spontune.Input.PlacesAutoCompleteAdapter;
-import de.spontune.android.spontune.Input.TimePickerFragment;
+import de.spontune.android.spontune.fragments.TimePickerFragment;
 
 import static de.spontune.android.spontune.MapsActivity.bitmapDescriptorFromDrawable;
 import static de.spontune.android.spontune.MapsActivity.getBitmap;

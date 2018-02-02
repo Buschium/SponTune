@@ -32,7 +32,8 @@
             tools:layout_constraintLeft_creator="1"
             tools:layout_constraintTop_creator="1"
             android:textSize="24sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:textColor="@color/white"/>
 
         <ImageView
             android:id="@+id/fragment_image_time"

@@ -1,4 +1,4 @@
-package de.spontune.android.spontune.Input;
+package de.spontune.android.spontune.fragments;
 
 import android.app.Dialog;
 import android.os.Bundle;

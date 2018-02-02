@@ -7,6 +7,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -81,6 +82,19 @@ public class EventActivity extends AppCompatActivity {
         Toolbar bottomToolbar = findViewById(R.id.event_toolbar_bottom);
         bottomToolbar.setPadding(0,0,0,0);
         bottomToolbar.setContentInsetsAbsolute(0,0);
+
+        Button joinEventButton = findViewById(R.id.join_event_button);
+        joinEventButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+        /*
+        if(bundle.getString("uid") != null && bundle.getString("uid").equals(bundle.getString("creator"))){
+            joinEventButton.setText(R.string.edit_event);
+        }
+        */
 
         setUpTimeAndDate(bundle);
 
