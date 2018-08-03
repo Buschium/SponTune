@@ -1,4 +1,4 @@
-package de.spontune.android.spontune.fragments;
+package de.spontune.android.spontune.Fragments;
 
 import android.app.Dialog;
 import android.os.Bundle;

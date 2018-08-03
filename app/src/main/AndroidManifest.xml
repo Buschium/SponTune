@@ -8,8 +8,14 @@
          location permissions for the 'MyLocation' functionality.
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <uses-feature android:name="android.hardware.location.gps" />
+
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
         android:allowBackup="true"
@@ -19,60 +25,66 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <!--
-             The API key for Google Maps-based APIs is defined as a string resource.
-             (See the file "res/values/google_maps_api.xml").
-             Note that the API key is linked to the encryption key used to sign the APK.
-             You need a different API key for each encryption key, including the release key that is used to
-             sign the APK for publishing.
-             You can define the keys for the debug and release targets in src/debug/ and src/release/.
-        -->
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCKANNAJvJ5wPEAgYlxmt2pGknGen6Nwyg" />
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
 
         <service
-            android:name="de.spontune.android.spontune.Input.FetchLocationIntentService"
+            android:name=".Input.FetchLocationIntentService"
             android:exported="false"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <activity
-            android:name="de.spontune.android.spontune.MapsActivity"
+            android:name=".MapsActivity"
             android:label="@string/title_activity_maps"
-            android:launchMode="singleTop">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            android:launchMode="singleTop"
+            android:theme="@style/AppTheme"
+            android:parentActivityName=".LoginActivity">
         </activity>
+
         <activity
-            android:name="de.spontune.android.spontune.EventActivity"
+            android:name=".EventActivity"
             android:label="@string/title_activity_event"
-            android:parentActivityName="de.spontune.android.spontune.MapsActivity"
+            android:parentActivityName=".MapsActivity"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+
         <activity
-            android:name="de.spontune.android.spontune.CreateActivity"
+            android:name=".CreateActivity"
             android:label="@string/title_activity_create"
-            android:parentActivityName="de.spontune.android.spontune.MapsActivity"
+            android:parentActivityName=".MapsActivity"
             android:windowSoftInputMode="adjustPan">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="de.spontune.android.spontune.MapsActivity" />
         </activity>
+
         <activity
-            android:name="de.spontune.android.spontune.ListActivity"
+            android:name=".ListActivity"
             android:label="@string/title_activity_list"
-            android:parentActivityName="de.spontune.android.spontune.MapsActivity"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:parentActivityName=".MapsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="de.spontune.android.spontune.MapsActivity" />
         </activity>
+
+        <activity
+            android:name=".LoginActivity"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>

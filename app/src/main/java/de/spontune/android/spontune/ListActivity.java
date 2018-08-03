@@ -10,9 +10,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 
-import de.spontune.android.spontune.fragments.TodayFragment;
-import de.spontune.android.spontune.fragments.TomorrowFragment;
-import de.spontune.android.spontune.fragments.WeekFragment;
+import de.spontune.android.spontune.Fragments.TodayFragment;
+import de.spontune.android.spontune.Fragments.TomorrowFragment;
+import de.spontune.android.spontune.Fragments.WeekFragment;
 
 public class ListActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
 

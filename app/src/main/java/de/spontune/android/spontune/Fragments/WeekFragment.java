@@ -1,4 +1,4 @@
-package de.spontune.android.spontune.fragments;
+package de.spontune.android.spontune.Fragments;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
