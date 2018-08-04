@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.support.annotation.NonNull;
+import android.support.design.bottomappbar.BottomAppBar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -23,11 +24,11 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
 
-import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.FusedLocationProviderClient;
 
@@ -53,11 +54,13 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 
 import de.spontune.android.spontune.Data.Event;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import static android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT;
 
@@ -73,7 +76,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     //Set the seminary room as default location to make it look like it worked when something goes wrong ;)
     private static final LatLng mDefaultLocation = new LatLng(48.1500593,11.5662206);
-    private static final int DEFAULT_ZOOM = 15;
+    private static final int DEFAULT_ZOOM = 12;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean mLocationPermissionGranted;
 
@@ -103,15 +106,25 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private static final int RC_SIGN_IN = 123; //Request code for the Firebase UI sign in
 
+    //Milliseconds for securing that only events which start today are shown on the map
+    private long mNowMillis;
+    private long mEndOfDayMillis;
+
     //Lists of currently selected and unselected events
     private ArrayList<Event> mSelectedEvents = new ArrayList<>();
     private ArrayList<Event> mUnselectedEvents = new ArrayList<>();
+
+    private BottomAppBar bottomAppBar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        bottomAppBar = findViewById(R.id.bottom_app_bar);
+        //bottomAppBar.replaceMenu(R.menu.menu_map);
 
         //Set up Firebase
         FirebaseApp.initializeApp(this);
@@ -123,13 +136,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         setUpActionBar();
         setUpCategoryButtons();
 
+        //Set up the Calendar for now and the end of the day and set up the milliseconds
+        Calendar now = GregorianCalendar.getInstance();
+        Calendar endOfDay = GregorianCalendar.getInstance();
+        endOfDay.set(Calendar.HOUR_OF_DAY, 23);
+        endOfDay.set(Calendar.MINUTE, 59);
+        endOfDay.set(Calendar.SECOND, 59);
+        mNowMillis = now.getTimeInMillis();
+        mEndOfDayMillis = endOfDay.getTimeInMillis();
+
         //If the status of the app was saved beforehand, retrieve the saved location and camera position
         if (savedInstanceState != null) {
             mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
-
-        Toast.makeText(this, "onCreate() called", Toast.LENGTH_SHORT).show();
 
         //Get a Fused Location Provider Client
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -152,18 +172,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if(user != null){
                     onSignedInInitialize();
-                    Toast.makeText(MapsActivity.this, "Hallo, " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
                 }else{
                     onSignedOutCleanup();
+                    /*
                     startActivityForResult(
                             AuthUI.getInstance()
                                     .createSignInIntentBuilder()
                                     .setIsSmartLockEnabled(true)
+                                    .setTheme(R.style.AppTheme)
                                     .setAvailableProviders(
-                                            Arrays.asList(new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
+                                            Arrays.asList(new AuthUI.IdpConfig.Builder(AuthUI.SUPPORTED_PROVIDERS).build(),
                                                     new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build()))
                                     .build(),
                             RC_SIGN_IN);
+                    */
                 }
             }
         };
@@ -209,9 +231,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     Event event = dataSnapshot.getValue(Event.class);
                     assert event != null;
-                    event.setID(dataSnapshot.getKey());
-                    mSelectedEvents.add(event);
-                    updateSelectedEvents();
+                    if(event.getEndingTime() >= mNowMillis && event.getStartingTime() <= mEndOfDayMillis) {
+                        event.setID(dataSnapshot.getKey());
+                        mSelectedEvents.add(event);
+                        updateSelectedEvents();
+                    }
                 }
 
                 @Override
@@ -249,15 +273,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         ActionBar mActionBar = getSupportActionBar();
         if(mActionBar != null) {
             mActionBar.setDisplayShowHomeEnabled(false);
+            mActionBar.setDisplayHomeAsUpEnabled(false);
             mActionBar.setDisplayShowTitleEnabled(false);
             LayoutInflater mLayoutInflater = LayoutInflater.from(this);
             View customView = mLayoutInflater.inflate(R.layout.activity_maps_menu, null);
-            mActionBar.setCustomView(customView);
+            mActionBar.setCustomView(customView,new Toolbar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
             mActionBar.setDisplayShowCustomEnabled(true);
 
-            Toolbar mParent =(Toolbar) customView.getParent();
+            Toolbar mParent = (Toolbar) customView.getParent();
             mParent.setPadding(0,0,0,0);
             mParent.setContentInsetsAbsolute(0,0);
+
+            /*
 
             final ImageButton buttonList = customView.findViewById(R.id.action_list);
             buttonList.setOnClickListener(new View.OnClickListener() {
@@ -276,6 +303,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     mToast.show();
                 }
             });
+
+            */
         }
     }
 
@@ -286,9 +315,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      * By default, all categories are deactivated.
      */
     private void setUpCategoryButtons(){
-        Toolbar mBottomToolbar = findViewById(R.id.toolbar_bottom);
-        mBottomToolbar.setPadding(0,0,0,0);
-        mBottomToolbar.setContentInsetsAbsolute(0,0);
+
+        bottomAppBar.setPadding(0,0,0,0);
+        bottomAppBar.setContentInsetsAbsolute(0,0);
 
         mButtonFoodAndDrink = findViewById(R.id.action_category_food_and_drink);
         mButtonParty = findViewById(R.id.action_category_party);
@@ -520,23 +549,28 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             Bitmap resizedFilling;
             Bitmap resizedBorder;
             LayerDrawable layerDrawable;
+            Drawable dingens;
 
             switch (event.getCategory()) {
                 case 1:
                     center = getBitmap(this, R.drawable.category_food_and_drink_marker);
                     filling = getBitmap(this, R.drawable.category_food_and_drink_filling);
+                    dingens = getResources().getDrawable(R.drawable.test_marker_2);
                     break;
                 case 2:
                     center = getBitmap(this, R.drawable.category_party_marker);
                     filling = getBitmap(this, R.drawable.category_party_filling);
+                    dingens = getResources().getDrawable(R.drawable.test_marker_2);
                     break;
                 case 3:
                     center = getBitmap(this, R.drawable.category_music_marker);
                     filling = getBitmap(this, R.drawable.category_music_filling);
+                    dingens = getResources().getDrawable(R.drawable.test_marker_2);
                     break;
                 default:
                     center = getBitmap(this, R.drawable.category_sports_marker);
                     filling = getBitmap(this, R.drawable.category_sports_filling);
+                    dingens = getResources().getDrawable(R.drawable.test_marker_2);
             }
 
             int borderSize = (int) Math.sqrt(Math.pow(200, 2) - Math.pow((event.getMaxPersons() - 200), 2));
@@ -555,10 +589,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             layers[1] = gravityBorder;
             layers[2] = gravityCenter;
 
+            int height = 100;
+            int width = 100;
+            Bitmap b= vectorToBitmap( (VectorDrawable) getResources().getDrawable(R.drawable.test_marker_2));
+            Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
+
             layerDrawable = new LayerDrawable(layers);
             Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(event.getLat(), event.getLng()))
-                    .anchor(0.5f, 0.5f)
-                    .icon(bitmapDescriptorFromDrawable(getApplicationContext(), layerDrawable)));
+                    .anchor(0.5f, 1.0f)
+                    .icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
             marker.setTag(event.getID());
         }
     }
@@ -620,10 +659,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      * Greys out category buttons based on which categories are selected.
      */
     private void toggleButtonsGreyed(){
-        Drawable foodAndDrinkIcon = this.getResources().getDrawable(R.drawable.category_food_and_drink);
-        Drawable partyIcon = this.getResources().getDrawable(R.drawable.category_party);
-        Drawable musicIcon = this.getResources().getDrawable(R.drawable.category_music);
-        Drawable sportsIcon = this.getResources().getDrawable(R.drawable.category_sports);
+        Drawable foodAndDrinkIcon = this.getResources().getDrawable(R.drawable.category_food_and_drink_light);
+        Drawable partyIcon = this.getResources().getDrawable(R.drawable.category_party_light);
+        Drawable musicIcon = this.getResources().getDrawable(R.drawable.category_music_light);
+        Drawable sportsIcon = this.getResources().getDrawable(R.drawable.category_sports_light);
         Drawable foodAndDrinkIconDeactivated = this.getResources().getDrawable(R.drawable.category_food_and_drink_deactivated);
         Drawable partyIconDeactivated = this.getResources().getDrawable(R.drawable.category_party_deactivated);
         Drawable musicIconDeactivated = this.getResources().getDrawable(R.drawable.category_music_deactivated);
@@ -670,6 +709,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Intent i = new Intent(this, EventActivity.class);
                 Bundle b = new Bundle();
                 b.putString("id", clickedEventID);
+                b.putString("uid", mFirebaseAuth.getCurrentUser().getUid());
                 b.putString("creator", clickedEvent.getCreator());
                 b.putDouble("lat", clickedEvent.getLat());
                 b.putDouble("lng", clickedEvent.getLng());
@@ -728,6 +768,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mPartyActivated = false;
         mMusicActivated = false;
         mSportsActivated = false;
+    }
+
+
+    public Query getQuery(DatabaseReference databaseReference){
+        return databaseReference.child("events").limitToFirst(100).orderByChild("startingTime");
     }
 
 

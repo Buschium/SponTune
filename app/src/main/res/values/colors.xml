@@ -1,12 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#15151D</color>
-    <color name="colorPrimaryDark">#000000</color>
-    <color name="colorAccent">#00BFFF</color>
+
+    <!-- Brand colors -->
+    <color name="colorPrimary">#4A148C</color>
+    <color name="colorPrimaryDark">#12005E</color>
+    <color name="colorPrimaryLight">#7C43BD</color>
+    <color name="colorAccent">#03DAC4</color>
+    <color name="colorAccentDark">#00A794</color>
+    <color name="colorAccentLight">#66FFF7</color>
+
+    <!-- System colors -->
+    <color name="background">#EEEEEE</color>
+    <color name="backgroundDark">#212121</color>
+    <color name="surface">#FAFAFA</color>
+    <color name="surfaceDark">#15151D</color>
+    <color name="error">#B00020</color>
+
+    <!-- "On"-colours -->
+    <color name="onPrimary">#FFFFFF</color>
+    <color name="onSecondary">#DE000000</color>
+    <color name="onBackground">#DE000000</color>
+    <color name="onBackgroundDark">#FFFFFF</color>
+    <color name="onSurface">#DE000000</color>
+    <color name="onSurfaceSecondary">#8A000000</color>
+    <color name="onSurfaceDark">#FFFFFF</color>
+    <color name="onSurfaceDarkSecondary">#FFFFFFDC</color>
+    <color name="onError">#FFFFFF</color>
+
     <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
     <color name="red">#FF0000</color>
-    <color name="party">#FF0000</color>
+    <color name="green">#00CC00</color>
+
+    <!--Category colors -->
     <color name="foodAndDrink">#FFFF00</color>
     <color name="sports">#000080</color>
     <color name="music">#AAFFCC</color>
+    <color name="party">#FF0000</color>
+
+    <color name="text_shadow">#7F000000</color>
+    <color name="bg_login">#26ae90</color>
+    <color name="bg_register">#2e3237</color>
+    <color name="bg_main">#428bca</color>
+    <color name="input_login">#222222</color>
+    <color name="input_login_hint">#999999</color>
+    <color name="light_grey">#888888</color>
+    <color name="input_register_bg">#3b4148</color>
+    <color name="input_register_hint">#5e6266</color>
+    <color name="btn_login">#26ae90</color>
+    <color name="btn_login_bg">#eceef1</color>
+    <color name="lbl_name">#333333</color>
+    <color name="btn_logut_bg">#ff6861</color>
+    <color name="login_notification_bar">#01337C</color>
 </resources>

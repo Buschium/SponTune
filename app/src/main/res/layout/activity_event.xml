@@ -1,106 +1,295 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.constraint.ConstraintLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
-    android:layout_width="match_parent"
-    android:orientation="vertical">
+    android:layout_width="match_parent">
 
-<android.support.design.widget.CoordinatorLayout
-    android:id="@+id/coordinator_layout"
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/background_vibrant"
+        android:scaleType="centerCrop"/>
+
+<android.support.constraint.ConstraintLayout
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:background="@color/surface"
+    android:orientation="vertical"
+    android:backgroundTint="@color/fui_transparent">
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/app_bar"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/event_title_bar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/event_bar_height"
-        android:fitsSystemWindows="true"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:elevation="5dp"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <android.support.design.widget.CollapsingToolbarLayout
-            android:id="@+id/toolbar_layout"
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/avatar_image"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="8dp"
+            android:padding="6dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/category_party_light"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <TextView
+            android:id="@+id/title_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="2dp"
+            android:fontFamily="@font/roboto"
+            android:textColor="@color/onSurfaceDark"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/avatar_image"
+            app:layout_constraintTop_toTopOf="@+id/avatar_image" />
+
+        <TextView
+            android:id="@+id/subtitle_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="12dp"
+            android:textColor="@color/onSurfaceDarkSecondary"
+            app:layout_constraintBottom_toBottomOf="@+id/avatar_image"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/avatar_image" />
+
+        <ImageButton
+            android:id="@+id/event_close"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/fui_transparent"
+            android:src="@drawable/ic_round_close_dark"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toBottomOf="@id/event_title_bar"
+        android:layout_margin="4dp"
+        app:cardCornerRadius="8dp">
+
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/event_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/surface"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fitsSystemWindows="true"
-            app:contentScrim="?attr/colorPrimary"
-            app:layout_scrollFlags="snap|scroll|exitUntilCollapsed"
-            app:toolbarId="@+id/toolbar">
-
-            <ImageView
-                android:id="@+id/category_image"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:src="@drawable/food_and_drink_deafult"
-                android:scaleType="centerCrop"/>
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar_top"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:layout_collapseMode="pin">
-
-            </android.support.v7.widget.Toolbar>
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:layout_gravity="bottom"
-                android:background="#555555"
-                app:layout_collapseMode="pin"
-                app:popupTheme="@style/AppTheme.PopupOverlay">
-
-                <TextView
-                    android:id="@+id/toolbar_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:textSize="36sp"
-                    android:gravity="center"
-                    android:textColor="@color/white"/>
+            android:layout_height="wrap_content"
+            >
 
                 <ImageView
-                    android:id="@+id/toolbar_image"
-                    android:layout_width="?attr/actionBarSize"
-                    android:layout_height="?attr/actionBarSize"
-                    android:layout_gravity="end"
-                    android:padding="12dp"
-                    android:scaleType="fitCenter"/>
+                    android:id="@+id/category_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/food_and_drink_default"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:elevation="0dp"/>
 
-            </android.support.v7.widget.Toolbar>
+                <android.support.constraint.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:elevation="10dp"
+                    android:layout_marginBottom="20dp"
+                    app:layout_constraintTop_toBottomOf="@id/category_image">
 
-        </android.support.design.widget.CollapsingToolbarLayout>
+                    <Button
+                        android:id="@+id/event_join"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/join_event"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="20sp"
+                        android:shadowColor="#D04A148C"
+                        android:shadowDx="0.0"
+                        android:shadowDy="0.0"
+                        android:shadowRadius="8"
+                        android:layout_marginLeft="16dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        android:background="?android:attr/selectableItemBackground" />
 
-    </android.support.design.widget.AppBarLayout>
+                    <ImageButton
+                        android:id="@+id/event_chat"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="25dp"
+                        android:src="@drawable/ic_round_chat_light"
+                        android:layout_marginTop="13dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/event_share"
+                        android:background="?android:attr/selectableItemBackground" />
 
-    <include
-        android:id="@+id/include"
-        layout="@layout/content_event"/>
+                    <ImageButton
+                        android:id="@+id/event_share"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="25dp"
+                        android:src="@drawable/ic_round_share_light"
+                        android:layout_marginTop="13dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/event_map"
+                        android:background="?android:attr/selectableItemBackground" />
 
-    </android.support.design.widget.CoordinatorLayout>
+                    <ImageButton
+                        android:id="@+id/event_map"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="16dp"
+                        android:src="@drawable/ic_round_place_light"
+                        android:layout_marginTop="13dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:background="?android:attr/selectableItemBackground" />
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/event_toolbar_bottom"
-        android:layout_height="?attr/actionBarSize"
-        android:layout_width="match_parent"
-        android:background="?attr/colorAccent"
-        android:layout_alignParentBottom="true"
-        android:minHeight="?attr/actionBarSize"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:elevation="15dp">
+                    <FrameLayout
+                        android:id="@+id/description_frame"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toBottomOf="@id/event_join"
+                        app:layout_constraintBottom_toTopOf="@id/divider">
 
-        <Button
-            android:id="@+id/join_event_button"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/selectableItemBackground"
-            android:text="@string/join_event"
-            android:textSize="24sp"
-            android:gravity="center"/>
+                        <TextView
+                            android:id="@+id/event_description_textview"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="16dp"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginTop="24dp"
+                            android:maxLines="7"
+                            android:textColor="@color/onSurface"
+                            android:textSize="16sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent" />
 
-    </android.support.v7.widget.Toolbar>
+                        <View
+                            android:id="@+id/gradient"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="bottom"
+                            android:background="@drawable/transparent_to_light_surface_gradient" />
+
+                    </FrameLayout>
+
+                    <View
+                        android:id="@+id/divider"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginEnd="20dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="20dp"
+                        android:background="@color/light_grey"
+                        app:layout_constraintTop_toBottomOf="@id/description_frame" />
+
+                    <TextView
+                        android:id="@+id/text_view_starting_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="20dp"
+                        android:text="@string/starting_time"
+                        android:textColor="@color/onSurface"
+                        android:textSize="16sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/divider" />
+
+                    <TextView
+                        android:id="@+id/event_metadata_starting_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="16dp"
+                        android:textColor="@color/onSurface"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:layout_constraintBaseline_toBaselineOf="@id/text_view_starting_time"
+                        app:layout_constraintEnd_toStartOf="@id/event_metadata_starting_date" />
+
+                    <TextView
+                        android:id="@+id/event_metadata_starting_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="16dp"
+                        android:textColor="@color/onSurface"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        app:layout_constraintBaseline_toBaselineOf="@id/text_view_starting_time"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                    <TextView
+                        android:id="@+id/text_view_ending_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="20dp"
+                        android:text="@string/ending_time"
+                        android:textColor="@color/onSurface"
+                        android:textSize="16sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/text_view_starting_time" />
+
+                    <TextView
+                        android:id="@+id/event_metadata_ending_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="16dp"
+                        android:textColor="@color/onSurface"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:layout_constraintBaseline_toBaselineOf="@id/text_view_ending_time"
+                        app:layout_constraintEnd_toStartOf="@id/event_metadata_ending_date" />
+
+                    <TextView
+                        android:id="@+id/event_metadata_ending_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="16dp"
+                        android:textColor="@color/onSurface"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        app:layout_constraintBaseline_toBaselineOf="@id/text_view_ending_time"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                </android.support.constraint.ConstraintLayout>
+
+            </android.support.constraint.ConstraintLayout>
+
+
+    </android.support.v4.widget.NestedScrollView>
+
+    </android.support.v7.widget.CardView>
+
 
 </android.support.constraint.ConstraintLayout>
+
+</FrameLayout>

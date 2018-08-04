@@ -46,7 +46,6 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/number_picker"
         app:layout_constraintRight_toLeftOf="@+id/number_picker_set"
-        android:background="@color/fui_transparent"
         android:textColor="@color/colorAccent"
         android:text="Cancel" />
 
@@ -56,7 +55,6 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/number_picker"
         app:layout_constraintRight_toRightOf="parent"
-        android:background="@color/fui_transparent"
         android:textColor="@color/colorAccent"
         android:text="OK" />
 

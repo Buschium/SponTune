@@ -59,10 +59,10 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 
 import de.spontune.android.spontune.Data.Event;
-import de.spontune.android.spontune.Input.DatePickerFragment;
+import de.spontune.android.spontune.Fragments.DatePickerFragment;
 import de.spontune.android.spontune.Input.FetchLocationIntentService;
 import de.spontune.android.spontune.Input.PlacesAutoCompleteAdapter;
-import de.spontune.android.spontune.Input.TimePickerFragment;
+import de.spontune.android.spontune.Fragments.TimePickerFragment;
 
 import static de.spontune.android.spontune.MapsActivity.bitmapDescriptorFromDrawable;
 import static de.spontune.android.spontune.MapsActivity.getBitmap;
@@ -468,10 +468,10 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
      * Greys out category buttons based on which category is selected
      */
     private void toggleButtonsGreyed(){
-        Drawable foodAndDrinkIcon = this.getResources().getDrawable(R.drawable.category_food_and_drink);
-        Drawable partyIcon = this.getResources().getDrawable(R.drawable.category_party);
-        Drawable musicIcon = this.getResources().getDrawable(R.drawable.category_music);
-        Drawable sportsIcon = this.getResources().getDrawable(R.drawable.category_sports);
+        Drawable foodAndDrinkIcon = this.getResources().getDrawable(R.drawable.category_food_and_drink_dark);
+        Drawable partyIcon = this.getResources().getDrawable(R.drawable.category_party_dark);
+        Drawable musicIcon = this.getResources().getDrawable(R.drawable.category_music_dark);
+        Drawable sportsIcon = this.getResources().getDrawable(R.drawable.category_sports_dark);
         Drawable foodAndDrinkIconDeactivated = this.getResources().getDrawable(R.drawable.category_food_and_drink_deactivated);
         Drawable partyIconDeactivated = this.getResources().getDrawable(R.drawable.category_party_deactivated);
         Drawable musicIconDeactivated = this.getResources().getDrawable(R.drawable.category_music_deactivated);

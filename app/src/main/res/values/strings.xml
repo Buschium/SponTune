@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">SponTune</string>
-    <string name="title_activity_maps" translatable="false">SponTune</string>
+    <string name="app_name">Vybrant</string>
+    <string name="title_activity_maps" translatable="false">Vybrant</string>
     <string name="title_activity_event" translatable="false">EventActivity</string>
     <string name="action_settings" translatable="false">Settings</string>
     <string name="title_activity_scrolling" translatable="false">ScrollingActivity</string>
@@ -25,8 +25,58 @@
     <string name="invalid_address_used" translatable="false">The address value that is provided was invalid</string>
     <string name="no_location_found" translatable="false">The address could not be mapped to any known location</string>
     <string name="join_event">I\'m in!</string>
+    <string name="edit_event">Edit</string>
     <string name="title_activity_list" translatable="false">ListActivity</string>
     <string name="today">Today</string>
     <string name="tomorrow">Tomorrow</string>
     <string name="week">Week</string>
+    <string name="title_activity_login">Sign in</string>
+    <string name="slogan_login" translatable="false">Be a part of your city\'s vibration</string>
+    <string name="slogan_signup" translatable="false">Feel the pulse</string>
+    <string name="slogan_reset" translatable="false">Don\'t worry. We got your back</string>
+    <string name="category_food_and_drink" translatable="false">Food and drink</string>
+    <string name="category_party" translatable="false">Party</string>
+    <string name="category_music" translatable="false">Music</string>
+    <string name="category_sports" translatable="false">Sports</string>
+    <string name="password_reset">Please enter the email address you wish to have sent your password reset link  to:</string>
+    <string name="back">Back</string>
+    <string name="now">now</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="action_sign_up">SIGN UP</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email completions." </string>
+    <string name="email">Email</string>
+    <string name="minimum_password">Password too short, enter minimum 6 characters!</string>
+    <string name="auth_failed">Authentication failed, check your email and password or sign up</string>
+    <string name="change_email">Change Email</string>
+    <string name="change_password">Change Password</string>
+    <string name="send_password_reset_email">Send Password reset email</string>
+    <string name="remove_user">Remove user</string>
+    <string name="new_pass">New Password</string>
+    <string name="title_activity_profile" translatable="false">Firebase</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="hint_confirm_password">Confirm password</string>
+    <string name="hint_username">Username</string>
+    <string name="hint_name">Full name</string>
+    <string name="btn_login">LOGIN</string>
+    <string name="btn_link_to_register">Don\'t have an account?</string>
+    <string name="btn_link_to_login">Already registered. Login me!</string>
+    <string name="title_activity_reset_password" translatable="false">ResetPasswordActivity</string>
+    <string name="btn_forgot_password">Forgot your password?</string>
+    <string name="btn_reset_password">Reset Password</string>
+    <string name="btn_back"><![CDATA[<< Back]]></string>
+    <string name="hint_new_email">New Email</string>
+    <string name="btn_change">Change</string>
+    <string name="btn_send">Send</string>
+    <string name="btn_remove">Remove</string>
+    <string name="btn_sign_out">Sign Out</string>
+    <string name="lbl_forgot_password">Forgot password?</string>
+    <string name="forgot_password_msg">We just need your registered Email Id to sent you password reset instructions.</string>
+    <string name="title_activity_signup">SignupActivity</string>
 </resources>
