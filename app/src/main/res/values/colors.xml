@@ -3,7 +3,7 @@
 
     <!-- Brand colors -->
     <color name="colorPrimary">#4A148C</color>
-    <color name="colorPrimaryDark">#12005E</color>
+    <color name="colorPrimaryDark">#4A148C</color>
     <color name="colorPrimaryLight">#7C43BD</color>
     <color name="colorAccent">#03DAC4</color>
     <color name="colorAccentDark">#00A794</color>

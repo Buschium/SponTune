@@ -18,7 +18,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
+import de.spontune.android.spontune.Data.User;
+import de.spontune.android.spontune.EditUserActivity;
 import de.spontune.android.spontune.LoginActivity;
 import de.spontune.android.spontune.MapsActivity;
 import de.spontune.android.spontune.R;
@@ -30,6 +34,8 @@ public class SignupFragment extends Fragment {
     private Button btnSignIn, btnSignUp;
     private ProgressBar progressBar;
     private FirebaseAuth auth;
+    private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mDatabaseReference;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -37,6 +43,9 @@ public class SignupFragment extends Fragment {
 
         //Get Firebase auth instance
         auth = FirebaseAuth.getInstance();
+
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mDatabaseReference = mFirebaseDatabase.getReference().child("users");
 
         btnSignIn = v.findViewById(R.id.btn_login);
         btnSignUp = v.findViewById(R.id.btn_signup);
@@ -68,7 +77,7 @@ public class SignupFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                String username = inputUsername.getText().toString().trim();
+                final String username = inputUsername.getText().toString().trim();
                 String email = inputEmail.getText().toString().trim();
                 String password = inputPassword.getText().toString().trim();
                 String confirmPassword = inputConfirmPassword.getText().toString().trim();
@@ -113,7 +122,14 @@ public class SignupFragment extends Fragment {
                                     Toast.makeText(activity, "Authentication failed." + task.getException(),
                                             Toast.LENGTH_SHORT).show();
                                 } else {
-                                    startActivity(new Intent(activity, MapsActivity.class));
+
+                                    //Create a new user with the uid from the AuthResult and the username
+                                    String uid = task.getResult().getUser().getUid();
+                                    User newUser = new User(uid, username);
+
+                                    //Write the new user to the database
+                                    mDatabaseReference.child(uid).setValue(newUser);
+                                    startActivity(new Intent(activity, EditUserActivity.class).putExtra("justRegistered", true));
                                     activity.finish();
                                 }
                             }

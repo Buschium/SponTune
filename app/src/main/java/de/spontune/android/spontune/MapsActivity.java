@@ -8,20 +8,17 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.VectorDrawable;
 import android.os.Bundle;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.support.annotation.NonNull;
-import android.support.design.bottomappbar.BottomAppBar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +26,6 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 
-import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.FusedLocationProviderClient;
 
@@ -55,12 +51,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 
 import de.spontune.android.spontune.Data.Event;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -298,8 +292,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             buttonProfile.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    //TODO create user profile activity and intent that activity with this button
-                    mToast.show();
+                    Intent intent = new Intent(MapsActivity.this, UserActivity.class);
+                    startActivity(intent);
                 }
             });
 
@@ -366,7 +360,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         buttonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(MapsActivity.this, CreateActivity.class);
+                Intent i = new Intent(MapsActivity.this, CreateEventActivity.class);
                 i.setFlags(FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(i);
             }

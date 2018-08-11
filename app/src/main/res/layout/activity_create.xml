@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="de.spontune.android.spontune.CreateActivity">
+    tools:context="de.spontune.android.spontune.CreateEventActivity">
 
     <android.support.design.widget.CoordinatorLayout
         android:id="@+id/coordinator_layout"
@@ -36,7 +36,7 @@
                 android:layout_height="@dimen/create_bar_height"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toTopOf="@+id/scroll_view_create"
-                tools:context="de.spontune.android.spontune.CreateActivity" />
+                tools:context="de.spontune.android.spontune.CreateEventActivity" />
 
         </android.support.design.widget.CollapsingToolbarLayout>
 
