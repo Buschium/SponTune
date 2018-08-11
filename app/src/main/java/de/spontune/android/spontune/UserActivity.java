@@ -2,9 +2,13 @@ package de.spontune.android.spontune;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -43,6 +47,18 @@ public class UserActivity extends AppCompatActivity {
 
             }
         });
+
+        ActionBar mActionBar = getSupportActionBar();
+        if(mActionBar != null) {
+            LayoutInflater mLayoutInflater = LayoutInflater.from(this);
+            View customView = mLayoutInflater.inflate(R.layout.activity_user_menu, null);
+            mActionBar.setCustomView(customView, new Toolbar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            mActionBar.setDisplayShowCustomEnabled(true);
+
+            Toolbar mParent = (Toolbar) customView.getParent();
+            mParent.setPadding(0, 0, 0, 0);
+            mParent.setContentInsetsAbsolute(0, 0);
+        }
 
         Button btnEdit = findViewById(R.id.edit_button);
         btnEdit.setOnClickListener(new View.OnClickListener() {

@@ -85,7 +85,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/activity_maps_add"
             app:layout_anchor="@id/bottom_app_bar"
-            app:backgroundTint="@color/colorPrimary"/>
+            app:backgroundTint="@color/colorAccent"/>
 
     </android.support.design.widget.CoordinatorLayout>
 
