@@ -50,13 +50,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-
-    @Override
-    protected void onResume(){
-        super.onResume();
-        //slideUp();
-    }
-
     public void setCurrentItem (int item) {
         viewPager.setCurrentItem(item, true);
     }
@@ -69,7 +62,6 @@ public class LoginActivity extends AppCompatActivity {
             viewPager.setCurrentItem(1);
         }
     }
-
 
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {

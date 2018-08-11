@@ -543,7 +543,7 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
         layerDrawable = new LayerDrawable(layers);
         mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng))
                 .anchor(0.5f, 0.5f)
-                .icon(bitmapDescriptorFromDrawable(getApplicationContext(), layerDrawable)));
+                .icon(bitmapDescriptorFromDrawable(layerDrawable)));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), DEFAULT_ZOOM));
     }
 
