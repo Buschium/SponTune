@@ -48,11 +48,13 @@
             android:launchMode="singleTop"
             android:parentActivityName=".LoginActivity"
             android:theme="@style/AppTheme" />
+
         <activity
             android:name=".EventActivity"
             android:label="@string/title_activity_event"
             android:parentActivityName=".MapsActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+
         <activity
             android:name=".CreateEventActivity"
             android:label="@string/title_activity_create"
@@ -62,6 +64,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="de.spontune.android.spontune.MapsActivity" />
         </activity>
+
         <activity
             android:name=".ListActivity"
             android:label="@string/title_activity_list"
@@ -71,22 +74,35 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="de.spontune.android.spontune.MapsActivity" />
         </activity>
+
         <activity
             android:name=".LoginActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".EditUserActivity" />
-        <activity android:name=".UserActivity">
+
+        <activity
+            android:name=".EditUserActivity"
+            android:label="@string/title_activity_edit_user"
+            android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MapsActivity"/>
+                android:value="de.spontune.android.spontune.UserActivity" />
         </activity>
+
+        <activity
+            android:name=".UserActivity"
+            android:label="@string/title_activity_user"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="de.spontune.android.spontune.MapsActivity"/>
+        </activity>
+
     </application>
 
 </manifest>

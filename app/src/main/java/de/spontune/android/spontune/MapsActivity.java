@@ -1,5 +1,6 @@
 package de.spontune.android.spontune;
 
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -18,7 +19,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.transition.Slide;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -134,6 +137,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         endOfDay.set(Calendar.SECOND, 59);
         mNowMillis = now.getTimeInMillis();
         mEndOfDayMillis = endOfDay.getTimeInMillis();
+
+
 
         //If the status of the app was saved beforehand, retrieve the saved location and camera position
         if (savedInstanceState != null) {
@@ -284,7 +289,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(MapsActivity.this, ListActivity.class);
-                    startActivity(intent);
+                    Slide slide = new Slide();
+                    slide.setSlideEdge(Gravity.START);
+                    getWindow().setExitTransition(slide);
+                    slide.setSlideEdge(Gravity.END);
+                    getWindow().setEnterTransition(slide);
+                    startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(MapsActivity.this).toBundle());
                 }
             });
 
@@ -293,7 +303,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(MapsActivity.this, UserActivity.class);
-                    startActivity(intent);
+                    Slide slide = new Slide();
+                    slide.setSlideEdge(Gravity.END);
+                    getWindow().setExitTransition(slide);
+                    slide.setSlideEdge(Gravity.START);
+                    getWindow().setEnterTransition(slide);
+                    startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(MapsActivity.this).toBundle());
                 }
             });
 

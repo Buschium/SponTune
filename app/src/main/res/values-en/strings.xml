@@ -50,4 +50,8 @@
     <string name="btn_forgot_password">Forgot your password?</string>
     <string name="btn_reset_password">Reset Password</string>
     <string name="now">now</string>
+    <string name="title_activity_edit_user">Edit Profile</string>
+    <string name="title_activity_user">Profile</string>
+    <string name="edit">Edit</string>
+    <string name="save">Save</string>
 </resources>

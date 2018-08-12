@@ -18,7 +18,7 @@
         android:textSize="48sp"
         android:textColor="@color/onSurface"/>
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profile_image"
         android:layout_width="156dp"
         android:layout_height="156dp"
@@ -50,6 +50,7 @@
         android:layout_marginTop="252dp"
         android:background="@drawable/button_rounded_corners"
         android:text="@string/edit"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="24dp"
         android:textSize="20sp"

@@ -1,10 +1,12 @@
 <resources>
-    <string name="app_name">Vybrant</string>
+    <string name="app_name" translatable="false">Vybrant</string>
     <string name="title_activity_maps" translatable="false">Vybrant</string>
     <string name="title_activity_event" translatable="false">EventActivity</string>
     <string name="action_settings" translatable="false">Settings</string>
     <string name="title_activity_scrolling" translatable="false">ScrollingActivity</string>
     <string name="title_activity_create" translatable="false">CreateActivity</string>
+    <string name="title_activity_edit_user">Edit Profile</string>
+    <string name="title_activity_user">Profile</string>
     <string name="new_event">New Event</string>
     <string name="input_title">TITLE</string>
     <string name="input_description">Description</string>
@@ -80,4 +82,5 @@
     <string name="lbl_forgot_password">Forgot password?</string>
     <string name="forgot_password_msg">We just need your registered Email Id to sent you password reset instructions.</string>
     <string name="title_activity_signup">SignupActivity</string>
+    <string name="edit_event">Edit</string>
 </resources>

@@ -50,4 +50,8 @@
     <string name="btn_forgot_password">Passwort vergessen?</string>
     <string name="btn_reset_password">Passwort zurücksetzen</string>
     <string name="now">jetzt</string>
+    <string name="title_activity_edit_user">Profil bearbeiten</string>
+    <string name="title_activity_user">Profil</string>
+    <string name="edit">Bearbeiten</string>
+    <string name="save">Speichern</string>
 </resources>

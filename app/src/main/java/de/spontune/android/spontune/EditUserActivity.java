@@ -33,12 +33,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import de.spontune.android.spontune.Data.User;
 
 public class EditUserActivity extends AppCompatActivity {
 
     private User user;
-    private ImageButton btnProfilePicture;
+    private CircleImageView btnProfilePicture;
     private final int PICK_IMAGE_REQUEST = 71;
     private Uri filePath;
     //Firebase
@@ -83,8 +84,10 @@ public class EditUserActivity extends AppCompatActivity {
                 uploadImage();
                 if(justRegistered) {
                     startActivity(new Intent(EditUserActivity.this, MapsActivity.class));
-                }else{
+                }else if(filePath != null){
                     startActivity(new Intent(EditUserActivity.this, UserActivity.class).putExtra("image", filePath.toString()));
+                }else{
+                    startActivity(new Intent(EditUserActivity.this, UserActivity.class));
                 }
             }
         });

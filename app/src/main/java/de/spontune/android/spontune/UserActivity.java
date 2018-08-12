@@ -11,6 +11,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.transition.Slide;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,6 +47,11 @@ public class UserActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_user);
+        Slide slide = new Slide();
+        slide.setSlideEdge(Gravity.START);
+        getWindow().setExitTransition(slide);
+        slide.setSlideEdge(Gravity.END);
+        getWindow().setEnterTransition(slide);
 
         // if we changed the image in the @EditUserActivity.java we have to load it via the intent due to lag from the Server
         String path = getIntent().getStringExtra("image");
