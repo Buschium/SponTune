@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/navigate_list"
+        android:enabled="true"
+        android:icon="@drawable/ic_round_list_light"
+        android:title="@string/list" />
+    <item
+        android:id="@+id/navigate_map"
+        android:enabled="true"
+        android:icon="@drawable/ic_round_place_light"
+        android:title="@string/map"/>
+    <item
+        android:id="@+id/navigate_profile"
+        android:enabled="true"
+        android:icon="@drawable/ic_round_account_light"
+        android:title="@string/profile"/>
+</menu>
