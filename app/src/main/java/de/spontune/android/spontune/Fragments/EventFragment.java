@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -60,6 +61,16 @@ public abstract class EventFragment extends android.support.v4.app.Fragment {
 
             @Override
             protected void onBindViewHolder(EventViewHolder viewHolder, int position, final Event event) {
+                ImageView fragmentImage = viewHolder.itemView.findViewById(R.id.fragment_image);
+                switch (event.getCategory()){
+                    case 1: fragmentImage.setImageResource(R.drawable.party_default);
+                    break;
+                    case 2: fragmentImage.setImageResource(R.drawable.creative_default);
+                    break;
+                    case 3: fragmentImage.setImageResource(R.drawable.sports_default);
+                    break;
+                    default: fragmentImage.setImageResource(R.drawable.happening_default);
+                }
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
