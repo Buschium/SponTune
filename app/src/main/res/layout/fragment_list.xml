@@ -14,12 +14,10 @@
 
         <ImageView
             android:id="@+id/fragment_image"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
             android:padding="8dp"
-            android:src="@drawable/category_food_and_drink_light"
-            android:background="@color/foodAndDrink"
-            android:scaleType="fitCenter"/>
+            android:scaleType="centerCrop"/>
 
         <TextView
             android:id="@+id/fragment_title"
