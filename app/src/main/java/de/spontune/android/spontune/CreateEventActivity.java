@@ -67,7 +67,7 @@ import de.spontune.android.spontune.Fragments.TimePickerFragment;
 import static de.spontune.android.spontune.MapsActivity.bitmapDescriptorFromDrawable;
 import static de.spontune.android.spontune.MapsActivity.getBitmap;
 
-public class CreateActivity extends AppCompatActivity implements DatePickerFragment.PickDateDialogListener,
+public class CreateEventActivity extends AppCompatActivity implements DatePickerFragment.PickDateDialogListener,
         TimePickerFragment.PickTimeDialogListener, OnMapReadyCallback, GoogleMap.OnMapClickListener{
 
     private static FirebaseDatabase mFirebaseDatabase;
@@ -543,7 +543,7 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
         layerDrawable = new LayerDrawable(layers);
         mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng))
                 .anchor(0.5f, 0.5f)
-                .icon(bitmapDescriptorFromDrawable(getApplicationContext(), layerDrawable)));
+                .icon(bitmapDescriptorFromDrawable(layerDrawable)));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), DEFAULT_ZOOM));
     }
 
@@ -773,8 +773,8 @@ public class CreateActivity extends AppCompatActivity implements DatePickerFragm
         protected void onReceiveResult(int resultCode, Bundle resultData) {
             double lat = resultData.getDouble("lat");
             double lng = resultData.getDouble("lng");
-            CreateActivity.this.lat = lat;
-            CreateActivity.this.lng = lng;
+            CreateEventActivity.this.lat = lat;
+            CreateEventActivity.this.lng = lng;
             updateEventMarker();
         }
     }

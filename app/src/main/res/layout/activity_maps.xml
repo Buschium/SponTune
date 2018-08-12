@@ -17,68 +17,63 @@
 
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
+        android:layout_height="match_parent">
 
         <android.support.design.bottomappbar.BottomAppBar
-            style="@style/Widget.MaterialComponents.BottomAppBar"
             android:id="@+id/bottom_app_bar"
-            android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:layout_gravity="top"
-            app:fabAlignmentMode="center"
-            app:backgroundTint="@color/surface"
-            android:elevation="15dp">
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="@color/surface">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentEnd="true"
-                android:weightSum="4"
                 android:orientation="horizontal">
 
-                <ImageButton
-                    android:id="@+id/action_category_food_and_drink"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:padding="8dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/category_food_and_drink_light" />
+            <ImageButton
+                android:id="@+id/action_category_food_and_drink"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:background="?android:attr/selectableItemBackground"
+                android:layout_weight="1"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/category_food_and_drink_light"
+                app:layout_constraintStart_toStartOf="parent" />
 
-                <ImageButton
-                    android:id="@+id/action_category_party"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:padding="8dp"
-                    android:layout_marginEnd="20dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/category_party_light"/>
+            <ImageButton
+                android:id="@+id/action_category_party"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:background="?android:attr/selectableItemBackground"
+                android:layout_weight="1"
+                android:padding="8dp"
+                android:layout_marginEnd="20dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/category_party_light"/>
 
-                <ImageButton
-                    android:id="@+id/action_category_music"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:padding="8dp"
-                    android:layout_marginStart="20dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/category_music_light"/>
 
-                <ImageButton
-                    android:id="@+id/action_category_sports"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:padding="8dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/category_sports_light" />
+            <ImageButton
+                android:id="@+id/action_category_music"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:background="?android:attr/selectableItemBackground"
+                android:layout_weight="1"
+                android:padding="8dp"
+                android:layout_marginStart="20dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/category_music_light"/>
+
+            <ImageButton
+                android:id="@+id/action_category_sports"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:background="?android:attr/selectableItemBackground"
+                android:layout_weight="1"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/category_sports_light" />
 
             </LinearLayout>
 
@@ -89,9 +84,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/activity_maps_add"
-            app:backgroundTint="@color/colorPrimary"
-            android:layout_gravity="bottom"
-            android:elevation="15dp"/>
+            app:layout_anchor="@id/bottom_app_bar"
+            app:backgroundTint="@color/colorAccent"/>
 
     </android.support.design.widget.CoordinatorLayout>
 

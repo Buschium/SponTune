@@ -63,8 +63,8 @@
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
-                            <entry key="outputName" value="ic_round_share_dark" />
-                            <entry key="sourceFile" value="F:\Bilder\icons\round-share-24px-1.svg" />
+                            <entry key="outputName" value="ic_round_list_light" />
+                            <entry key="sourceFile" value="C:\Users\Benutzer1\Downloads\round-list-24px.svg" />
                           </map>
                         </option>
                       </PersistentState>

@@ -7,25 +7,25 @@
         android:id="@+id/category_food_and_drink"
         android:checkable="true"
         android:enabled="true"
-        android:icon="@drawable/category_food_and_drink_dark"
+        android:icon="@drawable/category_food_and_drink_light"
         android:title="@string/category_food_and_drink"
         android:visible="true"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_category_music"
-        android:icon="@drawable/category_music_dark"
+        android:icon="@drawable/category_music_light"
         android:title="@string/category_music"
         app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/category_sports"
-        android:icon="@drawable/category_sports_dark"
+        android:icon="@drawable/category_sports_light"
         android:title="@string/category_sports"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/category_party"
-        android:icon="@drawable/category_party_dark"
+        android:icon="@drawable/category_party_light"
         android:title="@string/category_party"
         app:showAsAction="ifRoom"/>
 

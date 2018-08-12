@@ -21,6 +21,7 @@ import java.util.GregorianCalendar;
 public class EventActivity extends AppCompatActivity {
 
     private TextView mEventDescriptionTextView;
+    //TODO apply gradient only if the description is too long
     private View gradientView;
 
     @Override
@@ -37,20 +38,17 @@ public class EventActivity extends AppCompatActivity {
         ImageView toolbarImage = findViewById(R.id.avatar_image);
         switch (bundle.getInt("category")){
             case 1:
-                //toolbarImage.setBackgroundColor(getResources().getColor(R.color.foodAndDrink));
                 toolbarImage.setImageResource(R.drawable.category_food_and_drink_light);
                 break;
             case 2:
-                toolbarImage.setBackgroundColor(getResources().getColor(R.color.party));
                 toolbarImage.setImageResource(R.drawable.category_party_light);
+                //Party has its own default image
                 categoryImage.setImageResource(R.drawable.party_default);
                 break;
             case 3:
-                toolbarImage.setBackgroundColor(getResources().getColor(R.color.music));
                 toolbarImage.setImageResource(R.drawable.category_music_light);
                 break;
             default:
-                toolbarImage.setBackgroundColor(getResources().getColor(R.color.sports));
                 toolbarImage.setImageResource(R.drawable.category_sports_light);
                 break;
         }
@@ -63,10 +61,6 @@ public class EventActivity extends AppCompatActivity {
                 finish();
             }
         });
-        /*
-        if(bundle.getString("uid") != null && bundle.getString("uid").equals(bundle.getString("creator"))){
-            joinEventButton.setText(R.string.edit_event);
-        }
         */
 
         ImageButton btnClose = findViewById(R.id.event_close);
@@ -81,6 +75,8 @@ public class EventActivity extends AppCompatActivity {
         mEventDescriptionTextView = findViewById(R.id.event_description_textview);
         mEventDescriptionTextView.setText(bundle.getString("description"));
         gradientView = findViewById(R.id.gradient);
+
+        //The description expands when the user clicks on it (or shrinks when it's already expanded)
         mEventDescriptionTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

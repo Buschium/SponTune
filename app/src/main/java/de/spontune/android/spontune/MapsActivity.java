@@ -8,20 +8,17 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.VectorDrawable;
 import android.os.Bundle;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.support.annotation.NonNull;
-import android.support.design.bottomappbar.BottomAppBar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,7 +51,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 
 import de.spontune.android.spontune.Data.Event;
 
@@ -114,17 +110,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ArrayList<Event> mSelectedEvents = new ArrayList<>();
     private ArrayList<Event> mUnselectedEvents = new ArrayList<>();
 
-    private BottomAppBar bottomAppBar;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-
-        bottomAppBar = findViewById(R.id.bottom_app_bar);
-        //bottomAppBar.replaceMenu(R.menu.menu_map);
 
         //Set up Firebase
         FirebaseApp.initializeApp(this);
@@ -151,7 +141,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
 
-        //Get a Fused Location Provider Client
+        //Get a Fused Location Provider Client for the map
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         //Get the map fragment and jump to onMapReady when the map is set up
@@ -164,6 +154,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     /**
      * Set up the Firebase AuthStateListener for initializing the sign in if the user is currently
      * not logged in.
+     * May be used once the user is able to log out.
      */
     private void setUpAuthStateListener(){
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
@@ -231,6 +222,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     Event event = dataSnapshot.getValue(Event.class);
                     assert event != null;
+                    //If the event starts today and hasn't ended yet, it will be displayed on the map
+                    //TODO: maybe find a more efficient way that doesn't require to load all the events
                     if(event.getEndingTime() >= mNowMillis && event.getStartingTime() <= mEndOfDayMillis) {
                         event.setID(dataSnapshot.getKey());
                         mSelectedEvents.add(event);
@@ -265,6 +258,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     /**
      * Sets up the action bar with the list and profile buttons on top of the screen.
+     * The layout file for the action bar is activity_maps_menu.
      */
     private void setUpActionBar(){
         //Toast to show when the user tries to use a function that hasn't been implemented yet
@@ -272,7 +266,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         ActionBar mActionBar = getSupportActionBar();
         if(mActionBar != null) {
-            mActionBar.setDisplayShowHomeEnabled(false);
+            mActionBar.setDisplayShowHomeEnabled(false); //Gets rid of the "back"-button in the action bar
             mActionBar.setDisplayHomeAsUpEnabled(false);
             mActionBar.setDisplayShowTitleEnabled(false);
             LayoutInflater mLayoutInflater = LayoutInflater.from(this);
@@ -284,8 +278,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             mParent.setPadding(0,0,0,0);
             mParent.setContentInsetsAbsolute(0,0);
 
-            /*
-
+            //Takes the user to the list activity when the "list"-button is pressed
             final ImageButton buttonList = customView.findViewById(R.id.action_list);
             buttonList.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -299,25 +292,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             buttonProfile.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    //TODO create user profile activity and intent that activity with this button
-                    mToast.show();
+                    Intent intent = new Intent(MapsActivity.this, UserActivity.class);
+                    startActivity(intent);
                 }
             });
 
-            */
         }
     }
 
 
     /**
      * Sets up the logic for the category buttons on the bottom of the screen.
-     * If all categories are deactivated (un-selected), the system acts like all categories are selected.
+     * If all categories are deactivated (un-selected), the system acts like all categories are selected (for logic purposes).
      * By default, all categories are deactivated.
      */
     private void setUpCategoryButtons(){
-
-        bottomAppBar.setPadding(0,0,0,0);
-        bottomAppBar.setContentInsetsAbsolute(0,0);
 
         mButtonFoodAndDrink = findViewById(R.id.action_category_food_and_drink);
         mButtonParty = findViewById(R.id.action_category_party);
@@ -329,6 +318,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View v) {
                 mFoodAndDrinkActivated = !mFoodAndDrinkActivated;
+                /*If all categories are selected after the button is pressed, all categories have to be set
+                 *to false to keep the logic consistent.
+                 */
                 if(everyCategoryActivated()) setAllButtonsFalse();
                 toggleButtonsGreyed();
                 updateSelectedEvents();
@@ -368,11 +360,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         buttonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(MapsActivity.this, CreateActivity.class);
+                Intent i = new Intent(MapsActivity.this, CreateEventActivity.class);
                 i.setFlags(FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(i);
             }
         });
+
     }
 
 
@@ -447,7 +440,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     /**
-     * Update the UI of the map (actually, just enable the "My Location"-Button).
+     * Update the UI of the map (actually, just enable the "go to my location"-button, but the method has to be called like this).
      */
     private void updateLocationUI() {
         if (mMap == null) {
@@ -536,65 +529,33 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     /**
-     * Updates the event markers on the map based on selected categories.
+     * Updates the event markers on the map based on selected categories and the list of events in these categories.
      */
     private void updateEventMarkers(){
         mMap.clear();
         for(Event event : mSelectedEvents){
             Resources r = getResources();
-            Drawable[] layers = new Drawable[3];
-            Bitmap center;
-            Bitmap filling;
-            Bitmap border = getBitmap(this, R.drawable.event_max_border);
-            Bitmap resizedFilling;
-            Bitmap resizedBorder;
-            LayerDrawable layerDrawable;
-            Drawable dingens;
+            Drawable markerDrawable;
 
             switch (event.getCategory()) {
                 case 1:
-                    center = getBitmap(this, R.drawable.category_food_and_drink_marker);
-                    filling = getBitmap(this, R.drawable.category_food_and_drink_filling);
-                    dingens = getResources().getDrawable(R.drawable.test_marker_2);
+                    markerDrawable = getResources().getDrawable(R.drawable.test_marker_2);
                     break;
                 case 2:
-                    center = getBitmap(this, R.drawable.category_party_marker);
-                    filling = getBitmap(this, R.drawable.category_party_filling);
-                    dingens = getResources().getDrawable(R.drawable.test_marker_2);
+                    markerDrawable = getResources().getDrawable(R.drawable.test_marker_2);
                     break;
                 case 3:
-                    center = getBitmap(this, R.drawable.category_music_marker);
-                    filling = getBitmap(this, R.drawable.category_music_filling);
-                    dingens = getResources().getDrawable(R.drawable.test_marker_2);
+                    markerDrawable = getResources().getDrawable(R.drawable.test_marker_2);
                     break;
                 default:
-                    center = getBitmap(this, R.drawable.category_sports_marker);
-                    filling = getBitmap(this, R.drawable.category_sports_filling);
-                    dingens = getResources().getDrawable(R.drawable.test_marker_2);
+                    markerDrawable = getResources().getDrawable(R.drawable.test_marker_2);
             }
-
-            int borderSize = (int) Math.sqrt(Math.pow(200, 2) - Math.pow((event.getMaxPersons() - 200), 2));
-            int scaldedAttendance = (int) Math.sqrt(Math.pow(borderSize, 2) - Math.pow((event.getCurrentPersons() - borderSize), 2));
-            resizedFilling = Bitmap.createScaledBitmap(filling, center.getWidth() + scaldedAttendance, center.getHeight() + scaldedAttendance, true);
-            resizedBorder = Bitmap.createScaledBitmap(border, center.getWidth() + borderSize, center.getHeight() + borderSize, true);
-
-            BitmapDrawable gravityCenter = new BitmapDrawable(r, center);
-            gravityCenter.setGravity(Gravity.CENTER);
-            BitmapDrawable gravityFilling = new BitmapDrawable(r, resizedFilling);
-            gravityFilling.setGravity(Gravity.CENTER);
-            BitmapDrawable gravityBorder = new BitmapDrawable(r, resizedBorder);
-            gravityBorder.setGravity(Gravity.CENTER);
-
-            layers[0] = gravityFilling;
-            layers[1] = gravityBorder;
-            layers[2] = gravityCenter;
 
             int height = 100;
             int width = 100;
-            Bitmap b= vectorToBitmap( (VectorDrawable) getResources().getDrawable(R.drawable.test_marker_2));
+            Bitmap b= vectorToBitmap( (VectorDrawable) markerDrawable);
             Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
 
-            layerDrawable = new LayerDrawable(layers);
             Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(event.getLat(), event.getLng()))
                     .anchor(0.5f, 1.0f)
                     .icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
@@ -616,6 +577,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         return bitmap;
     }
 
+
+    //TODO: this function should not be needed anymore, it can be deleted once the usages have been removed
     protected static Bitmap getBitmap(Context context, int drawableId) {
         Drawable drawable = ContextCompat.getDrawable(context, drawableId);
         if (drawable instanceof BitmapDrawable) {
@@ -628,22 +591,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
-    /**
-     * @param context current context.
-     * @param vectorResId resource ID of the vector graphic
-     * @return BitmapDescriptor from a locally saved vector graphic
-     */
-    private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
-        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
-        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
-        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        vectorDrawable.draw(canvas);
-        return BitmapDescriptorFactory.fromBitmap(bitmap);
-    }
 
-
-    protected static BitmapDescriptor bitmapDescriptorFromDrawable(Context context, Drawable drawable){
+    protected static BitmapDescriptor bitmapDescriptorFromDrawable(Drawable drawable){
         int width = drawable.getIntrinsicWidth();
         int height = drawable.getIntrinsicHeight();
 
@@ -737,7 +686,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      */
     @Override
     public void onPoiClick(PointOfInterest poi) {
-        //TODO
+        //TODO handle clicks on POIs
         Toast.makeText(getApplicationContext(), "Keine Sorge, das kommt auch noch", Toast.LENGTH_LONG).show();
     }
 
@@ -768,11 +717,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mPartyActivated = false;
         mMusicActivated = false;
         mSportsActivated = false;
-    }
-
-
-    public Query getQuery(DatabaseReference databaseReference){
-        return databaseReference.child("events").limitToFirst(100).orderByChild("startingTime");
     }
 
 

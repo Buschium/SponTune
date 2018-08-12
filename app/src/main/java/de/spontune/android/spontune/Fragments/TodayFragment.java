@@ -10,11 +10,11 @@ public class TodayFragment extends EventFragment {
 
     @Override
     public Query getQuery(DatabaseReference databaseReference) {
-        Calendar now = GregorianCalendar.getInstance();
+        //Calendar now = GregorianCalendar.getInstance();   //used for determining which events start today
         Calendar endOfDay = GregorianCalendar.getInstance();
         endOfDay.set(Calendar.HOUR_OF_DAY, 23);
         endOfDay.set(Calendar.MINUTE, 59);
         endOfDay.set(Calendar.SECOND, 59);
-        return databaseReference.child("events").orderByChild("startingTime").startAt(now.getTimeInMillis()).endAt(endOfDay.getTimeInMillis());
+        return databaseReference.child("events").orderByChild("startingTime").endAt(endOfDay.getTimeInMillis());
     }
 }
