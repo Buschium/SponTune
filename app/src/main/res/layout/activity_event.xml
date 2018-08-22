@@ -1,31 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<FrameLayout
+<android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_height="match_parent"
-    android:layout_width="match_parent">
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:src="@drawable/background_vibrant"
-        android:scaleType="centerCrop"/>
-
-<android.support.constraint.ConstraintLayout
-
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/surface"
-    android:orientation="vertical"
-    android:backgroundTint="@color/fui_transparent">
+    android:orientation="vertical">
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/event_title_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorAccent"
+        android:layout_height="@dimen/category_bar_height"
+        android:background="@color/surface"
         android:elevation="5dp"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -52,12 +40,13 @@
             android:layout_marginStart="12dp"
             android:layout_marginTop="2dp"
             android:fontFamily="@font/roboto"
-            android:textColor="@color/onSurfaceDark"
-            android:textSize="18sp"
+            android:textColor="@color/onSurface"
+            android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/avatar_image"
-            app:layout_constraintTop_toTopOf="@+id/avatar_image" />
+            app:layout_constraintTop_toTopOf="@+id/avatar_image"
+            app:layout_constraintBottom_toBottomOf="@id/avatar_image"/>
 
         <TextView
             android:id="@+id/subtitle_text"
@@ -66,7 +55,7 @@
             android:layout_marginBottom="2dp"
             android:layout_marginEnd="16dp"
             android:layout_marginStart="12dp"
-            android:textColor="@color/onSurfaceDarkSecondary"
+            android:textColor="@color/onSurfaceSecondary"
             app:layout_constraintBottom_toBottomOf="@+id/avatar_image"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/avatar_image" />
@@ -79,213 +68,208 @@
             android:layout_marginEnd="12dp"
             android:layout_marginTop="8dp"
             android:background="@color/fui_transparent"
-            android:src="@drawable/ic_round_close_dark"
+            android:src="@drawable/ic_round_close_light"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
     </android.support.constraint.ConstraintLayout>
 
-    <android.support.v7.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintTop_toBottomOf="@id/event_title_bar"
-        android:layout_margin="4dp"
-        app:cardCornerRadius="8dp">
-
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/event_scroll_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:background="@color/surface"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/event_title_bar"
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_editor_absoluteX="0dp">
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            >
+            android:layout_height="wrap_content">
 
-                <ImageView
-                    android:id="@+id/category_image"
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/food_and_drink_default"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:elevation="0dp"/>
+            <ImageView
+                android:id="@+id/category_image"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:elevation="0dp"
+                android:scaleType="centerCrop"
+                app:layout_constraintTop_toTopOf="parent" />
 
-                <android.support.constraint.ConstraintLayout
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:elevation="10dp"
+                app:layout_constraintTop_toBottomOf="@id/category_image">
+
+                <Button
+                    android:id="@+id/event_join"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@color/colorAccent"
+                    android:paddingEnd="5dp"
+                    android:paddingStart="5dp"
+                    android:text="@string/join_event"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageButton
+                    android:id="@+id/event_chat"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginEnd="25dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:src="@drawable/ic_round_chat_light"
+                    app:layout_constraintBottom_toBottomOf="@id/event_join"
+                    app:layout_constraintEnd_toStartOf="@id/event_share"
+                    app:layout_constraintTop_toTopOf="@id/event_join" />
+
+                <ImageButton
+                    android:id="@+id/event_share"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="25dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:src="@drawable/ic_round_share_light"
+                    app:layout_constraintEnd_toStartOf="@id/event_map"
+                    app:layout_constraintTop_toTopOf="@id/event_join"
+                    app:layout_constraintBottom_toBottomOf="@id/event_join"/>
+
+                <ImageButton
+                    android:id="@+id/event_map"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:src="@drawable/ic_round_place_light"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/event_join"
+                    app:layout_constraintBottom_toBottomOf="@id/event_join"/>
+
+                <FrameLayout
+                    android:id="@+id/description_frame"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:elevation="10dp"
-                    android:layout_marginBottom="20dp"
-                    app:layout_constraintTop_toBottomOf="@id/category_image">
+                    app:layout_constraintBottom_toTopOf="@id/divider"
+                    app:layout_constraintTop_toBottomOf="@id/event_join">
 
-                    <Button
-                        android:id="@+id/event_join"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/join_event"
-                        android:textColor="@color/onPrimary"
-                        android:textSize="20sp"
-                        android:layout_marginStart="16dp"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        android:background="@color/colorAccent" />
-
-                    <ImageButton
-                        android:id="@+id/event_chat"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="25dp"
-                        android:src="@drawable/ic_round_chat_light"
-                        android:layout_marginTop="13dp"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintEnd_toStartOf="@id/event_share"
-                        android:background="?android:attr/selectableItemBackground" />
-
-                    <ImageButton
-                        android:id="@+id/event_share"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="25dp"
-                        android:src="@drawable/ic_round_share_light"
-                        android:layout_marginTop="13dp"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintEnd_toStartOf="@id/event_map"
-                        android:background="?android:attr/selectableItemBackground" />
-
-                    <ImageButton
-                        android:id="@+id/event_map"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="16dp"
-                        android:src="@drawable/ic_round_place_light"
-                        android:layout_marginTop="13dp"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        android:background="?android:attr/selectableItemBackground" />
-
-                    <FrameLayout
-                        android:id="@+id/description_frame"
+                    <TextView
+                        android:id="@+id/event_description_textview"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:layout_constraintTop_toBottomOf="@id/event_join"
-                        app:layout_constraintBottom_toTopOf="@id/divider">
-
-                        <TextView
-                            android:id="@+id/event_description_textview"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="16dp"
-                            android:layout_marginStart="16dp"
-                            android:layout_marginTop="24dp"
-                            android:maxLines="7"
-                            android:textColor="@color/onSurface"
-                            android:textSize="16sp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent" />
-
-                        <View
-                            android:id="@+id/gradient"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_gravity="bottom"
-                            android:background="@drawable/transparent_to_light_surface_gradient" />
-
-                    </FrameLayout>
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="24dp"
+                        android:maxLines="7"
+                        android:textColor="@color/onSurface"
+                        android:textSize="16sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
 
                     <View
-                        android:id="@+id/divider"
+                        android:id="@+id/gradient"
                         android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginEnd="20dp"
-                        android:layout_marginStart="20dp"
-                        android:layout_marginTop="20dp"
-                        android:background="@color/light_grey"
-                        app:layout_constraintTop_toBottomOf="@id/description_frame" />
+                        android:layout_height="match_parent"
+                        android:layout_gravity="bottom"
+                        android:background="@drawable/transparent_to_light_surface_gradient" />
 
-                    <TextView
-                        android:id="@+id/text_view_starting_time"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginTop="20dp"
-                        android:text="@string/starting_time"
-                        android:textColor="@color/onSurface"
-                        android:textSize="16sp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/divider" />
+                </FrameLayout>
 
-                    <TextView
-                        android:id="@+id/event_metadata_starting_time"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="16dp"
-                        android:textColor="@color/onSurface"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        app:layout_constraintBaseline_toBaselineOf="@id/text_view_starting_time"
-                        app:layout_constraintEnd_toStartOf="@id/event_metadata_starting_date" />
+                <View
+                    android:id="@+id/divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:background="@color/light_grey"
+                    app:layout_constraintTop_toBottomOf="@id/description_frame" />
 
-                    <TextView
-                        android:id="@+id/event_metadata_starting_date"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="16dp"
-                        android:textColor="@color/onSurface"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:visibility="gone"
-                        app:layout_constraintBaseline_toBaselineOf="@id/text_view_starting_time"
-                        app:layout_constraintEnd_toEndOf="parent" />
+                <TextView
+                    android:id="@+id/text_view_starting_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/starting_time"
+                    android:textColor="@color/onSurface"
+                    android:textSize="16sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/divider" />
 
-                    <TextView
-                        android:id="@+id/text_view_ending_time"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginTop="20dp"
-                        android:text="@string/ending_time"
-                        android:textColor="@color/onSurface"
-                        android:textSize="16sp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/text_view_starting_time" />
+                <TextView
+                    android:id="@+id/event_metadata_starting_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:textColor="@color/onSurface"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBaseline_toBaselineOf="@id/text_view_starting_time"
+                    app:layout_constraintEnd_toStartOf="@id/event_metadata_starting_date" />
 
-                    <TextView
-                        android:id="@+id/event_metadata_ending_time"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="16dp"
-                        android:textColor="@color/onSurface"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        app:layout_constraintBaseline_toBaselineOf="@id/text_view_ending_time"
-                        app:layout_constraintEnd_toStartOf="@id/event_metadata_ending_date" />
+                <TextView
+                    android:id="@+id/event_metadata_starting_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:textColor="@color/onSurface"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    app:layout_constraintBaseline_toBaselineOf="@id/text_view_starting_time"
+                    app:layout_constraintEnd_toEndOf="parent" />
 
-                    <TextView
-                        android:id="@+id/event_metadata_ending_date"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="16dp"
-                        android:textColor="@color/onSurface"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:visibility="gone"
-                        app:layout_constraintBaseline_toBaselineOf="@id/text_view_ending_time"
-                        app:layout_constraintEnd_toEndOf="parent" />
+                <TextView
+                    android:id="@+id/text_view_ending_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/ending_time"
+                    android:textColor="@color/onSurface"
+                    android:textSize="16sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_view_starting_time" />
 
-                </android.support.constraint.ConstraintLayout>
+                <TextView
+                    android:id="@+id/event_metadata_ending_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:textColor="@color/onSurface"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBaseline_toBaselineOf="@id/text_view_ending_time"
+                    app:layout_constraintEnd_toStartOf="@id/event_metadata_ending_date" />
+
+                <TextView
+                    android:id="@+id/event_metadata_ending_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:textColor="@color/onSurface"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    app:layout_constraintBaseline_toBaselineOf="@id/text_view_ending_time"
+                    app:layout_constraintEnd_toEndOf="parent" />
 
             </android.support.constraint.ConstraintLayout>
+
+        </android.support.constraint.ConstraintLayout>
 
 
     </android.support.v4.widget.NestedScrollView>
 
-    </android.support.v7.widget.CardView>
-
-
 </android.support.constraint.ConstraintLayout>
-
-</FrameLayout>

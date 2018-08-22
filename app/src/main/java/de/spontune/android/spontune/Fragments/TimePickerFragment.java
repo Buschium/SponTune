@@ -1,14 +1,16 @@
 package de.spontune.android.spontune.Fragments;
 
 import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
-import android.app.TimePickerDialog;
 import android.text.format.DateFormat;
 import android.widget.TimePicker;
 
 public class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
+
+    private PickTimeDialogListener pickTimeDialogListener;
 
     public interface PickTimeDialogListener {
         void onFinishPickTimeDialog(int hour, int minute);
@@ -29,8 +31,11 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
 
     @Override
     public void onTimeSet(TimePicker timePicker, int hour, int minute) {
-        PickTimeDialogListener activity = (PickTimeDialogListener) getActivity();
-        activity.onFinishPickTimeDialog(hour, minute);
+        pickTimeDialogListener.onFinishPickTimeDialog(hour, minute);
         this.dismiss();
+    }
+
+    public void setPickTimeDialogListener(PickTimeDialogListener pickTimeDialogListener) {
+        this.pickTimeDialogListener = pickTimeDialogListener;
     }
 }

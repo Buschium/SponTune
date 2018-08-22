@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/scroll_view_create"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toTopOf="@+id/create_bottom_toolbar"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/input_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:hint="@string/input_title"
+                android:inputType="text"
+                android:maxLength="60"
+                android:maxLines="1"
+                android:scrollHorizontally="false"
+                android:textSize="20sp"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <EditText
+                android:id="@+id/input_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:hint="@string/input_description"
+                android:inputType="textMultiLine"
+                android:lineSpacingExtra="2dp"
+                android:maxLength="2000"
+                android:scrollHorizontally="false"
+                android:textSize="20sp"
+                app:layout_constraintTop_toBottomOf="@+id/input_title"/>
+
+            <AutoCompleteTextView
+                android:id="@+id/input_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:hint="@string/input_address"
+                android:inputType="text"
+                android:lineSpacingExtra="2dp"
+                android:maxLength="2000"
+                android:maxLines="1"
+                android:textSize="20sp"
+                android:scrollHorizontally="false"
+                app:layout_constraintTop_toBottomOf="@+id/input_description" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:text="@string/starting_time"
+                android:textSize="16sp"
+                app:layout_constraintBaseline_toBaselineOf="@+id/starting_date"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/input_address" />
+
+            <ImageView
+                android:id="@+id/starting_date_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/activity_event_date"
+                app:layout_constraintEnd_toStartOf="@+id/starting_date"
+                app:layout_constraintTop_toTopOf="@+id/starting_date"
+                app:layout_constraintBottom_toBottomOf="@+id/starting_date"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="5dp"/>
+
+            <EditText
+                android:id="@+id/starting_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:inputType="none"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/input_address" />
+
+            <ImageView
+                android:id="@+id/starting_time_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/activity_event_time"
+                app:layout_constraintEnd_toStartOf="@+id/starting_time"
+                app:layout_constraintTop_toTopOf="@+id/starting_time"
+                app:layout_constraintBottom_toBottomOf="@+id/starting_time"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="5dp"/>
+
+            <EditText
+                android:id="@+id/starting_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:inputType="none"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@id/starting_date_image"
+                app:layout_constraintTop_toBottomOf="@+id/input_address" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:text="@string/ending_time"
+                android:textSize="16sp"
+                app:layout_constraintBaseline_toBaselineOf="@+id/ending_date"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <ImageView
+                android:id="@+id/ending_date_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/activity_event_date"
+                app:layout_constraintEnd_toStartOf="@+id/ending_date"
+                app:layout_constraintTop_toTopOf="@+id/ending_date"
+                app:layout_constraintBottom_toBottomOf="@+id/ending_date"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="5dp"/>
+
+            <EditText
+                android:id="@+id/ending_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:inputType="none"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/starting_date" />
+
+            <ImageView
+                android:id="@+id/ending_time_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/activity_event_time"
+                app:layout_constraintEnd_toStartOf="@+id/ending_time"
+                app:layout_constraintTop_toTopOf="@+id/ending_time"
+                app:layout_constraintBottom_toBottomOf="@+id/ending_time"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="5dp"/>
+
+            <EditText
+                android:id="@+id/ending_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:inputType="none"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@id/ending_date_image"
+                app:layout_constraintTop_toBottomOf="@+id/starting_time" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:text="@string/max_persons_title"
+                android:textSize="16sp"
+                app:layout_constraintBaseline_toBaselineOf="@+id/max_persons"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <EditText
+                android:id="@+id/max_persons"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:editable="false"
+                android:inputType="none"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ending_date" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:text="@string/current_persons_title"
+                android:textSize="16sp"
+                app:layout_constraintBaseline_toBaselineOf="@+id/current_persons"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <EditText
+                android:id="@+id/current_persons"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:editable="false"
+                android:inputType="none"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/max_persons"/>
+
+            <LinearLayout
+                android:id="@+id/create_categories"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/category_bar_height"
+                android:orientation="horizontal"
+                android:weightSum="4"
+                app:layout_constraintTop_toBottomOf="@id/current_persons"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_margin="16dp">
+
+                <ImageButton
+                    android:id="@+id/create_category_creative"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:padding="14dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/category_creative_light" />
+
+                <ImageButton
+                    android:id="@+id/create_category_party"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:padding="14dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/category_party_deactivated" />
+
+                <ImageButton
+                    android:id="@+id/create_category_happening"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:padding="14dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/category_happening_deactivated" />
+
+                <ImageButton
+                    android:id="@+id/create_category_sports"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:padding="14dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/category_sports_deactivated" />
+
+            </LinearLayout>
+
+        </android.support.constraint.ConstraintLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
+</android.support.constraint.ConstraintLayout>

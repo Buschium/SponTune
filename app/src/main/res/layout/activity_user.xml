@@ -49,6 +49,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="252dp"
         android:background="@drawable/button_rounded_corners"
+        android:backgroundTint="@color/colorAccent"
         android:text="@string/edit"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"

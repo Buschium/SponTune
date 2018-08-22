@@ -15,6 +15,7 @@ public class TodayFragment extends EventFragment {
         endOfDay.set(Calendar.HOUR_OF_DAY, 23);
         endOfDay.set(Calendar.MINUTE, 59);
         endOfDay.set(Calendar.SECOND, 59);
-        return databaseReference.child("events").orderByChild("startingTime").endAt(endOfDay.getTimeInMillis());
+        Query query = databaseReference.child("events").orderByChild("startingTime").endAt(endOfDay.getTimeInMillis());
+        return query;
     }
 }

@@ -54,4 +54,7 @@
     <string name="title_activity_user">Profil</string>
     <string name="edit">Bearbeiten</string>
     <string name="save">Speichern</string>
+    <string name="leave">Verlassen</string>
+    <string name="send">Senden</string>
+    <string name="preview">Vorschau</string>
 </resources>

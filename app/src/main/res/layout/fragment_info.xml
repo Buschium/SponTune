@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/constraintLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/background">
+
+    <ImageView
+        android:id="@+id/fragment_image"
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:scaleType="centerCrop"/>
+
+    <TextView
+        android:id="@+id/fragment_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_image"
+        app:layout_constraintStart_toStartOf="parent"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="@color/onPrimary" />
+
+    <ImageView
+        android:id="@+id/fragment_image_time"
+        android:layout_width="20sp"
+        android:layout_height="20sp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintTop_toTopOf="@id/fragment_time"
+        app:layout_constraintBottom_toBottomOf="@id/fragment_time"
+        app:layout_constraintStart_toStartOf="parent"
+        android:src="@drawable/activity_event_time"/>
+
+    <TextView
+        android:id="@+id/fragment_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintTop_toBottomOf="@id/fragment_title"
+        app:layout_constraintStart_toEndOf="@id/fragment_image_time"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:textColor="@color/onPrimary"
+        android:textSize="16sp"/>
+
+    <ImageView
+        android:id="@+id/fragment_image_date"
+        android:layout_width="20sp"
+        android:layout_height="20sp"
+        android:layout_marginStart="12dp"
+        app:layout_constraintTop_toTopOf="@id/fragment_date"
+        app:layout_constraintBottom_toBottomOf="@id/fragment_date"
+        app:layout_constraintStart_toEndOf="@id/fragment_time"
+        android:src="@drawable/activity_event_date"/>
+
+    <TextView
+        android:id="@+id/fragment_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
+        android:textColor="@color/onPrimary"
+        app:layout_constraintTop_toBottomOf="@id/fragment_title"
+        app:layout_constraintStart_toEndOf="@id/fragment_image_date"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:textSize="16sp"/>
+
+</android.support.constraint.ConstraintLayout>

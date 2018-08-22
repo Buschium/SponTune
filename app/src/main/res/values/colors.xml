@@ -3,9 +3,9 @@
 
     <!-- Brand colors -->
     <color name="colorPrimary">#FAFAFA</color>
-    <color name="colorPrimaryDark">#4A148C</color>
+    <color name="colorPrimaryDark">#711A6C</color>
     <color name="colorPrimaryLight">#FAFAFA</color>
-    <color name="colorAccent">#4A148C</color>
+    <color name="colorAccent">#711A6C</color>
     <color name="colorAccentDark">#12005E</color>
     <color name="colorAccentLight">#7C43BD</color>
 
@@ -33,10 +33,10 @@
     <color name="green">#00CC00</color>
 
     <!--Category colors -->
-    <color name="foodAndDrink">#FFFF00</color>
-    <color name="sports">#000080</color>
-    <color name="music">#AAFFCC</color>
-    <color name="party">#FF0000</color>
+    <color name="creative">#EA8922</color>
+    <color name="sports">#345A7D</color>
+    <color name="happening">#3DB284</color>
+    <color name="party">#A71F4B</color>
 
     <color name="text_shadow">#7F000000</color>
     <color name="bg_login">#26ae90</color>

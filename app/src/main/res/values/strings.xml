@@ -44,6 +44,9 @@
     <string name="back">Back</string>
     <string name="now">now</string>
     <string name="save">Save</string>
+    <string name="leave">Leave</string>
+    <string name="send">Send</string>
+    <string name="preview">Preview</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>

@@ -53,6 +53,8 @@
         android:hint="@string/hint_username"
         android:textColor="@color/onBackground"
         android:padding="10dp"
+        android:inputType="text"
+        android:maxLines="1"
         app:layout_constraintBottom_toTopOf="@+id/email" />
 
     <EditText

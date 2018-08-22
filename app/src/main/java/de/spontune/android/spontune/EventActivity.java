@@ -1,7 +1,11 @@
 package de.spontune.android.spontune;
 
 import android.animation.ObjectAnimator;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateFormat;
 import android.view.MenuItem;
@@ -9,20 +13,40 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 
 
 public class EventActivity extends AppCompatActivity {
 
     private TextView mEventDescriptionTextView;
+    private ImageView categoryImage;
     //TODO apply gradient only if the description is too long
     private View gradientView;
+    private FirebaseDatabase firebaseDatabase;
+    private DatabaseReference databaseReference;
+    private FirebaseAuth firebaseAuth;
+    private String eventID;
+    private String uid;
+    private boolean isParticipating = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,41 +57,72 @@ public class EventActivity extends AppCompatActivity {
         setContentView(R.layout.activity_event);
         TextView toolbarTitle = findViewById(R.id.title_text);
         toolbarTitle.setText(bundle.getString("summary"));
-        ImageView categoryImage = findViewById(R.id.category_image);
+        categoryImage = findViewById(R.id.category_image);
+
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
+        eventID = bundle.getString("id");
+        databaseReference = firebaseDatabase.getReference().child("events").child(eventID).child("participants");
+        uid = firebaseAuth.getUid();
 
         ImageView toolbarImage = findViewById(R.id.avatar_image);
         switch (bundle.getInt("category")){
             case 1:
-                toolbarImage.setImageResource(R.drawable.category_food_and_drink_light);
+                toolbarImage.setImageResource(R.drawable.category_creative_light);
+                loadImage("creative");
                 break;
             case 2:
                 toolbarImage.setImageResource(R.drawable.category_party_light);
-                //Party has its own default image
-                categoryImage.setImageResource(R.drawable.party_default);
+                loadImage("party");
                 break;
             case 3:
-                toolbarImage.setImageResource(R.drawable.category_music_light);
+                toolbarImage.setImageResource(R.drawable.category_happening_light);
+                loadImage("happening");
                 break;
             default:
                 toolbarImage.setImageResource(R.drawable.category_sports_light);
+                loadImage("sports");
                 break;
         }
 
-        /*
-        Button joinEventButton = findViewById(R.id.join_event_button);
+        final HashMap<String, String> participants = (HashMap<String, String>) getIntent().getSerializableExtra("participants");
+        final Button joinEventButton = findViewById(R.id.event_join);
+        if(participants.containsKey(uid)){
+            isParticipating = true;
+            joinEventButton.setText(getResources().getText(R.string.leave));
+        }
         joinEventButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                finish();
+                if(!isParticipating) {
+                    databaseReference.child(uid).setValue(uid);
+                    joinEventButton.setText(getResources().getText(R.string.leave));
+                    isParticipating = true;
+                }else{
+                    databaseReference.child(uid).removeValue();
+                    joinEventButton.setText(getResources().getText(R.string.join_event));
+                    isParticipating = false;
+                }
             }
         });
-        */
 
         ImageButton btnClose = findViewById(R.id.event_close);
         btnClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finishAfterTransition();
+            }
+        });
+
+        ImageButton btnChat = findViewById(R.id.event_chat);
+        btnChat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(isParticipating) {
+                    startActivity(new Intent(EventActivity.this, ChatActivity.class).putExtra("id", eventID));
+                }else{
+                    Toast.makeText(EventActivity.this, "Du musst dem Event beitreten, um chatten zu können", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
@@ -152,4 +207,33 @@ public class EventActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private void loadImage(final String categoryName){
+        if(getIntent().getSerializableExtra("picture") != null){
+            categoryImage.setImageBitmap((Bitmap) getIntent().getParcelableExtra("picture"));
+        }
+        try {
+            final File localFile = File.createTempFile("categoryImages", "jpg");
+            FirebaseStorage.getInstance().getReference().child("categoryImages/" + eventID).getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                    Bitmap bitmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
+                    categoryImage.setImageBitmap(bitmap);
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    FirebaseStorage.getInstance().getReference().child("categoryImages/" + categoryName + ".jpg").getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                            Bitmap bitmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
+                            categoryImage.setImageBitmap(bitmap);
+                        }
+                    });
+                }
+            });
+        } catch (IOException e ) {}
+    }
+
 }

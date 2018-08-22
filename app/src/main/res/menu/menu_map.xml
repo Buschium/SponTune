@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
         android:id="@+id/category_food_and_drink"
         android:checkable="true"
         android:enabled="true"
-        android:icon="@drawable/category_food_and_drink_light"
+        android:icon="@drawable/category_creative_light"
         android:title="@string/category_food_and_drink"
         android:visible="true"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_category_music"
-        android:icon="@drawable/category_music_light"
+        android:icon="@drawable/category_happening_light"
         android:title="@string/category_music"
         app:showAsAction="ifRoom"/>
 

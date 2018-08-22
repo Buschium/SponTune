@@ -3,22 +3,24 @@ package de.spontune.android.spontune;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.VectorDrawable;
-import android.os.Bundle;
-import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.transition.ChangeTransform;
 import android.transition.Slide;
 import android.util.Log;
 import android.view.Gravity;
@@ -28,22 +30,19 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.FusedLocationProviderClient;
-
-import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PointOfInterest;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
@@ -55,16 +54,16 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import de.spontune.android.spontune.Data.Event;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import de.spontune.android.spontune.Data.Event;
+
 import static android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT;
 
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnPoiClickListener, GoogleMap.OnMarkerClickListener{
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnPoiClickListener{
 
     private static final String LOG_TAG = MapsActivity.class.getSimpleName();
 
@@ -87,16 +86,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final String KEY_LOCATION = "location";
 
     //Category selection button states
-    private boolean mFoodAndDrinkActivated = false;
+    private boolean mCreativeActivated = false;
     private boolean mPartyActivated = false;
-    private boolean mMusicActivated = false;
+    private boolean mHappeningActivated = false;
     private boolean mSportsActivated = false;
 
     //category buttons
-    private ImageButton mButtonFoodAndDrink;
+    private CoordinatorLayout coordinatorLayout;
+    private ImageButton mButtonCreative;
     private ImageButton mButtonParty;
-    private ImageButton mButtonMusic;
+    private ImageButton mButtonHappening;
     private ImageButton mButtonSports;
+    private ImageButton mButtonAdd;
 
     //Firebase stuff
     private static DatabaseReference mEventsDatabaseReference;
@@ -128,6 +129,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Set up category buttons and action bar
         setUpActionBar();
         setUpCategoryButtons();
+        coordinatorLayout = findViewById(R.id.coordinator_layout);
 
         //Set up the Calendar for now and the end of the day and set up the milliseconds
         Calendar now = GregorianCalendar.getInstance();
@@ -294,7 +296,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     getWindow().setExitTransition(slide);
                     slide.setSlideEdge(Gravity.END);
                     getWindow().setEnterTransition(slide);
-                    startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(MapsActivity.this).toBundle());
+                    getWindow().setSharedElementEnterTransition(new ChangeTransform());
+                    getWindow().setSharedElementEnterTransition(new ChangeTransform());
+                    ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(MapsActivity.this, mButtonAdd, "add_event");
+                    startActivity(intent, options.toBundle());
                 }
             });
 
@@ -323,16 +328,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      */
     private void setUpCategoryButtons(){
 
-        mButtonFoodAndDrink = findViewById(R.id.action_category_food_and_drink);
+        mButtonCreative = findViewById(R.id.action_category_food_and_drink);
         mButtonParty = findViewById(R.id.action_category_party);
-        mButtonMusic = findViewById(R.id.action_category_music);
+        mButtonHappening = findViewById(R.id.action_category_music);
         mButtonSports = findViewById(R.id.action_category_sports);
-        ImageButton buttonAdd = findViewById(R.id.add_event);
+        mButtonAdd = findViewById(R.id.add_event);
 
-        mButtonFoodAndDrink.setOnClickListener(new View.OnClickListener() {
+        mButtonCreative.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mFoodAndDrinkActivated = !mFoodAndDrinkActivated;
+                mCreativeActivated = !mCreativeActivated;
                 /*If all categories are selected after the button is pressed, all categories have to be set
                  *to false to keep the logic consistent.
                  */
@@ -352,10 +357,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-        mButtonMusic.setOnClickListener(new View.OnClickListener() {
+        mButtonHappening.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mMusicActivated = !mMusicActivated;
+                mHappeningActivated = !mHappeningActivated;
                 if(everyCategoryActivated()) setAllButtonsFalse();
                 toggleButtonsGreyed();
                 updateSelectedEvents();
@@ -372,12 +377,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-        buttonAdd.setOnClickListener(new View.OnClickListener() {
+        mButtonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(MapsActivity.this, CreateEventActivity.class);
-                i.setFlags(FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(i);
+                getWindow().setEnterTransition(new Slide());
+                getWindow().setExitTransition(new Slide());
+                Intent intent = new Intent(MapsActivity.this, CreateEventActivity.class);
+                intent.setFlags(FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(MapsActivity.this).toBundle());
             }
         });
 
@@ -409,7 +416,36 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             getDeviceLocation();
         }
         mMap.setOnPoiClickListener(this);
-        mMap.setOnMarkerClickListener(this);
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                if(marker.getTag() != null) {
+                    Event clickedEvent = (Event) marker.getTag();
+
+                    if(clickedEvent != null) {
+                        Intent i = new Intent(MapsActivity.this, EventActivity.class);
+                        Bundle b = new Bundle();
+                        b.putString("id", clickedEvent.getID());
+                        b.putString("uid", mFirebaseAuth.getCurrentUser().getUid());
+                        b.putString("creator", clickedEvent.getCreator());
+                        b.putDouble("lat", clickedEvent.getLat());
+                        b.putDouble("lng", clickedEvent.getLng());
+                        b.putString("summary", clickedEvent.getSummary());
+                        b.putString("description", clickedEvent.getDescription());
+                        b.putLong("startingTime", clickedEvent.getStartingTime());
+                        b.putLong("endingTime", clickedEvent.getEndingTime());
+                        b.putInt("category", clickedEvent.getCategory());
+                        b.putInt("maxPersons", clickedEvent.getMaxPersons());
+                        b.putInt("currentPersons", clickedEvent.getCurrentPersons());
+                        b.putString("address", clickedEvent.getAddress());
+                        i.putExtras(b);
+                        i.putExtra("participants", clickedEvent.getParticipants());
+                        startActivity(i);
+                    }
+                }
+            }
+        });
+        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(this));
     }
 
 
@@ -515,9 +551,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         for(int i = 0; i < mSelectedEvents.size(); i++){
             Event event = mSelectedEvents.get(i);
             int cat = event.getCategory();
-            if((cat == 1 && !mFoodAndDrinkActivated
+            if((cat == 1 && !mCreativeActivated
                     || cat == 2 && !mPartyActivated
-                    || cat == 3 && !mMusicActivated
+                    || cat == 3 && !mHappeningActivated
                     || cat == 4 && !mSportsActivated)
                     && !noCategoryActivated()){
                 mUnselectedEvents.add(event);
@@ -529,9 +565,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         for(int i = 0; i < mUnselectedEvents.size(); i++){
             Event event = mUnselectedEvents.get(i);
             int cat = event.getCategory();
-            if(cat == 1 && mFoodAndDrinkActivated
+            if(cat == 1 && mCreativeActivated
                     || cat == 2 && mPartyActivated
-                    || cat == 3 && mMusicActivated
+                    || cat == 3 && mHappeningActivated
                     || cat == 4 && mSportsActivated
                     || noCategoryActivated()){
                 mUnselectedEvents.remove(event);
@@ -549,21 +585,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void updateEventMarkers(){
         mMap.clear();
         for(Event event : mSelectedEvents){
-            Resources r = getResources();
             Drawable markerDrawable;
 
             switch (event.getCategory()) {
                 case 1:
-                    markerDrawable = getResources().getDrawable(R.drawable.test_marker_2);
+                    markerDrawable = getResources().getDrawable(R.drawable.category_creative_marker);
                     break;
                 case 2:
-                    markerDrawable = getResources().getDrawable(R.drawable.test_marker_2);
+                    markerDrawable = getResources().getDrawable(R.drawable.category_party_marker);
                     break;
                 case 3:
-                    markerDrawable = getResources().getDrawable(R.drawable.test_marker_2);
+                    markerDrawable = getResources().getDrawable(R.drawable.category_happening_marker);
                     break;
                 default:
-                    markerDrawable = getResources().getDrawable(R.drawable.test_marker_2);
+                    markerDrawable = getResources().getDrawable(R.drawable.category_sports_marker);
             }
 
             int height = 100;
@@ -574,7 +609,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(event.getLat(), event.getLng()))
                     .anchor(0.5f, 1.0f)
                     .icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
-            marker.setTag(event.getID());
+            marker.setTag(event);
         }
     }
 
@@ -584,7 +619,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      * @param vectorDrawable the SVG to convert
      * @return a Bitmap
      */
-    private static Bitmap vectorToBitmap(VectorDrawable vectorDrawable) {
+    public static Bitmap vectorToBitmap(VectorDrawable vectorDrawable) {
         Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
@@ -623,75 +658,33 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      * Greys out category buttons based on which categories are selected.
      */
     private void toggleButtonsGreyed(){
-        Drawable foodAndDrinkIcon = this.getResources().getDrawable(R.drawable.category_food_and_drink_light);
+        Drawable foodAndDrinkIcon = this.getResources().getDrawable(R.drawable.category_creative_light);
         Drawable partyIcon = this.getResources().getDrawable(R.drawable.category_party_light);
-        Drawable musicIcon = this.getResources().getDrawable(R.drawable.category_music_light);
+        Drawable musicIcon = this.getResources().getDrawable(R.drawable.category_happening_light);
         Drawable sportsIcon = this.getResources().getDrawable(R.drawable.category_sports_light);
-        Drawable foodAndDrinkIconDeactivated = this.getResources().getDrawable(R.drawable.category_food_and_drink_deactivated);
+        Drawable foodAndDrinkIconDeactivated = this.getResources().getDrawable(R.drawable.category_creative_deactivated);
         Drawable partyIconDeactivated = this.getResources().getDrawable(R.drawable.category_party_deactivated);
-        Drawable musicIconDeactivated = this.getResources().getDrawable(R.drawable.category_music_deactivated);
+        Drawable musicIconDeactivated = this.getResources().getDrawable(R.drawable.category_happening_deactivated);
         Drawable sportsIconDeactivated = this.getResources().getDrawable(R.drawable.category_sports_deactivated);
         if(noCategoryActivated()){
-            mButtonFoodAndDrink.setImageDrawable(foodAndDrinkIcon);
+            mButtonCreative.setImageDrawable(foodAndDrinkIcon);
             mButtonParty.setImageDrawable(partyIcon);
-            mButtonMusic.setImageDrawable(musicIcon);
+            mButtonHappening.setImageDrawable(musicIcon);
             mButtonSports.setImageDrawable(sportsIcon);
         }else{
-            Drawable newIcon = mFoodAndDrinkActivated ? foodAndDrinkIcon : foodAndDrinkIconDeactivated;
-            mButtonFoodAndDrink.setImageDrawable(newIcon);
+            Drawable newIcon = mCreativeActivated ? foodAndDrinkIcon : foodAndDrinkIconDeactivated;
+            mButtonCreative.setImageDrawable(newIcon);
 
             newIcon = mPartyActivated ? partyIcon : partyIconDeactivated;
             mButtonParty.setImageDrawable(newIcon);
 
-            newIcon = mMusicActivated ? musicIcon : musicIconDeactivated;
-            mButtonMusic.setImageDrawable(newIcon);
+            newIcon = mHappeningActivated ? musicIcon : musicIconDeactivated;
+            mButtonHappening.setImageDrawable(newIcon);
 
             newIcon = mSportsActivated ? sportsIcon : sportsIconDeactivated;
             mButtonSports.setImageDrawable(newIcon);
         }
 
-    }
-
-
-    /**
-     * Handles clicks on (event-)markers on the map.
-     * @param marker Clicked marker
-     * @return true if click was consumed, else false
-     */
-    @Override
-    public boolean onMarkerClick(Marker marker){
-        if(marker.getTag() != null) {
-            String clickedEventID = (String) marker.getTag();
-            Event clickedEvent = null;
-            for(Event event : mSelectedEvents){
-                if(event.getID().equals(marker.getTag())){
-                    clickedEvent = event;
-                }
-            }
-
-            if(clickedEvent != null) {
-                Intent i = new Intent(this, EventActivity.class);
-                Bundle b = new Bundle();
-                b.putString("id", clickedEventID);
-                b.putString("uid", mFirebaseAuth.getCurrentUser().getUid());
-                b.putString("creator", clickedEvent.getCreator());
-                b.putDouble("lat", clickedEvent.getLat());
-                b.putDouble("lng", clickedEvent.getLng());
-                b.putString("summary", clickedEvent.getSummary());
-                b.putString("description", clickedEvent.getDescription());
-                b.putLong("startingTime", clickedEvent.getStartingTime());
-                b.putLong("endingTime", clickedEvent.getEndingTime());
-                b.putInt("category", clickedEvent.getCategory());
-                b.putInt("maxPersons", clickedEvent.getMaxPersons());
-                b.putInt("currentPersons", clickedEvent.getCurrentPersons());
-                b.putString("address", clickedEvent.getAddress());
-                i.putExtras(b);
-                startActivity(i);
-            }
-
-            return true;
-        }
-        return false;
     }
 
 
@@ -711,7 +704,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      * @return true if no category is selected
      */
     private boolean noCategoryActivated(){
-        return (!mFoodAndDrinkActivated && !mPartyActivated && !mMusicActivated && !mSportsActivated);
+        return (!mCreativeActivated && !mPartyActivated && !mHappeningActivated && !mSportsActivated);
     }
 
 
@@ -720,7 +713,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      * @return true if all categories are selected
      */
     private boolean everyCategoryActivated(){
-        return (mFoodAndDrinkActivated && mPartyActivated && mMusicActivated && mSportsActivated);
+        return (mCreativeActivated && mPartyActivated && mHappeningActivated && mSportsActivated);
     }
 
 
@@ -728,9 +721,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      * Un-selects all categories and thus puts category system back in idle mode.
      */
     private void setAllButtonsFalse(){
-        mFoodAndDrinkActivated = false;
+        mCreativeActivated = false;
         mPartyActivated = false;
-        mMusicActivated = false;
+        mHappeningActivated = false;
         mSportsActivated = false;
     }
 

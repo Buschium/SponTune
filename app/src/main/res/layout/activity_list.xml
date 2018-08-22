@@ -1,4 +1,4 @@
-<android.support.design.widget.CoordinatorLayout
+<android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -7,6 +7,7 @@
     tools:context=".ListActivity">
 
     <android.support.design.widget.AppBarLayout
+        android:id="@+id/tab_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -25,6 +26,86 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:layout_constraintTop_toBottomOf="@id/tab_bar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="@dimen/category_bar_height"
+        android:layout_marginBottom="@dimen/category_bar_height"
         android:background="@color/background"/>
 
-</android.support.design.widget.CoordinatorLayout>
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/coordinator_layout"
+        android:transitionName="category_bar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.design.bottomappbar.BottomAppBar
+            android:id="@+id/bottom_app_bar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/category_bar_height"
+            android:layout_gravity="bottom"
+            android:background="@color/surface">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/action_category_food_and_drink"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:layout_weight="1"
+                    android:padding="12dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/category_creative_light"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <ImageButton
+                    android:id="@+id/action_category_party"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:layout_weight="1"
+                    android:padding="12dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/category_party_light"/>
+
+
+                <ImageButton
+                    android:id="@+id/action_category_music"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:layout_weight="1"
+                    android:padding="12dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/category_happening_light"/>
+
+                <ImageButton
+                    android:id="@+id/action_category_sports"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:layout_weight="1"
+                    android:padding="12dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/category_sports_light" />
+
+            </LinearLayout>
+
+        </android.support.design.bottomappbar.BottomAppBar>
+
+        <android.support.design.widget.FloatingActionButton
+            android:transitionName="add_event"
+            android:id="@+id/add_event"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/activity_maps_add"
+            app:layout_anchor="@id/bottom_app_bar"
+            app:backgroundTint="@color/colorAccent"
+            android:visibility="gone"/>
+
+    </android.support.design.widget.CoordinatorLayout>
+
+</android.support.constraint.ConstraintLayout>

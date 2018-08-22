@@ -16,13 +16,15 @@
         tools:context="de.spontune.android.spontune.MapsActivity" />
 
     <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/coordinator_layout"
+        android:transitionName="category_bar"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <android.support.design.bottomappbar.BottomAppBar
             android:id="@+id/bottom_app_bar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/category_bar_height"
             android:layout_gravity="bottom"
             android:background="@color/surface">
 
@@ -37,9 +39,9 @@
                 android:layout_height="match_parent"
                 android:background="?android:attr/selectableItemBackground"
                 android:layout_weight="1"
-                android:padding="8dp"
+                android:padding="12dp"
                 android:scaleType="fitCenter"
-                android:src="@drawable/category_food_and_drink_light"
+                android:src="@drawable/category_creative_light"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <ImageButton
@@ -48,7 +50,7 @@
                 android:layout_height="match_parent"
                 android:background="?android:attr/selectableItemBackground"
                 android:layout_weight="1"
-                android:padding="8dp"
+                android:padding="12dp"
                 android:layout_marginEnd="20dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/category_party_light"/>
@@ -60,10 +62,10 @@
                 android:layout_height="match_parent"
                 android:background="?android:attr/selectableItemBackground"
                 android:layout_weight="1"
-                android:padding="8dp"
+                android:padding="12dp"
                 android:layout_marginStart="20dp"
                 android:scaleType="fitCenter"
-                android:src="@drawable/category_music_light"/>
+                android:src="@drawable/category_happening_light"/>
 
             <ImageButton
                 android:id="@+id/action_category_sports"
@@ -71,7 +73,7 @@
                 android:layout_height="match_parent"
                 android:background="?android:attr/selectableItemBackground"
                 android:layout_weight="1"
-                android:padding="8dp"
+                android:padding="12dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/category_sports_light" />
 
@@ -80,6 +82,7 @@
         </android.support.design.bottomappbar.BottomAppBar>
 
         <android.support.design.widget.FloatingActionButton
+            android:transitionName="add_event"
             android:id="@+id/add_event"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

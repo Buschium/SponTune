@@ -1,13 +1,15 @@
 package de.spontune.android.spontune.Fragments;
 
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
-import android.app.DatePickerDialog;
 import android.widget.DatePicker;
 
 public class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
+
+    private PickDateDialogListener pickDateDialogListener;
 
     public interface PickDateDialogListener {
         void onFinishPickDateDialog(int year, int month, int day);
@@ -28,9 +30,12 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
     }
 
     public void onDateSet(DatePicker view, int year, int month, int day) {
-        PickDateDialogListener activity = (PickDateDialogListener) getActivity();
-        activity.onFinishPickDateDialog(year, month, day);
+        pickDateDialogListener.onFinishPickDateDialog(year, month, day);
         this.dismiss();
+    }
+
+    public void setPickDateDialogListener(PickDateDialogListener pickDateDialogListener){
+        this.pickDateDialogListener = pickDateDialogListener;
     }
 
 }

@@ -1,34 +1,41 @@
 package de.spontune.android.spontune.Fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.spontune.android.spontune.Data.Event;
-import de.spontune.android.spontune.Data.EventViewHolder;
-import de.spontune.android.spontune.EventActivity;
 import de.spontune.android.spontune.R;
 
 
 public abstract class EventFragment extends android.support.v4.app.Fragment {
 
     private DatabaseReference mDatabase;
-    private FirebaseRecyclerAdapter<Event, EventViewHolder> mAdapter;
+    private CustomFirebaseRecyclerAdapter mAdapter;
     private RecyclerView mRecycler;
     private LinearLayoutManager mManager;
+    private FirebaseAuth firebaseAuth;
+
+    private List<Event> eventList;
 
     public EventFragment() {}
+
 
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -48,72 +55,55 @@ public abstract class EventFragment extends android.support.v4.app.Fragment {
         mRecycler.setLayoutManager(mManager);
 
         Query postsQuery = getQuery(mDatabase);
+        firebaseAuth = FirebaseAuth.getInstance();
 
-        FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Event>().setQuery(postsQuery, Event.class).build();
-
-        mAdapter = new FirebaseRecyclerAdapter<Event, EventViewHolder>(options) {
-
-            @Override
-            public EventViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-                LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
-                return new EventViewHolder(inflater.inflate(R.layout.fragment_list, viewGroup, false), viewGroup.getContext());
-            }
-
-            @Override
-            protected void onBindViewHolder(EventViewHolder viewHolder, int position, final Event event) {
-                ImageView fragmentImage = viewHolder.itemView.findViewById(R.id.fragment_image);
-                switch (event.getCategory()){
-                    case 1: fragmentImage.setImageResource(R.drawable.party_default);
-                    break;
-                    case 2: fragmentImage.setImageResource(R.drawable.creative_default);
-                    break;
-                    case 3: fragmentImage.setImageResource(R.drawable.sports_default);
-                    break;
-                    default: fragmentImage.setImageResource(R.drawable.happening_default);
-                }
-                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent i = new Intent(getActivity(), EventActivity.class);
-                        Bundle b = new Bundle();
-                        b.putString("id", event.getID());
-                        b.putString("creator", event.getCreator());
-                        b.putDouble("lat", event.getLat());
-                        b.putDouble("lng", event.getLng());
-                        b.putString("summary", event.getSummary());
-                        b.putString("description", event.getDescription());
-                        b.putLong("startingTime", event.getStartingTime());
-                        b.putLong("endingTime", event.getEndingTime());
-                        b.putInt("category", event.getCategory());
-                        b.putInt("maxPersons", event.getMaxPersons());
-                        b.putInt("currentPersons", event.getCurrentPersons());
-                        b.putString("address", event.getAddress());
-                        i.putExtras(b);
-                        startActivityForResult(i, 1);
-                    }
-                });
-                viewHolder.bindToPost(event);
-            }
-        };
+        eventList = new ArrayList<>();
+        ArrayList<Event> eventListNew = new ArrayList<>();
+        mAdapter = new CustomFirebaseRecyclerAdapter(getActivity(), eventListNew);
         mRecycler.setAdapter(mAdapter);
-    }
 
+        postsQuery.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                Event event = dataSnapshot.getValue(Event.class);
+                eventList.add(event);
+                mAdapter.addItem(event, eventList.indexOf(event), eventList.size() - 1);
+            }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (mAdapter != null) {
-            mAdapter.startListening();
-        }
-    }
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (mAdapter != null) {
-            mAdapter.stopListening();
-        }
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     public abstract Query getQuery(DatabaseReference databaseReference);
+
+    public void onCategorySelected(boolean creativeActivated, boolean partyActivated, boolean happeningActivated, boolean sportsActivated){
+        boolean allCategoriesDeactivated = !creativeActivated && !partyActivated && !happeningActivated && !sportsActivated;
+        for(Event event : eventList){
+            int category = event.getCategory();
+            if(category == 1 && creativeActivated || category == 2 && partyActivated || category == 3 && happeningActivated || category == 4 && sportsActivated || allCategoriesDeactivated){
+                mAdapter.addItem(event, eventList.indexOf(event), eventList.size() - 1);
+            }else{
+                mAdapter.removeItem(event);
+            }
+        }
+        mRecycler.smoothScrollToPosition(0);
+    }
 }

@@ -1,5 +1,9 @@
 package de.spontune.android.spontune.Data;
 
+import android.graphics.Bitmap;
+
+import java.util.HashMap;
+
 public class Event {
     private int category;
     private String creator;
@@ -13,12 +17,13 @@ public class Event {
     private long startingTime;
     private String summary;
     private String address;
-    //public byte[] picture;
+    private HashMap<String, String> participants;
+    public Bitmap picture;
 
     public Event(){}
 
     public Event(double lat, double lng, String creator, String summary, String description, long startingTime,
-                 long endingTime, int category, int maxPersons, int currentPersons, String address){
+                 long endingTime, int category, int maxPersons, int currentPersons, String address, HashMap<String, String> participants){
         this.lat = lat;
         this.lng = lng;
         this.creator = creator;
@@ -31,6 +36,7 @@ public class Event {
         this.maxPersons = maxPersons;
         this.currentPersons = currentPersons;
         this.address = address;
+        this.participants = participants;
     }
 
     public String getID() {
@@ -127,5 +133,21 @@ public class Event {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public HashMap<String, String> getParticipants() {
+        return participants;
+    }
+
+    public void setParticipants(HashMap<String, String> participants) {
+        this.participants = participants;
+    }
+
+    public Bitmap getPicture() {
+        return picture;
+    }
+
+    public void setPicture(Bitmap picture) {
+        this.picture = picture;
     }
 }
