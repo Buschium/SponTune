@@ -12,8 +12,8 @@ import android.widget.ProgressBar;
 
 import com.google.firebase.auth.FirebaseAuth;
 
+import de.spontune.android.spontune.Adapters.NonSwipeableViewPager;
 import de.spontune.android.spontune.Fragments.LoginFragment;
-import de.spontune.android.spontune.Fragments.NonSwipeableViewPager;
 import de.spontune.android.spontune.Fragments.PasswordResetFragment;
 import de.spontune.android.spontune.Fragments.SignupFragment;
 

@@ -4,28 +4,17 @@
     <!-- Brand colors -->
     <color name="colorPrimary">#FAFAFA</color>
     <color name="colorPrimaryDark">#711A6C</color>
-    <color name="colorPrimaryLight">#FAFAFA</color>
     <color name="colorAccent">#711A6C</color>
-    <color name="colorAccentDark">#12005E</color>
-    <color name="colorAccentLight">#7C43BD</color>
 
     <!-- System colors -->
     <color name="background">#EEEEEE</color>
-    <color name="backgroundDark">#212121</color>
     <color name="surface">#FAFAFA</color>
-    <color name="surfaceDark">#15151D</color>
     <color name="error">#B00020</color>
 
     <!-- "On"-colours -->
     <color name="onPrimary">#DE000000</color>
-    <color name="onSecondary">#DE000000</color>
     <color name="onBackground">#DE000000</color>
-    <color name="onBackgroundDark">#FFFFFF</color>
     <color name="onSurface">#DE000000</color>
-    <color name="onSurfaceSecondary">#8A000000</color>
-    <color name="onSurfaceDark">#FFFFFF</color>
-    <color name="onSurfaceDarkSecondary">#FFFFFFDC</color>
-    <color name="onError">#FFFFFF</color>
 
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
@@ -38,19 +27,5 @@
     <color name="happening">#3DB284</color>
     <color name="party">#A71F4B</color>
 
-    <color name="text_shadow">#7F000000</color>
-    <color name="bg_login">#26ae90</color>
-    <color name="bg_register">#2e3237</color>
-    <color name="bg_main">#428bca</color>
-    <color name="input_login">#222222</color>
-    <color name="input_login_hint">#999999</color>
-    <color name="light_grey">#888888</color>
-    <color name="input_register_bg">#3b4148</color>
-    <color name="input_register_hint">#5e6266</color>
-    <color name="btn_login">#26ae90</color>
-    <color name="btn_login_bg">#eceef1</color>
-    <color name="lbl_name">#333333</color>
-    <color name="btn_logut_bg">#ff6861</color>
-    <color name="login_notification_bar">#01337C</color>
-    <color name="text_color_primary">#de000000</color>
+    <color name="light_grey">#88888888</color>
 </resources>

@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -20,6 +19,7 @@ import com.google.firebase.database.Query;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.spontune.android.spontune.Adapters.CustomFirebaseRecyclerAdapter;
 import de.spontune.android.spontune.Data.Event;
 import de.spontune.android.spontune.R;
 
@@ -29,10 +29,9 @@ public abstract class EventFragment extends android.support.v4.app.Fragment {
     private DatabaseReference mDatabase;
     private CustomFirebaseRecyclerAdapter mAdapter;
     private RecyclerView mRecycler;
-    private LinearLayoutManager mManager;
-    private FirebaseAuth firebaseAuth;
 
     private List<Event> eventList;
+    private List<String> ids;
 
     public EventFragment() {}
 
@@ -51,14 +50,14 @@ public abstract class EventFragment extends android.support.v4.app.Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mManager = new LinearLayoutManager(getActivity());
+        LinearLayoutManager mManager = new LinearLayoutManager(getActivity());
         mRecycler.setLayoutManager(mManager);
 
         Query postsQuery = getQuery(mDatabase);
-        firebaseAuth = FirebaseAuth.getInstance();
 
         eventList = new ArrayList<>();
         ArrayList<Event> eventListNew = new ArrayList<>();
+        ids = new ArrayList<>();
         mAdapter = new CustomFirebaseRecyclerAdapter(getActivity(), eventListNew);
         mRecycler.setAdapter(mAdapter);
 
@@ -67,12 +66,18 @@ public abstract class EventFragment extends android.support.v4.app.Fragment {
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 Event event = dataSnapshot.getValue(Event.class);
                 eventList.add(event);
+                ids.add(event.getID());
                 mAdapter.addItem(event, eventList.indexOf(event), eventList.size() - 1);
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
+                Event event = dataSnapshot.getValue(Event.class);
+                int position = ids.indexOf(event.getID());
+                eventList.remove(position);
+                mAdapter.removeItem(position);
+                eventList.add(position, event);
+                mAdapter.addItem(event, position, eventList.size() - 1);
             }
 
             @Override

@@ -2,13 +2,15 @@ package de.spontune.android.spontune.Data;
 
 import android.graphics.Bitmap;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 public class User {
     private String id;
     private String username;
     private String userDescription;
     private Bitmap profilePicture;
+    private HashMap<String, String> followers;
+    private HashMap<String, String> following;
 
     public User(){}
 
@@ -50,5 +52,21 @@ public class User {
 
     public Bitmap getProfilePicture() {
         return profilePicture;
+    }
+
+    public HashMap<String, String> getFollowers(){
+        return followers;
+    }
+
+    public void setFollowers(HashMap<String, String> followers){
+        this.followers = followers;
+    }
+
+    public HashMap<String, String> getFollowing(){
+        return following;
+    }
+
+    public void setFollowing(HashMap<String, String> following){
+        this.following = following;
     }
 }

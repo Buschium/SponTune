@@ -2,8 +2,6 @@ package de.spontune.android.spontune;
 
 import android.animation.ObjectAnimator;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -19,21 +17,23 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Map;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class EventActivity extends AppCompatActivity {
 
@@ -43,49 +43,101 @@ public class EventActivity extends AppCompatActivity {
     private View gradientView;
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
+    private StorageReference storageReference;
     private FirebaseAuth firebaseAuth;
     private String eventID;
     private String uid;
-    private boolean isParticipating = false;
+    private boolean isParticipating;
+
+    private CircleImageView participantsImageOne;
+    private CircleImageView participantsImageTwo;
+    private CircleImageView participantsImageThree;
+
+    private Map<String, String> following;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Bundle bundle = getIntent().getExtras();
-        assert bundle != null;
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event);
-        TextView toolbarTitle = findViewById(R.id.title_text);
-        toolbarTitle.setText(bundle.getString("summary"));
-        categoryImage = findViewById(R.id.category_image);
 
+        final Bundle bundle = getIntent().getExtras();
+        assert bundle != null;
         firebaseDatabase = FirebaseDatabase.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
-        eventID = bundle.getString("id");
-        databaseReference = firebaseDatabase.getReference().child("events").child(eventID).child("participants");
-        uid = firebaseAuth.getUid();
+        storageReference = FirebaseStorage.getInstance().getReference();
+        setUpActionBar(bundle);
 
-        ImageView toolbarImage = findViewById(R.id.avatar_image);
-        switch (bundle.getInt("category")){
+        eventID = bundle.getString("id");
+        categoryImage = findViewById(R.id.category_image);
+        switch(bundle.getInt("category")){
             case 1:
-                toolbarImage.setImageResource(R.drawable.category_creative_light);
                 loadImage("creative");
                 break;
             case 2:
-                toolbarImage.setImageResource(R.drawable.category_party_light);
                 loadImage("party");
                 break;
             case 3:
-                toolbarImage.setImageResource(R.drawable.category_happening_light);
                 loadImage("happening");
                 break;
-            default:
-                toolbarImage.setImageResource(R.drawable.category_sports_light);
+            case 4:
                 loadImage("sports");
-                break;
         }
 
+        databaseReference = firebaseDatabase.getReference().child("events").child(eventID).child("participants");
+        uid = firebaseAuth.getUid();
+
         final HashMap<String, String> participants = (HashMap<String, String>) getIntent().getSerializableExtra("participants");
+        DatabaseReference userReference = firebaseDatabase.getReference().child("users").child(uid).child("following");
+        userReference.addListenerForSingleValueEvent(new ValueEventListener(){
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot){
+                following = (HashMap<String, String>) dataSnapshot.getValue();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError){
+                //TODO handle database exception
+            }
+        });
+
+        int numParticipants = participants.size();
+        TextView participantsTextView = findViewById(R.id.text_view_participants);
+        participantsTextView.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                Intent intent = new Intent(EventActivity.this, ParticipantsActivity.class);
+                intent.putExtra("participants", participants);
+                intent.putExtra("uid", uid);
+                startActivity(intent);
+            }
+        });
+        participantsImageOne = findViewById(R.id.participants_image_one);
+        participantsImageTwo = findViewById(R.id.participants_image_two);
+        participantsImageThree = findViewById(R.id.participants_image_three);
+        Object[] participantsSet = participants.keySet().toArray();
+        if(numParticipants == 1){
+            participantsTextView.setText(getResources().getString(R.string.participants_one));
+            loadUserImage((String) participantsSet[0], 1);
+            participantsImageTwo.setVisibility(View.GONE);
+            participantsImageThree.setVisibility(View.GONE);
+        }else if(numParticipants <= 3){
+            participantsTextView.setText(getResources().getString(R.string.participants_more_than_three, numParticipants));
+            if(numParticipants == 2){
+                participantsImageThree.setVisibility(View.GONE);
+                loadUserImage((String) participantsSet[0], 1);
+                loadUserImage((String) participantsSet[1], 2);
+            }else{
+                loadUserImage((String) participantsSet[0], 1);
+                loadUserImage((String) participantsSet[1], 2);
+                loadUserImage((String) participantsSet[2], 3);
+            }
+        }else{
+            participantsTextView.setText(getResources().getString(R.string.participants_more_than_three, numParticipants));
+            loadUserImage((String) participantsSet[0], 1);
+            loadUserImage((String) participantsSet[1], 2);
+            loadUserImage((String) participantsSet[2], 3);
+        }
+
         final Button joinEventButton = findViewById(R.id.event_join);
         if(participants.containsKey(uid)){
             isParticipating = true;
@@ -106,14 +158,6 @@ public class EventActivity extends AppCompatActivity {
             }
         });
 
-        ImageButton btnClose = findViewById(R.id.event_close);
-        btnClose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finishAfterTransition();
-            }
-        });
-
         ImageButton btnChat = findViewById(R.id.event_chat);
         btnChat.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -130,30 +174,50 @@ public class EventActivity extends AppCompatActivity {
         mEventDescriptionTextView = findViewById(R.id.event_description_textview);
         mEventDescriptionTextView.setText(bundle.getString("description"));
         gradientView = findViewById(R.id.gradient);
+        final int collapsedMaxLines = 7;
+        final int expandedMaxLines = 20;
+        int lines = mEventDescriptionTextView.getLineCount();
 
-        //The description expands when the user clicks on it (or shrinks when it's already expanded)
-        mEventDescriptionTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int collapsedMaxLines = 7;
-                ObjectAnimator animation = ObjectAnimator.ofInt(mEventDescriptionTextView, "maxLines", mEventDescriptionTextView.getMaxLines() == collapsedMaxLines? 20 : collapsedMaxLines);
-                animation.setInterpolator(new DecelerateInterpolator());
-                animation.setDuration(200).start();
-                if(mEventDescriptionTextView.getMaxLines() == collapsedMaxLines) {
-                    gradientView.setBackground(null);
-                }else{
-                    gradientView.setBackground(getDrawable(R.drawable.transparent_to_light_surface_gradient));
+        if(lines > collapsedMaxLines){
+            gradientView.setVisibility(View.VISIBLE);
+
+            //The description expands when the user clicks on it (or shrinks when it's already expanded)
+            mEventDescriptionTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ObjectAnimator animation = ObjectAnimator.ofInt(mEventDescriptionTextView, "maxLines", mEventDescriptionTextView.getMaxLines() == collapsedMaxLines? expandedMaxLines : collapsedMaxLines);
+                    animation.setInterpolator(new DecelerateInterpolator());
+                    animation.setDuration(200).start();
+                    if(mEventDescriptionTextView.getMaxLines() == collapsedMaxLines) {
+                        gradientView.setVisibility(View.GONE);
+                    }else{
+                        gradientView.setVisibility(View.VISIBLE);
+                    }
                 }
-            }
-        });
+            });
+        }
 
         setUpTimeAndDate(bundle);
 
-        if(bundle.getString("address") != null) {
-            TextView locationTextView = findViewById(R.id.subtitle_text);
-            locationTextView.setText(bundle.getString("address"));
-        }
+    }
 
+
+    private void setUpActionBar(Bundle bundle){
+        assert  getSupportActionBar() != null;
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(bundle.getString("summary"));
+        DatabaseReference creatorReference = firebaseDatabase.getReference().child("users").child(bundle.getString("creator")).child("username");
+        creatorReference.addListenerForSingleValueEvent(new ValueEventListener(){
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot){
+                getSupportActionBar().setSubtitle(getResources().getString(R.string.created_by, dataSnapshot.getValue(String.class)));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError){
+
+            }
+        });
     }
 
 
@@ -169,7 +233,7 @@ public class EventActivity extends AppCompatActivity {
         long startingTime = bundle.getLong("startingTime");
         long endingTime = bundle.getLong("endingTime");
 
-        Calendar calendar = GregorianCalendar.getInstance();
+        Calendar calendar = Calendar.getInstance();
 
         Date startingDate = new Date(startingTime);
         String startingDateString = DateFormat.getDateFormat(getApplicationContext()).format(startingDate);
@@ -192,48 +256,51 @@ public class EventActivity extends AppCompatActivity {
             startingDateTextView.setVisibility(View.VISIBLE);
         }
 
-        if(startingDate.getDate() != endingDate.getDate()){
+        if(calendar.get(Calendar.DAY_OF_MONTH) != endingDate.getDate()){
             endingDateTextView.setText(endingDateString);
             endingDateTextView.setVisibility(View.VISIBLE);
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            // Respond to the action bar's Up/Home button
-            case android.R.id.home:
-                finish();
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     private void loadImage(final String categoryName){
-        if(getIntent().getSerializableExtra("picture") != null){
-            categoryImage.setImageBitmap((Bitmap) getIntent().getParcelableExtra("picture"));
-        }
-        try {
-            final File localFile = File.createTempFile("categoryImages", "jpg");
-            FirebaseStorage.getInstance().getReference().child("categoryImages/" + eventID).getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                    Bitmap bitmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
-                    categoryImage.setImageBitmap(bitmap);
-
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    FirebaseStorage.getInstance().getReference().child("categoryImages/" + categoryName + ".jpg").getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                            Bitmap bitmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
-                            categoryImage.setImageBitmap(bitmap);
-                        }
-                    });
-                }
-            });
-        } catch (IOException e ) {}
+        Glide.with(this)
+                .load(storageReference.child("categoryImages/" + eventID))
+                .error(Glide.with(this).load(storageReference.child("categoryImages/" + categoryName + ".jpg")))
+                .into(categoryImage);
     }
+
+    /**
+     * try to load the profilePicture from firebase. The image is saved under 'images/[userId]'
+     */
+    private void loadUserImage(String uid, final int participant){
+        RequestOptions options = new RequestOptions()
+                .placeholder(R.drawable.activity_maps_menu_user)
+                .error(R.drawable.activity_maps_menu_user);
+        switch(participant){
+            case 1:
+                Glide.with(this).load(storageReference.child("images/" + uid)).apply(options).into(participantsImageOne);
+                break;
+            case 2:
+                Glide.with(this).load(storageReference.child("images/" + uid)).apply(options).into(participantsImageTwo);
+                break;
+            case 3:
+                Glide.with(this).load(storageReference.child("images/" + uid)).apply(options).into(participantsImageThree);
+                break;
+        }
+
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (item.getItemId() == android.R.id.home) {
+            finishAfterTransition();
+            return true;
+        }
+        return false;
+    }
+
 
 }

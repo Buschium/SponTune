@@ -1,19 +1,16 @@
 package de.spontune.android.spontune;
 
 import android.app.ActivityOptions;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.VectorDrawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
@@ -30,13 +27,16 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
@@ -53,16 +53,20 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 
+import de.spontune.android.spontune.Adapters.CustomInfoWindowAdapter;
 import de.spontune.android.spontune.Data.Event;
 
 import static android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT;
 
 
+@SuppressWarnings("FeatureEnvy")
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnPoiClickListener{
 
     private static final String LOG_TAG = MapsActivity.class.getSimpleName();
@@ -91,8 +95,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private boolean mHappeningActivated = false;
     private boolean mSportsActivated = false;
 
-    //category buttons
-    private CoordinatorLayout coordinatorLayout;
     private ImageButton mButtonCreative;
     private ImageButton mButtonParty;
     private ImageButton mButtonHappening;
@@ -111,8 +113,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private long mEndOfDayMillis;
 
     //Lists of currently selected and unselected events
-    private ArrayList<Event> mSelectedEvents = new ArrayList<>();
-    private ArrayList<Event> mUnselectedEvents = new ArrayList<>();
+    private List<Event> mSelectedEvents = new ArrayList<>();
+    private List<Event> mUnselectedEvents = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,7 +131,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Set up category buttons and action bar
         setUpActionBar();
         setUpCategoryButtons();
-        coordinatorLayout = findViewById(R.id.coordinator_layout);
 
         //Set up the Calendar for now and the end of the day and set up the milliseconds
         Calendar now = GregorianCalendar.getInstance();
@@ -172,18 +173,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     onSignedInInitialize();
                 }else{
                     onSignedOutCleanup();
-                    /*
-                    startActivityForResult(
-                            AuthUI.getInstance()
-                                    .createSignInIntentBuilder()
-                                    .setIsSmartLockEnabled(true)
-                                    .setTheme(R.style.AppTheme)
-                                    .setAvailableProviders(
-                                            Arrays.asList(new AuthUI.IdpConfig.Builder(AuthUI.SUPPORTED_PROVIDERS).build(),
-                                                    new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build()))
-                                    .build(),
-                            RC_SIGN_IN);
-                    */
                 }
             }
         };
@@ -227,12 +216,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             mChildEventListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    Event event = dataSnapshot.getValue(Event.class);
+                    final Event event = dataSnapshot.getValue(Event.class);
                     assert event != null;
                     //If the event starts today and hasn't ended yet, it will be displayed on the map
                     //TODO: maybe find a more efficient way that doesn't require to load all the events
                     if(event.getEndingTime() >= mNowMillis && event.getStartingTime() <= mEndOfDayMillis) {
                         event.setID(dataSnapshot.getKey());
+                        loadImage(event);
                         mSelectedEvents.add(event);
                         updateSelectedEvents();
                     }
@@ -268,9 +258,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      * The layout file for the action bar is activity_maps_menu.
      */
     private void setUpActionBar(){
-        //Toast to show when the user tries to use a function that hasn't been implemented yet
-        final Toast mToast = Toast.makeText(getApplicationContext(), "Sorry, daran wird noch gebaut", Toast.LENGTH_SHORT);
-
         ActionBar mActionBar = getSupportActionBar();
         if(mActionBar != null) {
             mActionBar.setDisplayShowHomeEnabled(false); //Gets rid of the "back"-button in the action bar
@@ -313,6 +300,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     getWindow().setExitTransition(slide);
                     slide.setSlideEdge(Gravity.START);
                     getWindow().setEnterTransition(slide);
+                    intent.putExtra("uid", mFirebaseAuth.getUid());
                     startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(MapsActivity.this).toBundle());
                 }
             });
@@ -446,6 +434,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
         mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(this));
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener(){
+            @Override
+            public boolean onMarkerClick(Marker marker){
+                marker.showInfoWindow();
+                Projection projection = mMap.getProjection();
+                LatLng markerPosition = marker.getPosition();
+                Point markerPoint = projection.toScreenLocation(markerPosition);
+                Point targetPoint = new Point(markerPoint.x, markerPoint.y - 100);
+                LatLng targetPosition = projection.fromScreenLocation(targetPoint);
+                mMap.animateCamera(CameraUpdateFactory.newLatLng(targetPosition), 300, null);
+                return true;
+            }
+        });
     }
 
 
@@ -628,32 +629,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
-    //TODO: this function should not be needed anymore, it can be deleted once the usages have been removed
-    protected static Bitmap getBitmap(Context context, int drawableId) {
-        Drawable drawable = ContextCompat.getDrawable(context, drawableId);
-        if (drawable instanceof BitmapDrawable) {
-            return BitmapFactory.decodeResource(context.getResources(), drawableId);
-        } else if (drawable instanceof VectorDrawable) {
-            return vectorToBitmap((VectorDrawable) drawable);
-        } else {
-            throw new IllegalArgumentException("unsupported drawable type");
-        }
-    }
-
-
-
-    protected static BitmapDescriptor bitmapDescriptorFromDrawable(Drawable drawable){
-        int width = drawable.getIntrinsicWidth();
-        int height = drawable.getIntrinsicHeight();
-
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        drawable.setBounds(0, 0, width, height);
-        drawable.draw(new Canvas(bitmap));
-
-        return BitmapDescriptorFactory.fromBitmap(bitmap);
-    }
-
-
     /**
      * Greys out category buttons based on which categories are selected.
      */
@@ -751,6 +726,26 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             mMap.moveCamera(CameraUpdateFactory.newCameraPosition(mCameraPosition));
         }
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+    }
+
+    private void loadImage(final Event event){
+        String categoryName;
+        switch(event.getCategory()){
+            case 1: categoryName = "creative"; break;
+            case 2: categoryName = "party"; break;
+            case 3: categoryName = "happening"; break;
+            default: categoryName = "sports";
+        }
+        Glide.with(this)
+                .asBitmap()
+                .load(FirebaseStorage.getInstance().getReference().child("categoryImages/" + event.getID()))
+                .error(Glide.with(this).asBitmap().load(FirebaseStorage.getInstance().getReference().child("categoryImages/" + categoryName + ".jpg")))
+                .into(new SimpleTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, Transition<? super Bitmap> transition){
+                        event.setPicture(resource);
+                    }
+                });
     }
 
 }

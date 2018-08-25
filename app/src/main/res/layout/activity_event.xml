@@ -6,77 +6,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/surface"
     android:orientation="vertical">
 
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/event_title_bar"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/category_bar_height"
-        android:background="@color/surface"
-        android:elevation="5dp"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/avatar_image"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="8dp"
-            android:padding="6dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/category_party_light"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="packed" />
-
-        <TextView
-            android:id="@+id/title_text"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="2dp"
-            android:fontFamily="@font/roboto"
-            android:textColor="@color/onSurface"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/avatar_image"
-            app:layout_constraintTop_toTopOf="@+id/avatar_image"
-            app:layout_constraintBottom_toBottomOf="@id/avatar_image"/>
-
-        <TextView
-            android:id="@+id/subtitle_text"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="2dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginStart="12dp"
-            android:textColor="@color/onSurfaceSecondary"
-            app:layout_constraintBottom_toBottomOf="@+id/avatar_image"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/avatar_image" />
-
-        <ImageButton
-            android:id="@+id/event_close"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="12dp"
-            android:layout_marginTop="8dp"
-            android:background="@color/fui_transparent"
-            android:src="@drawable/ic_round_close_light"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </android.support.constraint.ConstraintLayout>
-
     <android.support.v4.widget.NestedScrollView
-        android:id="@+id/event_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="@color/surface"
@@ -84,7 +16,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/event_title_bar"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
         tools:layout_editor_absoluteX="0dp">
 
@@ -107,60 +39,12 @@
                 android:elevation="10dp"
                 app:layout_constraintTop_toBottomOf="@id/category_image">
 
-                <Button
-                    android:id="@+id/event_join"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="12dp"
-                    android:background="@color/colorAccent"
-                    android:paddingEnd="5dp"
-                    android:paddingStart="5dp"
-                    android:text="@string/join_event"
-                    android:textColor="@color/white"
-                    android:textSize="20sp"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageButton
-                    android:id="@+id/event_chat"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_marginEnd="25dp"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:src="@drawable/ic_round_chat_light"
-                    app:layout_constraintBottom_toBottomOf="@id/event_join"
-                    app:layout_constraintEnd_toStartOf="@id/event_share"
-                    app:layout_constraintTop_toTopOf="@id/event_join" />
-
-                <ImageButton
-                    android:id="@+id/event_share"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="25dp"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:src="@drawable/ic_round_share_light"
-                    app:layout_constraintEnd_toStartOf="@id/event_map"
-                    app:layout_constraintTop_toTopOf="@id/event_join"
-                    app:layout_constraintBottom_toBottomOf="@id/event_join"/>
-
-                <ImageButton
-                    android:id="@+id/event_map"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:src="@drawable/ic_round_place_light"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/event_join"
-                    app:layout_constraintBottom_toBottomOf="@id/event_join"/>
-
                 <FrameLayout
                     android:id="@+id/description_frame"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintBottom_toTopOf="@id/divider"
-                    app:layout_constraintTop_toBottomOf="@id/event_join">
+                    app:layout_constraintTop_toTopOf="parent">
 
                     <TextView
                         android:id="@+id/event_description_textview"
@@ -169,9 +53,9 @@
                         android:layout_marginEnd="16dp"
                         android:layout_marginStart="16dp"
                         android:layout_marginTop="24dp"
-                        android:maxLines="7"
+                        android:maxLines="20"
                         android:textColor="@color/onSurface"
-                        android:textSize="16sp"
+                        android:textSize="@dimen/default_text_size"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent" />
@@ -181,6 +65,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_gravity="bottom"
+                        android:visibility="gone"
                         android:background="@drawable/transparent_to_light_surface_gradient" />
 
                 </FrameLayout>
@@ -189,8 +74,8 @@
                     android:id="@+id/divider"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginEnd="20dp"
-                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
                     android:layout_marginTop="20dp"
                     android:background="@color/light_grey"
                     app:layout_constraintTop_toBottomOf="@id/description_frame" />
@@ -203,7 +88,7 @@
                     android:layout_marginTop="20dp"
                     android:text="@string/starting_time"
                     android:textColor="@color/onSurface"
-                    android:textSize="16sp"
+                    android:textSize="@dimen/default_text_size"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/divider" />
 
@@ -211,24 +96,24 @@
                     android:id="@+id/event_metadata_starting_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="16dp"
                     android:textColor="@color/onSurface"
-                    android:textSize="16sp"
+                    android:textSize="@dimen/default_text_size"
                     android:textStyle="bold"
                     app:layout_constraintBaseline_toBaselineOf="@id/text_view_starting_time"
-                    app:layout_constraintEnd_toStartOf="@id/event_metadata_starting_date" />
+                    app:layout_constraintStart_toEndOf="@id/text_view_starting_time" />
 
                 <TextView
                     android:id="@+id/event_metadata_starting_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="16dp"
                     android:textColor="@color/onSurface"
-                    android:textSize="16sp"
+                    android:textSize="@dimen/default_text_size"
                     android:textStyle="bold"
                     android:visibility="gone"
                     app:layout_constraintBaseline_toBaselineOf="@id/text_view_starting_time"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintStart_toEndOf="@id/event_metadata_starting_time" />
 
                 <TextView
                     android:id="@+id/text_view_ending_time"
@@ -238,7 +123,7 @@
                     android:layout_marginTop="20dp"
                     android:text="@string/ending_time"
                     android:textColor="@color/onSurface"
-                    android:textSize="16sp"
+                    android:textSize="@dimen/default_text_size"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/text_view_starting_time" />
 
@@ -246,24 +131,70 @@
                     android:id="@+id/event_metadata_ending_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="16dp"
                     android:textColor="@color/onSurface"
-                    android:textSize="16sp"
+                    android:textSize="@dimen/default_text_size"
                     android:textStyle="bold"
                     app:layout_constraintBaseline_toBaselineOf="@id/text_view_ending_time"
-                    app:layout_constraintEnd_toStartOf="@id/event_metadata_ending_date" />
+                    app:layout_constraintStart_toEndOf="@id/text_view_ending_time" />
 
                 <TextView
                     android:id="@+id/event_metadata_ending_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="16dp"
                     android:textColor="@color/onSurface"
-                    android:textSize="16sp"
+                    android:textSize="@dimen/default_text_size"
                     android:textStyle="bold"
                     android:visibility="gone"
                     app:layout_constraintBaseline_toBaselineOf="@id/text_view_ending_time"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintStart_toEndOf="@id/event_metadata_ending_time" />
+
+                <FrameLayout
+                    android:id="@+id/participants_images"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@id/event_metadata_ending_time"
+                    android:layout_marginTop="20dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginStart="8dp">
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/participants_image_one"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/activity_maps_menu_user" />
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/participants_image_two"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/activity_maps_menu_user"
+                        android:layout_marginStart="20dp"/>
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/participants_image_three"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/activity_maps_menu_user"
+                        android:layout_marginStart="40dp"/>
+
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/text_view_participants"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:textColor="@color/onSurface"
+                    android:textSize="@dimen/default_text_size"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toEndOf="@id/participants_images"
+                    app:layout_constraintTop_toTopOf="@id/participants_images"
+                    app:layout_constraintBottom_toBottomOf="@id/participants_images"/>
 
             </android.support.constraint.ConstraintLayout>
 
@@ -271,5 +202,64 @@
 
 
     </android.support.v4.widget.NestedScrollView>
+
+    <android.support.design.bottomappbar.BottomAppBar
+        android:layout_width="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="@dimen/category_bar_height">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <Button
+                android:id="@+id/event_join"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@color/colorAccent"
+                android:paddingEnd="16dp"
+                android:paddingStart="16dp"
+                android:text="@string/join_event"
+                android:textColor="@color/white"
+                android:textSize="@dimen/default_text_size"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/event_chat"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginEnd="25dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:src="@drawable/ic_round_chat_light"
+                app:layout_constraintBottom_toBottomOf="@id/event_join"
+                app:layout_constraintEnd_toStartOf="@id/event_share"
+                app:layout_constraintTop_toTopOf="@id/event_join" />
+
+            <ImageButton
+                android:id="@+id/event_share"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="25dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:src="@drawable/ic_round_share_light"
+                app:layout_constraintEnd_toStartOf="@id/event_map"
+                app:layout_constraintTop_toTopOf="@id/event_join"
+                app:layout_constraintBottom_toBottomOf="@id/event_join"/>
+
+            <ImageButton
+                android:id="@+id/event_map"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:src="@drawable/ic_round_place_light"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/event_join"
+                app:layout_constraintBottom_toBottomOf="@id/event_join"/>
+
+        </android.support.constraint.ConstraintLayout>
+
+    </android.support.design.bottomappbar.BottomAppBar>
 
 </android.support.constraint.ConstraintLayout>

@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,13 +23,14 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class PlacesAutoCompleteAdapter extends ArrayAdapter<AutocompletePrediction> implements Filterable {
+public class PlacesAutoCompleteAdapter extends ArrayAdapter<AutocompletePrediction>{
 
-    private ArrayList<AutocompletePrediction> mResultList;
+    private List<AutocompletePrediction> mResultList;
     private Context mContext;
     private GeoDataClient mGeoDataClient;
     private LatLngBounds mLatLngBounds;
@@ -65,8 +65,8 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<AutocompletePredicti
         View row = super.getView(position, convertView, parent);
         AutocompletePrediction item = getItem(position);
 
-        TextView textView1 = (TextView) row.findViewById(android.R.id.text1);
-        TextView textView2 = (TextView) row.findViewById(android.R.id.text2);
+        TextView textView1 = row.findViewById(android.R.id.text1);
+        TextView textView2 = row.findViewById(android.R.id.text2);
         textView1.setText(item.getPrimaryText(STYLE_BOLD));
         textView2.setText(item.getSecondaryText(STYLE_BOLD));
 
@@ -80,7 +80,7 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<AutocompletePredicti
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
                 FilterResults filterResults = new FilterResults();
-                ArrayList<AutocompletePrediction> filterData = new ArrayList<>();
+                List<AutocompletePrediction> filterData = new ArrayList<>();
 
                 if (constraint != null) {
                     filterData = getAutocomplete(constraint);
@@ -135,7 +135,7 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<AutocompletePredicti
             AutocompletePredictionBufferResponse autocompletePredictions = results.getResult();
             return DataBufferUtils.freezeAndClose(autocompletePredictions);
         } catch (RuntimeExecutionException e) {
-            Toast.makeText(getContext(), "Error contacting API: " + e.toString(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Error contacting API: " + e, Toast.LENGTH_SHORT).show();
             return null;
         }
     }

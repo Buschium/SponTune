@@ -52,13 +52,13 @@
             android:name=".EventActivity"
             android:label="@string/title_activity_event"
             android:parentActivityName=".MapsActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".CreateEventActivity"
             android:label="@string/title_activity_create"
             android:parentActivityName=".MapsActivity"
-            android:windowSoftInputMode="adjustPan"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="de.spontune.android.spontune.MapsActivity" />
@@ -99,6 +99,15 @@
                 android:value="de.spontune.android.spontune.MapsActivity" />
         </activity>
         <activity android:name=".ChatActivity" />
+        <activity
+            android:name=".ParticipantsActivity"
+            android:label="Participants"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="de.spontune.android.spontune.EventActivity" />
+        </activity>
+        <activity android:name=".FollowingFollowersActivity"></activity>
     </application>
 
 </manifest>

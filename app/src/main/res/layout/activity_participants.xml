@@ -4,16 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ListActivity">
+    tools:context=".ParticipantsActivity">
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/events_list"
+        android:id="@+id/participants_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
         android:clipToPadding="false"
         android:padding="5dp"
         android:scrollbars="vertical"
-        tools:listitem="@layout/fragment_list"
+        tools:listitem="@layout/fragment_participant"
         android:layoutAnimation="@anim/anim_fall_down_layout"/>
 
 </FrameLayout>

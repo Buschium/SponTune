@@ -5,14 +5,14 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -31,7 +31,7 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.UUID;
+import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import de.spontune.android.spontune.Data.User;
@@ -80,14 +80,23 @@ public class EditUserActivity extends AppCompatActivity {
             public void onClick(View view) {
                 user.setUsername(etUsername.getText().toString());
                 user.setUserDescription(etDescription.getText().toString());
+                HashMap<String, String> followers = new HashMap<>();
+                followers.put(user.getId(), user.getId());
+                user.setFollowers(followers);
+                HashMap<String, String> following = new HashMap<>();
+                following.put(user.getId(), user.getId());
+                user.setFollowing(following);
                 databaseReference.setValue(user);
                 uploadImage();
                 if(justRegistered) {
                     startActivity(new Intent(EditUserActivity.this, MapsActivity.class));
+                    finish();
                 }else if(filePath != null){
-                    startActivity(new Intent(EditUserActivity.this, UserActivity.class).putExtra("image", filePath.toString()));
+                    startActivity(new Intent(EditUserActivity.this, UserActivity.class).putExtra("image", filePath.toString()).putExtra("uid", user.getId()));
+                    finish();
                 }else{
-                    startActivity(new Intent(EditUserActivity.this, UserActivity.class));
+                    startActivity(new Intent(EditUserActivity.this, UserActivity.class).putExtra("uid", user.getId()));
+                    finish();
                 }
             }
         });
@@ -188,5 +197,15 @@ public class EditUserActivity extends AppCompatActivity {
                         }
                     });
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (item.getItemId() == android.R.id.home) {
+            finishAfterTransition();
+            return true;
+        }
+        return false;
     }
 }

@@ -33,7 +33,6 @@
         android:background="@color/background"/>
 
     <android.support.design.widget.CoordinatorLayout
-        android:id="@+id/coordinator_layout"
         android:transitionName="category_bar"
         android:layout_width="match_parent"
         android:layout_height="match_parent">

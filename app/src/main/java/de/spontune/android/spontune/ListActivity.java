@@ -21,7 +21,7 @@ import de.spontune.android.spontune.Fragments.TodayFragment;
 import de.spontune.android.spontune.Fragments.TomorrowFragment;
 import de.spontune.android.spontune.Fragments.WeekFragment;
 
-public class ListActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener{
+public class ListActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
 
     private ViewPager mViewPager;
 
@@ -30,10 +30,10 @@ public class ListActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private ImageButton mButtonHappening;
     private ImageButton mButtonSports;
 
-    private boolean mCreativeActivated = false;
-    private boolean mPartyActivated = false;
-    private boolean mHappeningActivated = false;
-    private boolean mSportsActivated = false;
+    private boolean mCreativeActivated;
+    private boolean mPartyActivated;
+    private boolean mHappeningActivated;
+    private boolean mSportsActivated;
 
     private EventFragment todayFragment;
     private EventFragment tomorrowFragment;
@@ -71,7 +71,7 @@ public class ListActivity extends AppCompatActivity implements TabLayout.OnTabSe
      * If all categories are deactivated (un-selected), the system acts like all categories are selected (for logic purposes).
      * By default, all categories are deactivated.
      */
-    private void setUpCategoryButtons(){
+    private void setUpCategoryButtons() {
 
         mButtonCreative = findViewById(R.id.action_category_food_and_drink);
         mButtonParty = findViewById(R.id.action_category_party);
@@ -85,9 +85,9 @@ public class ListActivity extends AppCompatActivity implements TabLayout.OnTabSe
                 /*If all categories are selected after the button is pressed, all categories have to be set
                  *to false to keep the logic consistent.
                  */
-                if(everyCategoryActivated()) setAllButtonsFalse();
+                if (everyCategoryActivated()) setAllButtonsFalse();
                 toggleButtonsGreyed();
-                updateList(mViewPager.getCurrentItem(), 1, mCreativeActivated);
+                updateList();
             }
         });
 
@@ -95,9 +95,9 @@ public class ListActivity extends AppCompatActivity implements TabLayout.OnTabSe
             @Override
             public void onClick(View v) {
                 mPartyActivated = !mPartyActivated;
-                if(everyCategoryActivated()) setAllButtonsFalse();
+                if (everyCategoryActivated()) setAllButtonsFalse();
                 toggleButtonsGreyed();
-                updateList(mViewPager.getCurrentItem(), 2, mPartyActivated);
+                updateList();
             }
         });
 
@@ -105,44 +105,37 @@ public class ListActivity extends AppCompatActivity implements TabLayout.OnTabSe
             @Override
             public void onClick(View v) {
                 mHappeningActivated = !mHappeningActivated;
-                if(everyCategoryActivated()) setAllButtonsFalse();
+                if (everyCategoryActivated()) setAllButtonsFalse();
                 toggleButtonsGreyed();
-                updateList(mViewPager.getCurrentItem(), 3, mHappeningActivated);
+                updateList();
             }
         });
 
         mButtonSports.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mSportsActivated = ! mSportsActivated;
-                if(everyCategoryActivated()) setAllButtonsFalse();
+                mSportsActivated = !mSportsActivated;
+                if (everyCategoryActivated()) setAllButtonsFalse();
                 toggleButtonsGreyed();
-                updateList(mViewPager.getCurrentItem(), 4, mSportsActivated);
+                updateList();
             }
         });
 
     }
 
 
-    private void updateList(int position, int category, boolean selected){
-        switch(position){
-            case 0:
-                todayFragment.onCategorySelected(mCreativeActivated, mPartyActivated, mHappeningActivated, mSportsActivated);
-                break;
-            case 1:
-                todayFragment.onCategorySelected(mCreativeActivated, mPartyActivated, mHappeningActivated, mSportsActivated);
-                break;
-            default:
-                todayFragment.onCategorySelected(mCreativeActivated, mPartyActivated, mHappeningActivated, mSportsActivated);
-                break;
-        }
+    @SuppressWarnings("FeatureEnvy")
+    private void updateList() {
+        todayFragment.onCategorySelected(mCreativeActivated, mPartyActivated, mHappeningActivated, mSportsActivated);
+        tomorrowFragment.onCategorySelected(mCreativeActivated, mPartyActivated, mHappeningActivated, mSportsActivated);
+        weekFragment.onCategorySelected(mCreativeActivated, mPartyActivated, mHappeningActivated, mSportsActivated);
     }
 
 
     /**
      * Greys out category buttons based on which categories are selected.
      */
-    private void toggleButtonsGreyed(){
+    private void toggleButtonsGreyed() {
         Drawable foodAndDrinkIcon = this.getResources().getDrawable(R.drawable.category_creative_light);
         Drawable partyIcon = this.getResources().getDrawable(R.drawable.category_party_light);
         Drawable musicIcon = this.getResources().getDrawable(R.drawable.category_happening_light);
@@ -151,12 +144,12 @@ public class ListActivity extends AppCompatActivity implements TabLayout.OnTabSe
         Drawable partyIconDeactivated = this.getResources().getDrawable(R.drawable.category_party_deactivated);
         Drawable musicIconDeactivated = this.getResources().getDrawable(R.drawable.category_happening_deactivated);
         Drawable sportsIconDeactivated = this.getResources().getDrawable(R.drawable.category_sports_deactivated);
-        if(noCategoryActivated()){
+        if (noCategoryActivated()) {
             mButtonCreative.setImageDrawable(foodAndDrinkIcon);
             mButtonParty.setImageDrawable(partyIcon);
             mButtonHappening.setImageDrawable(musicIcon);
             mButtonSports.setImageDrawable(sportsIcon);
-        }else{
+        } else {
             Drawable newIcon = mCreativeActivated ? foodAndDrinkIcon : foodAndDrinkIconDeactivated;
             mButtonCreative.setImageDrawable(newIcon);
 
@@ -175,18 +168,20 @@ public class ListActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     /**
      * Checks whether no category is selected.
+     *
      * @return true if no category is selected
      */
-    private boolean noCategoryActivated(){
+    private boolean noCategoryActivated() {
         return (!mCreativeActivated && !mPartyActivated && !mHappeningActivated && !mSportsActivated);
     }
 
 
     /**
      * Checks whether all categories are selected.
+     *
      * @return true if all categories are selected
      */
-    private boolean everyCategoryActivated(){
+    private boolean everyCategoryActivated() {
         return (mCreativeActivated && mPartyActivated && mHappeningActivated && mSportsActivated);
     }
 
@@ -194,7 +189,7 @@ public class ListActivity extends AppCompatActivity implements TabLayout.OnTabSe
     /**
      * Un-selects all categories and thus puts category system back in idle mode.
      */
-    private void setAllButtonsFalse(){
+    private void setAllButtonsFalse() {
         mCreativeActivated = false;
         mPartyActivated = false;
         mHappeningActivated = false;
@@ -220,8 +215,6 @@ public class ListActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
 
 
-
-
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
@@ -234,7 +227,7 @@ public class ListActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
         @Override
         public Fragment getItem(int position) {
-            switch (position){
+            switch (position) {
                 case 0:
                     todayFragment = new TodayFragment();
                     return todayFragment;
@@ -267,12 +260,12 @@ public class ListActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
 
     @Override
-    public void onPause(){
+    public void onPause() {
         super.onPause();
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
     }
 

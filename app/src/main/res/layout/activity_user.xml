@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".UserActivity"
-    android:background="@color/surface">
+    tools:context=".UserActivity">
 
     <TextView
         android:id="@+id/tv_username"
@@ -20,8 +19,8 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profile_image"
-        android:layout_width="156dp"
-        android:layout_height="156dp"
+        android:layout_width="136dp"
+        android:layout_height="136dp"
         android:src="@drawable/activity_maps_menu_user"
         android:backgroundTint="@color/fui_transparent"
         app:layout_constraintTop_toBottomOf="@id/tv_username"
@@ -40,8 +39,113 @@
         android:gravity="center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:textSize="20sp"
+        android:textSize="@dimen/default_text_size"
         android:textColor="@color/onSurface"/>
+
+    <View
+        android:id="@+id/divider_one"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="@color/light_grey"
+        app:layout_constraintTop_toBottomOf="@id/tv_description" />
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/following"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/divider_one"
+        android:layout_marginTop="15dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            android:text="@string/following"
+            android:textSize="@dimen/default_text_size"
+            android:textColor="@color/onSurface"
+            android:layout_marginStart="16dp"
+            />
+
+        <TextView
+            android:id="@+id/following_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toStartOf="@id/following_image_view"
+            android:layout_marginEnd="16dp"
+            android:textSize="@dimen/default_text_size"
+            android:textColor="@color/onSurface"
+            android:textStyle="bold"
+            />
+
+        <ImageView
+            android:id="@+id/following_image_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_round_forward"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="16dp"/>
+
+    </android.support.constraint.ConstraintLayout>
+
+    <View
+        android:id="@+id/divider_two"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="@color/light_grey"
+        app:layout_constraintTop_toBottomOf="@id/following" />
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/followers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/divider_two"
+        android:layout_marginTop="15dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            android:text="@string/followers"
+            android:textSize="@dimen/default_text_size"
+            android:textColor="@color/onSurface"
+            android:layout_marginStart="16dp"
+            />
+
+        <TextView
+            android:id="@+id/followers_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toStartOf="@id/followers_image_view"
+            android:layout_marginEnd="16dp"
+            android:textSize="@dimen/default_text_size"
+            android:textColor="@color/onSurface"
+            android:textStyle="bold"
+            />
+
+        <ImageView
+            android:id="@+id/followers_image_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_round_forward"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="16dp"/>
+
+    </android.support.constraint.ConstraintLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="@color/light_grey"
+        app:layout_constraintTop_toBottomOf="@id/followers" />
 
     <Button
         android:id="@+id/edit_button"
@@ -54,8 +158,10 @@
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="24dp"
-        android:textSize="20sp"
+        android:textSize="@dimen/default_text_size"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
+
+
 
 </android.support.constraint.ConstraintLayout>

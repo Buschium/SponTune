@@ -1,4 +1,4 @@
-package de.spontune.android.spontune.Fragments;
+package de.spontune.android.spontune.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import de.spontune.android.spontune.Data.Event;
-import de.spontune.android.spontune.Data.EventViewHolder;
 import de.spontune.android.spontune.EventActivity;
 import de.spontune.android.spontune.R;
 
@@ -22,7 +21,6 @@ public class CustomFirebaseRecyclerAdapter extends RecyclerView.Adapter<EventVie
     private List<Event> mEventList;
 
     public CustomFirebaseRecyclerAdapter(Context mContext, List<Event> mEventList){
-        super();
         this.mEventList = mEventList;
         this.mContext = mContext;
     }
@@ -35,7 +33,7 @@ public class CustomFirebaseRecyclerAdapter extends RecyclerView.Adapter<EventVie
     }
 
     @Override
-    public void onBindViewHolder(EventViewHolder viewHolder, int position) {
+    public void onBindViewHolder(@NonNull EventViewHolder viewHolder, int position) {
         final Event event = mEventList.get(position);
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,6 +68,14 @@ public class CustomFirebaseRecyclerAdapter extends RecyclerView.Adapter<EventVie
     public void removeItem(Event event){
         if(mEventList.contains(event)) {
             int position = mEventList.indexOf(event);
+            mEventList.remove(position);
+            notifyItemRemoved(position);
+            notifyItemRangeChanged(position, mEventList.size());
+        }
+    }
+
+    public void removeItem(int position){
+        if(mEventList.get(position) != null){
             mEventList.remove(position);
             notifyItemRemoved(position);
             notifyItemRangeChanged(position, mEventList.size());
