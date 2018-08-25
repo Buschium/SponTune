@@ -26,9 +26,9 @@ public class EventPreviewFragment extends Fragment {
     private ImageButton categoryImage;
     public TextView mEventDescriptionTextView;
     public TextView mStartingTimeTextView;
-    public TextView mStartingDateTextView;
     public TextView mEndingTimeTextView;
-    public TextView mEndingDateTextView;
+    public TextView mCreatorTextView;
+    public TextView mParticipantsTextView;
 
     private final int PICK_IMAGE_REQUEST = 71;
     public Uri filePath;
@@ -40,10 +40,6 @@ public class EventPreviewFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_event_preview, container, false);
 
         categoryImage = rootView.findViewById(R.id.category_image);
-
-        mEventDescriptionTextView = rootView.findViewById(R.id.event_description_textview);
-        gradientView = rootView.findViewById(R.id.gradient);
-
         categoryImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -51,26 +47,36 @@ public class EventPreviewFragment extends Fragment {
             }
         });
 
-        //The description expands when the user clicks on it (or shrinks when it's already expanded)
-        mEventDescriptionTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int collapsedMaxLines = 7;
-                ObjectAnimator animation = ObjectAnimator.ofInt(mEventDescriptionTextView, "maxLines", mEventDescriptionTextView.getMaxLines() == collapsedMaxLines? 20 : collapsedMaxLines);
-                animation.setInterpolator(new DecelerateInterpolator());
-                animation.setDuration(200).start();
-                if(mEventDescriptionTextView.getMaxLines() == collapsedMaxLines) {
-                    gradientView.setBackground(null);
-                }else{
-                    gradientView.setBackground(getActivity().getDrawable(R.drawable.transparent_to_light_surface_gradient));
-                }
-            }
-        });
+        mCreatorTextView = rootView.findViewById(R.id.text_view_creator);
+        mParticipantsTextView = rootView.findViewById(R.id.text_view_icon_participants);
 
-        mStartingTimeTextView = rootView.findViewById(R.id.event_metadata_starting_time);
-        mStartingDateTextView = rootView.findViewById(R.id.event_metadata_starting_date);
-        mEndingTimeTextView = rootView.findViewById(R.id.event_metadata_ending_time);
-        mEndingDateTextView = rootView.findViewById(R.id.event_metadata_ending_date);
+        mEventDescriptionTextView = rootView.findViewById(R.id.event_description_textview);
+        gradientView = rootView.findViewById(R.id.gradient);
+        final int collapsedMaxLines = 7;
+        final int expandedMaxLines = 20;
+        int lines = mEventDescriptionTextView.getLineCount();
+
+        if(lines > collapsedMaxLines){
+            gradientView.setVisibility(View.VISIBLE);
+
+            //The description expands when the user clicks on it (or shrinks when it's already expanded)
+            mEventDescriptionTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ObjectAnimator animation = ObjectAnimator.ofInt(mEventDescriptionTextView, "maxLines", mEventDescriptionTextView.getMaxLines() == collapsedMaxLines? expandedMaxLines : collapsedMaxLines);
+                    animation.setInterpolator(new DecelerateInterpolator());
+                    animation.setDuration(200).start();
+                    if(mEventDescriptionTextView.getMaxLines() == collapsedMaxLines) {
+                        gradientView.setVisibility(View.GONE);
+                    }else{
+                        gradientView.setVisibility(View.VISIBLE);
+                    }
+                }
+            });
+        }
+
+        mStartingTimeTextView = rootView.findViewById(R.id.text_view_starting_time);
+        mEndingTimeTextView = rootView.findViewById(R.id.text_view_ending_time);
 
         return rootView;
     }

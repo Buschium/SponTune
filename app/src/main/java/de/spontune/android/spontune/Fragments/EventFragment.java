@@ -82,7 +82,8 @@ public abstract class EventFragment extends android.support.v4.app.Fragment {
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
+                Event event = dataSnapshot.getValue(Event.class);
+                mAdapter.removeItem(event);
             }
 
             @Override

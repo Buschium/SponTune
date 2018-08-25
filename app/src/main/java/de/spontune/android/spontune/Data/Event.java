@@ -7,7 +7,6 @@ import java.util.HashMap;
 public class Event {
     private int category;
     private String creator;
-    private int currentPersons;
     private String description;
     private long endingTime;
     private String ID;
@@ -23,7 +22,7 @@ public class Event {
     public Event(){}
 
     public Event(double lat, double lng, String creator, String summary, String description, long startingTime,
-                 long endingTime, int category, int maxPersons, int currentPersons, String address, HashMap<String, String> participants){
+                 long endingTime, int category, int maxPersons, String address, HashMap<String, String> participants){
         this.lat = lat;
         this.lng = lng;
         this.creator = creator;
@@ -34,7 +33,6 @@ public class Event {
         this.category = category;
         //this.picture = picture;
         this.maxPersons = maxPersons;
-        this.currentPersons = currentPersons;
         this.address = address;
         this.participants = participants;
     }
@@ -119,14 +117,6 @@ public class Event {
         this.maxPersons = maxPersons;
     }
 
-    public int getCurrentPersons() {
-        return currentPersons;
-    }
-
-    public void setCurrentPersons(int currentPersons) {
-        this.currentPersons = currentPersons;
-    }
-
     public String getAddress() {
         return address;
     }
@@ -149,5 +139,14 @@ public class Event {
 
     public void setPicture(Bitmap picture) {
         this.picture = picture;
+    }
+
+    @Override
+    public boolean equals(Object event){
+        if(event.getClass().equals(Event.class)){
+            return ((Event) event).getID().equals(ID);
+        }else{
+            return false;
+        }
     }
 }

@@ -40,6 +40,7 @@ public class CreateMapFragment extends Fragment implements GoogleMap.OnMapClickL
 
     public double lat;
     public double lng;
+    private int selectedCategory = 1;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -94,7 +95,7 @@ public class CreateMapFragment extends Fragment implements GoogleMap.OnMapClickL
                         lng = mDefaultLocation.longitude;
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
                     }
-                    updateEventMarker();
+                    updateEventMarker(selectedCategory);
                 }
             });
         } catch (SecurityException e)  {
@@ -107,7 +108,7 @@ public class CreateMapFragment extends Fragment implements GoogleMap.OnMapClickL
     public void onMapClick(LatLng latLng) {
         lat = latLng.latitude;
         lng = latLng.longitude;
-        updateEventMarker();
+        updateEventMarker(selectedCategory);
     }
 
 
@@ -115,17 +116,36 @@ public class CreateMapFragment extends Fragment implements GoogleMap.OnMapClickL
      * Updates the event marker of the new event based on the selected location, category, and values
      * for the maximum number of visitors and the current number of visitors
      */
-    private void updateEventMarker(){
+    private void updateEventMarker(int category){
         mMap.clear();
-        Drawable markerDrawable = getResources().getDrawable(R.drawable.generic_marker);
-        int height = 100;
-        int width = 100;
-        Bitmap b = vectorToBitmap( (VectorDrawable) markerDrawable);
-        Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
+        Drawable markerDrawable;
+        switch(category){
+            case 1:
+                markerDrawable = getResources().getDrawable(R.drawable.category_creative_marker);
+                break;
+            case 2:
+                markerDrawable = getResources().getDrawable(R.drawable.category_party_marker);
+                break;
+            case 3:
+                markerDrawable = getResources().getDrawable(R.drawable.category_happening_marker);
+                break;
+            default:
+                markerDrawable = getResources().getDrawable(R.drawable.category_sports_marker);
+                break;
+        }
+        int height = 150;
+        int width = 150;
+        Bitmap bitmap = vectorToBitmap( (VectorDrawable) markerDrawable);
+        Bitmap smallMarker = Bitmap.createScaledBitmap(bitmap, width, height, false);
 
         mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng))
                 .anchor(0.5f, 1.0f)
                 .icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), DEFAULT_ZOOM));
+    }
+
+    public void setSelectedCategory(int selectedCategory){
+        this.selectedCategory = selectedCategory;
+        updateEventMarker(selectedCategory);
     }
 }

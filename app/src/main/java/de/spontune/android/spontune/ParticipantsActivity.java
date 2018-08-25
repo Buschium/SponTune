@@ -33,6 +33,7 @@ public class ParticipantsActivity extends AppCompatActivity{
     private Map<String, String> participants;
     private HashMap<String, String> following;
     private String uid;
+    private String creator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -66,14 +67,18 @@ public class ParticipantsActivity extends AppCompatActivity{
             }
         };
 
-
+        creator = getIntent().getStringExtra("creator");
         databaseReference = FirebaseDatabase.getInstance().getReference().child("users");
         childEventListener = new ChildEventListener(){
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s){
                 User user = dataSnapshot.getValue(User.class);
                 if(participants.containsKey(user.getId())){
-                    customParticipantsRecyclerAdapter.addItem(user);
+                    if(creator.equals(user.getId())){
+                        customParticipantsRecyclerAdapter.addItem(user, 1);
+                    }else {
+                        customParticipantsRecyclerAdapter.addItem(user);
+                    }
                 }
             }
 

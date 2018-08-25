@@ -2,6 +2,7 @@ package de.spontune.android.spontune;
 
 import android.app.ProgressDialog;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -26,13 +27,17 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -59,6 +64,12 @@ public class CreateEventActivity extends AppCompatActivity{
     private String description;
     private double lat;
     private double lng;
+    private int selectedCategory = 1;
+
+    private ImageButton mButtonCreative;
+    private ImageButton mButtonParty;
+    private ImageButton mButtonHappening;
+    private ImageButton mButtonSports;
 
     private NonSwipeableViewPager viewPager;
 
@@ -88,6 +99,7 @@ public class CreateEventActivity extends AppCompatActivity{
         PagerAdapter pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(pagerAdapter);
         viewPager.setCurrentItem(0);
+        setUpCategoryButtons();
 
         final TextView toolbarTitle = findViewById(R.id.title_text);
 
@@ -99,6 +111,7 @@ public class CreateEventActivity extends AppCompatActivity{
             }
         });
 
+        final View categoryButtons = findViewById(R.id.category_buttons);
         final ImageButton buttonBack = findViewById(R.id.create_back);
         final ImageButton buttonForward = findViewById(R.id.create_forward);
         buttonBack.setVisibility(View.GONE);
@@ -109,6 +122,7 @@ public class CreateEventActivity extends AppCompatActivity{
                     finishAfterTransition();
                 }else if (viewPager.getCurrentItem() == 1) {
                     viewPager.setCurrentItem(0);
+                    categoryButtons.setVisibility(View.VISIBLE);
                     buttonBack.setVisibility(View.GONE);
                 }else{
                     viewPager.setCurrentItem(1);
@@ -123,6 +137,7 @@ public class CreateEventActivity extends AppCompatActivity{
             public void onClick(View view){
                 if (viewPager.getCurrentItem() == 0) {
                     viewPager.setCurrentItem(1);
+                    categoryButtons.setVisibility(View.GONE);
                     buttonBack.setVisibility(View.VISIBLE);
                 }else if (viewPager.getCurrentItem() == 1) {
                     final EditText inputTitle = createTextFragment.mTitleEdit;
@@ -191,41 +206,74 @@ public class CreateEventActivity extends AppCompatActivity{
                         createTextFragment.mEndingTimeEdit.getBackground().setColorFilter(getResources().getColor(R.color.error), PorterDuff.Mode.SRC_ATOP);
                         createTextFragment.mEndingDateEdit.getBackground().setColorFilter(getResources().getColor(R.color.error), PorterDuff.Mode.SRC_ATOP);
                     }else{
-                        viewPager.setCurrentItem(2);
+                        if(createTextFragment.maxPersons != 0){
+                            String max = getResources().getString(R.string.participants_limit, createTextFragment.maxPersons);
+                            String current = getResources().getString(R.string.num_participants, 1);
+                            eventPreviewFragment.mParticipantsTextView.setText(current + max);
+                        }else{
+                            String current = getResources().getString(R.string.num_participants, 1);
+                            eventPreviewFragment.mParticipantsTextView.setText(current);
+                        }
+                        DatabaseReference creatorReference = FirebaseDatabase.getInstance().getReference().child("users").child(createTextFragment.mUserID).child("username");
+                        creatorReference.addListenerForSingleValueEvent(new ValueEventListener(){
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot){
+                                String creator = dataSnapshot.getValue(String.class);
+                                eventPreviewFragment.mCreatorTextView.setText(getResources().getString(R.string.created_by, creator));
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError){
+
+                            }
+                        });
+
                         eventPreviewFragment.mEventDescriptionTextView.setText(description);
+
+                        Calendar endOfDay = Calendar.getInstance();
+                        endOfDay.set(Calendar.HOUR_OF_DAY, 23);
+                        endOfDay.set(Calendar.MINUTE, 59);
+                        endOfDay.set(Calendar.SECOND, 59);
+                        Calendar endOfTomorrow = Calendar.getInstance();
+                        endOfTomorrow.add(Calendar.DATE, 1);
+                        endOfTomorrow.set(Calendar.HOUR_OF_DAY, 23);
+                        endOfTomorrow.set(Calendar.MINUTE, 59);
+                        endOfTomorrow.set(Calendar.SECOND, 59);
+
                         Date startingDate = new Date(startingTime);
+                        String startingDayString = getDayOfWeek(startingDate);
                         String startingDateString = DateFormat.getDateFormat(getApplicationContext()).format(startingDate);
                         String startingTimeString = DateFormat.getTimeFormat(getApplicationContext()).format(startingDate);
 
                         Date endingDate = new Date(endingTime);
+                        String endingDayString = getDayOfWeek(endingDate);
                         String endingDateString = DateFormat.getDateFormat(getApplicationContext()).format(endingDate);
-                        String endingTimeString = DateFormat.getTimeFormat(getApplicationContext()).format(endingTime);
-                        TextView startingTimeTextView = eventPreviewFragment.mStartingTimeTextView;
-                        TextView endingTimeTextView = eventPreviewFragment.mEndingTimeTextView;
-                        TextView startingDateTextView = eventPreviewFragment.mStartingDateTextView;
-                        TextView endingDateTextView = eventPreviewFragment.mEndingDateTextView;
+                        String endingTimeString = DateFormat.getTimeFormat(getApplicationContext()).format(endingDate);
 
-                        startingTimeTextView.setText(startingTimeString);
-                        endingTimeTextView.setText(endingTimeString);
-
-                        Calendar calendar = Calendar.getInstance();
-                        if (calendar.getTimeInMillis() >= startingTime) {
-                            startingTimeTextView.setText(getResources().getText(R.string.now));
-                            startingTimeTextView.setTextColor(getResources().getColor(R.color.green));
-                            Animation animBlink = AnimationUtils.loadAnimation(CreateEventActivity.this, R.anim.anim_blink);
-                            startingTimeTextView.startAnimation(animBlink);
-                        }else if (calendar.get(Calendar.DAY_OF_MONTH) != startingDate.getDate()) {
-                            startingDateTextView.setText(startingDateString);
-                            startingDateTextView.setVisibility(View.VISIBLE);
+                        if(startingTime <= endOfDay.getTimeInMillis()){
+                            String today = getResources().getString(R.string.today);
+                            eventPreviewFragment.mStartingTimeTextView.setText(getResources().getString(R.string.starting_time, today, startingTimeString));
+                        }else if(startingTime <= endOfTomorrow.getTimeInMillis()){
+                            String tomorrow = getResources().getString(R.string.tomorrow);
+                            eventPreviewFragment.mStartingTimeTextView.setText(getResources().getString(R.string.starting_time, tomorrow, startingTimeString));
+                        }else{
+                            eventPreviewFragment.mStartingTimeTextView.setText(getResources().getString(R.string.starting_time, startingDayString + ", " + startingDateString, startingTimeString));
                         }
 
-                        if (startingDate.getDate() != endingDate.getDate()) {
-                            endingDateTextView.setText(endingDateString);
-                            endingDateTextView.setVisibility(View.VISIBLE);
+                        if(endingTime <= endOfDay.getTimeInMillis()){
+                            String today = getResources().getString(R.string.today);
+                            eventPreviewFragment.mEndingTimeTextView.setText(getResources().getString(R.string.ending_time, today, endingTimeString));
+                        }else if(endingTime <= endOfTomorrow.getTimeInMillis()){
+                            String tomorrow = getResources().getString(R.string.tomorrow);
+                            eventPreviewFragment.mEndingTimeTextView.setText(getResources().getString(R.string.ending_time, tomorrow, endingTimeString));
+                        }else{
+                            eventPreviewFragment.mEndingTimeTextView.setText(getResources().getString(R.string.ending_time, endingDayString + ", " + endingDateString, endingTimeString));
                         }
 
                         toolbarTitle.setText(getString(R.string.preview));
                         buttonForward.setImageDrawable(getDrawable(R.drawable.activity_create_accept));
+
+                        viewPager.setCurrentItem(2);
                     }
                 }else{
                     final EditText inputTitle = createTextFragment.mTitleEdit;
@@ -252,7 +300,7 @@ public class CreateEventActivity extends AppCompatActivity{
                         lat = createMapFragment.lat;
                         lng = createMapFragment.lng;
                     }
-                    Event event = new Event(lat, lng, createTextFragment.mUserID, title, description, startingTime, endingTime, createTextFragment.selectedCategory, createTextFragment.maxPersons, createTextFragment.currentPersons, address, participants);
+                    Event event = new Event(lat, lng, createTextFragment.mUserID, title, description, startingTime, endingTime, selectedCategory, createTextFragment.maxPersons, address, participants);
                     mEventID = mDatabaseReference.push().getKey();
                     event.setID(mEventID);
                     mDatabaseReference.child(mEventID).setValue(event);
@@ -303,6 +351,85 @@ public class CreateEventActivity extends AppCompatActivity{
         }
     }
 
+
+    /**
+     * Set up the buttons for selecting the category the new event should belong to.
+     */
+    private void setUpCategoryButtons(){
+        mButtonCreative = findViewById(R.id.create_category_creative);
+        mButtonParty = findViewById(R.id.create_category_party);
+        mButtonHappening = findViewById(R.id.create_category_happening);
+        mButtonSports = findViewById(R.id.create_category_sports);
+
+        mButtonCreative.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectedCategory = 1;
+                toggleButtonsGreyed();
+                createMapFragment.setSelectedCategory(1);
+            }
+        });
+
+        mButtonParty.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectedCategory = 2;
+                toggleButtonsGreyed();
+                createMapFragment.setSelectedCategory(2);
+            }
+        });
+
+        mButtonHappening.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectedCategory = 3;
+                toggleButtonsGreyed();
+                createMapFragment.setSelectedCategory(3);
+            }
+        });
+
+        mButtonSports.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectedCategory = 4;
+                toggleButtonsGreyed();
+                createMapFragment.setSelectedCategory(4);
+            }
+        });
+    }
+
+
+
+    /**
+     * Greys out category buttons based on which category is selected
+     */
+    private void toggleButtonsGreyed(){
+        Drawable creativeIcon = this.getResources().getDrawable(R.drawable.category_creative_light);
+        Drawable partyIcon = this.getResources().getDrawable(R.drawable.category_party_light);
+        Drawable happeningIcon = this.getResources().getDrawable(R.drawable.category_happening_light);
+        Drawable sportsIcon = this.getResources().getDrawable(R.drawable.category_sports_light);
+        Drawable foodAndDrinkIconDeactivated = this.getResources().getDrawable(R.drawable.category_creative_deactivated);
+        Drawable partyIconDeactivated = this.getResources().getDrawable(R.drawable.category_party_deactivated);
+        Drawable musicIconDeactivated = this.getResources().getDrawable(R.drawable.category_happening_deactivated);
+        Drawable sportsIconDeactivated = this.getResources().getDrawable(R.drawable.category_sports_deactivated);
+
+        Drawable newIcon = (selectedCategory == 1) ? creativeIcon : foodAndDrinkIconDeactivated;
+        mButtonCreative.setImageDrawable(newIcon);
+
+        newIcon = (selectedCategory == 2) ? partyIcon : partyIconDeactivated;
+        mButtonParty.setImageDrawable(newIcon);
+
+        newIcon = (selectedCategory == 3) ? happeningIcon : musicIconDeactivated;
+        mButtonHappening.setImageDrawable(newIcon);
+
+        newIcon = (selectedCategory == 4) ? sportsIcon : sportsIconDeactivated;
+        mButtonSports.setImageDrawable(newIcon);
+    }
+
+    private String getDayOfWeek(Date date){
+        SimpleDateFormat simpleDateformat = new SimpleDateFormat("EEEE", getResources().getConfiguration().locale); // the day of the week spelled out completely
+        return simpleDateformat.format(date);
+    }
 
     private long getUnixTime(Calendar calendar){
         return calendar.getTime().getTime();

@@ -9,8 +9,11 @@
     <string name="input_title">TITLE</string>
     <string name="input_description">Description</string>
     <string name="input_address">Address (optional)</string>
-    <string name="starting_time">Start:</string>
-    <string name="ending_time">End:</string>
+    <string name="starting_time">Start: %1$s at %2$s</string>
+    <string name="start">Start:</string>
+    <string name="end">End:</string>
+    <string name="ending_time">End: %1$s at %2$s</string>
+    <string name="max_persons">Limit number of participants</string>
     <string name="max_persons_title">Max. Participants</string>
     <string name="max_persons_text">Choose the maximum number of participants for your event</string>
     <string name="current_persons_title">Current Participants</string>
@@ -40,6 +43,8 @@
     <string name="participants_more_than_three">%1$d people are participating.</string>
     <string name="participants_one">1 person is participating.</string>
     <string name="created_by">Created by %1$s</string>
+    <string name="num_participants">%1$d participants</string>
+    <string name="participants_limit"> (limited to %1$d)</string>
     <string name="participants">Participants</string>
     <string name="follow">Follow</string>
     <string name="unfollow">Unfollow</string>
@@ -47,6 +52,7 @@
     <string name="followers">Followers</string>
     <string name="remaining_time_until_end">%1$s remaining.</string>
     <string name="remaining_time_until_start">Starting in %1$s.</string>
+    <string name="delete_event">Delete event</string>
 
     <!-- Strings related to login -->
     <string name="action_sign_up">SIGN UP</string>

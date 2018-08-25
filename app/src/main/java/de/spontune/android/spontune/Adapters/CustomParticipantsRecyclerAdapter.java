@@ -106,6 +106,13 @@ public class CustomParticipantsRecyclerAdapter extends RecyclerView.Adapter<Cust
         }
     }
 
+    public void addItem(User user, int position){
+        if(!users.contains(user)){
+            users.add(position, user);
+            notifyItemInserted(position);
+        }
+    }
+
 
     public static class ParticipantViewHolder extends RecyclerView.ViewHolder{
 
