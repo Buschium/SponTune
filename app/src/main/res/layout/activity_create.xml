@@ -71,6 +71,57 @@
             android:layout_marginStart="16dp"
             android:src="@drawable/ic_round_arrow_back" />
 
+        <LinearLayout
+            android:id="@+id/category_buttons"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/category_bar_height"
+            android:orientation="horizontal"
+            android:weightSum="4"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/create_forward">
+
+            <ImageButton
+                android:id="@+id/create_category_creative"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="14dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/category_creative_light" />
+
+            <ImageButton
+                android:id="@+id/create_category_party"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="14dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/category_party_deactivated" />
+
+            <ImageButton
+                android:id="@+id/create_category_happening"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="14dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/category_happening_deactivated" />
+
+            <ImageButton
+                android:id="@+id/create_category_sports"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="14dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/category_sports_deactivated" />
+
+        </LinearLayout>
+
         <ImageButton
             android:id="@+id/create_forward"
             android:layout_width="@dimen/category_bar_height"

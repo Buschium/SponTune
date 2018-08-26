@@ -7,7 +7,7 @@
     <color name="colorAccent">#711A6C</color>
 
     <!-- System colors -->
-    <color name="background">#EEEEEE</color>
+    <color name="background">#E0E0E0</color>
     <color name="surface">#FAFAFA</color>
     <color name="error">#B00020</color>
 

@@ -60,7 +60,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="20dp"
-                android:text="@string/starting_time"
+                android:text="@string/start"
                 android:textSize="16sp"
                 app:layout_constraintBaseline_toBaselineOf="@+id/starting_date"
                 app:layout_constraintStart_toStartOf="parent"
@@ -85,6 +85,7 @@
                 android:inputType="none"
                 android:textSize="16sp"
                 android:textStyle="bold"
+                android:focusable="false"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/input_address" />
 
@@ -106,6 +107,7 @@
                 android:inputType="none"
                 android:textSize="16sp"
                 android:textStyle="bold"
+                android:focusable="false"
                 app:layout_constraintEnd_toStartOf="@id/starting_date_image"
                 app:layout_constraintTop_toBottomOf="@+id/input_address" />
 
@@ -113,7 +115,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="20dp"
-                android:text="@string/ending_time"
+                android:text="@string/end"
                 android:textSize="16sp"
                 app:layout_constraintBaseline_toBaselineOf="@+id/ending_date"
                 app:layout_constraintStart_toStartOf="parent" />
@@ -133,8 +135,9 @@
                 android:id="@+id/ending_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="15dp"
+                android:layout_margin="16dp"
                 android:inputType="none"
+                android:focusable="false"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -154,106 +157,56 @@
                 android:id="@+id/ending_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="15dp"
+                android:layout_margin="16dp"
                 android:inputType="none"
                 android:textSize="16sp"
                 android:textStyle="bold"
+                android:focusable="false"
                 app:layout_constraintEnd_toStartOf="@id/ending_date_image"
                 app:layout_constraintTop_toBottomOf="@+id/starting_time" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="16dp"
+                app:layout_constraintTop_toTopOf="@id/checkbox"
+                app:layout_constraintBottom_toBottomOf="@id/checkbox"
+                android:text="@string/max_persons"/>
+
+            <CheckBox
+                android:id="@+id/checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/ending_time"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginEnd="16dp"/>
+
+            <TextView
+                android:id="@+id/max_persons_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_margin="20dp"
                 android:text="@string/max_persons_title"
                 android:textSize="16sp"
                 app:layout_constraintBaseline_toBaselineOf="@+id/max_persons"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                android:visibility="gone"/>
 
             <EditText
                 android:id="@+id/max_persons"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="15dp"
+                android:layout_margin="16dp"
                 android:editable="false"
                 android:inputType="none"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/ending_date" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="20dp"
-                android:text="@string/current_persons_title"
-                android:textSize="16sp"
-                app:layout_constraintBaseline_toBaselineOf="@+id/current_persons"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <EditText
-                android:id="@+id/current_persons"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="15dp"
-                android:editable="false"
-                android:inputType="none"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/max_persons"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/category_bar_height"
-                android:orientation="horizontal"
-                android:weightSum="4"
-                app:layout_constraintTop_toBottomOf="@id/current_persons"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:layout_margin="16dp">
-
-                <ImageButton
-                    android:id="@+id/create_category_creative"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:padding="14dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/category_creative_light" />
-
-                <ImageButton
-                    android:id="@+id/create_category_party"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:padding="14dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/category_party_deactivated" />
-
-                <ImageButton
-                    android:id="@+id/create_category_happening"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:padding="14dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/category_happening_deactivated" />
-
-                <ImageButton
-                    android:id="@+id/create_category_sports"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:padding="14dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/category_sports_deactivated" />
-
-            </LinearLayout>
+                app:layout_constraintTop_toBottomOf="@+id/checkbox"
+                android:visibility="gone"/>
 
         </android.support.constraint.ConstraintLayout>
 

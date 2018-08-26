@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/item_fragment"
     android:layout_margin="10dp"
+    android:elevation="1dp"
     app:cardCornerRadius="8dp">
 
     <android.support.constraint.ConstraintLayout

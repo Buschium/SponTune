@@ -216,7 +216,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             mChildEventListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    final Event event = dataSnapshot.getValue(Event.class);
+                    Event event = dataSnapshot.getValue(Event.class);
                     assert event != null;
                     //If the event starts today and hasn't ended yet, it will be displayed on the map
                     //TODO: maybe find a more efficient way that doesn't require to load all the events
@@ -235,7 +235,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                    Event event = dataSnapshot.getValue(Event.class);
+                    if(mSelectedEvents.contains(event)){
+                        mSelectedEvents.remove(event);
+                    }else if(mUnselectedEvents.contains(event)){
+                        mUnselectedEvents.remove(event);
+                    }
+                    updateEventMarkers();
                 }
 
                 @Override
@@ -424,7 +430,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         b.putLong("endingTime", clickedEvent.getEndingTime());
                         b.putInt("category", clickedEvent.getCategory());
                         b.putInt("maxPersons", clickedEvent.getMaxPersons());
-                        b.putInt("currentPersons", clickedEvent.getCurrentPersons());
                         b.putString("address", clickedEvent.getAddress());
                         i.putExtras(b);
                         i.putExtra("participants", clickedEvent.getParticipants());
@@ -602,8 +607,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     markerDrawable = getResources().getDrawable(R.drawable.category_sports_marker);
             }
 
-            int height = 100;
-            int width = 100;
+            int height = 150;
+            int width = 150;
             Bitmap b= vectorToBitmap( (VectorDrawable) markerDrawable);
             Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
 
@@ -712,20 +717,23 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if(mAuthStateListener != null) {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
+        /*
         if(mChildEventListener != null) {
             mEventsDatabaseReference.removeEventListener(mChildEventListener);
         }
+        */
     }
 
 
     @Override
     protected void onResume(){
         super.onResume();
-        mSelectedEvents = new ArrayList<>();
-        if(mCameraPosition != null) {
+        //mSelectedEvents = new ArrayList<>();
+        if(mCameraPosition != null && mMap != null) {
             mMap.moveCamera(CameraUpdateFactory.newCameraPosition(mCameraPosition));
         }
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+        //mEventsDatabaseReference.addChildEventListener(mChildEventListener);
     }
 
     private void loadImage(final Event event){

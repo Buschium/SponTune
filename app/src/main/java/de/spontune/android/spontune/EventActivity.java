@@ -28,6 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -83,6 +84,21 @@ public class EventActivity extends AppCompatActivity {
                 loadImage("sports");
         }
 
+        DatabaseReference creatorReference = firebaseDatabase.getReference().child("users").child(bundle.getString("creator")).child("username");
+        creatorReference.addListenerForSingleValueEvent(new ValueEventListener(){
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot){
+                String creator = dataSnapshot.getValue(String.class);
+                TextView textViewCreator = findViewById(R.id.text_view_creator);
+                textViewCreator.setText(getResources().getString(R.string.created_by, creator));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError){
+
+            }
+        });
+
         databaseReference = firebaseDatabase.getReference().child("events").child(eventID).child("participants");
         uid = firebaseAuth.getUid();
 
@@ -106,6 +122,7 @@ public class EventActivity extends AppCompatActivity {
             @Override
             public void onClick(View view){
                 Intent intent = new Intent(EventActivity.this, ParticipantsActivity.class);
+                intent.putExtra("creator", bundle.getString("creator"));
                 intent.putExtra("participants", participants);
                 intent.putExtra("uid", uid);
                 startActivity(intent);
@@ -139,14 +156,20 @@ public class EventActivity extends AppCompatActivity {
         }
 
         final Button joinEventButton = findViewById(R.id.event_join);
-        if(participants.containsKey(uid)){
+        final String creator = bundle.getString("creator");
+        if(creator.equals(uid)){
+            joinEventButton.setText(getResources().getString(R.string.delete_event));
+        }else if(participants.containsKey(uid)){
             isParticipating = true;
             joinEventButton.setText(getResources().getText(R.string.leave));
         }
         joinEventButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!isParticipating) {
+                if(creator.equals(uid)){
+                    firebaseDatabase.getReference().child("events").child(eventID).removeValue();
+                    finish();
+                }else if(!isParticipating) {
                     databaseReference.child(uid).setValue(uid);
                     joinEventButton.setText(getResources().getText(R.string.leave));
                     isParticipating = true;
@@ -157,6 +180,17 @@ public class EventActivity extends AppCompatActivity {
                 }
             }
         });
+
+        TextView textViewIconParticipants = findViewById(R.id.text_view_icon_participants);
+        int maxPersons = bundle.getInt("maxPersons");
+        if(maxPersons != 0){
+            String max = getResources().getString(R.string.participants_limit, maxPersons);
+            String current = getResources().getString(R.string.num_participants, numParticipants);
+            textViewIconParticipants.setText(current + max);
+        }else{
+            String current = getResources().getString(R.string.num_participants, numParticipants);
+            textViewIconParticipants.setText(current);
+        }
 
         ImageButton btnChat = findViewById(R.id.event_chat);
         btnChat.setOnClickListener(new View.OnClickListener() {
@@ -206,18 +240,6 @@ public class EventActivity extends AppCompatActivity {
         assert  getSupportActionBar() != null;
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(bundle.getString("summary"));
-        DatabaseReference creatorReference = firebaseDatabase.getReference().child("users").child(bundle.getString("creator")).child("username");
-        creatorReference.addListenerForSingleValueEvent(new ValueEventListener(){
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot){
-                getSupportActionBar().setSubtitle(getResources().getString(R.string.created_by, dataSnapshot.getValue(String.class)));
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError){
-
-            }
-        });
     }
 
 
@@ -226,39 +248,49 @@ public class EventActivity extends AppCompatActivity {
      * to human-readable time formats.
      */
     private void setUpTimeAndDate(Bundle bundle){
-        TextView startingTimeTextView = findViewById(R.id.event_metadata_starting_time);
-        TextView startingDateTextView = findViewById(R.id.event_metadata_starting_date);
-        TextView endingTimeTextView = findViewById(R.id.event_metadata_ending_time);
-        TextView endingDateTextView = findViewById(R.id.event_metadata_ending_date);
+        TextView startingTimeTextView = findViewById(R.id.text_view_starting_time);
+        TextView endingTimeTextView = findViewById(R.id.text_view_ending_time);
         long startingTime = bundle.getLong("startingTime");
         long endingTime = bundle.getLong("endingTime");
 
-        Calendar calendar = Calendar.getInstance();
+        Calendar endOfDay = Calendar.getInstance();
+        endOfDay.set(Calendar.HOUR_OF_DAY, 23);
+        endOfDay.set(Calendar.MINUTE, 59);
+        endOfDay.set(Calendar.SECOND, 59);
+        Calendar endOfTomorrow = Calendar.getInstance();
+        endOfTomorrow.add(Calendar.DATE, 1);
+        endOfTomorrow.set(Calendar.HOUR_OF_DAY, 23);
+        endOfTomorrow.set(Calendar.MINUTE, 59);
+        endOfTomorrow.set(Calendar.SECOND, 59);
 
         Date startingDate = new Date(startingTime);
+        String startingDayString = getDayOfWeek(startingDate);
         String startingDateString = DateFormat.getDateFormat(getApplicationContext()).format(startingDate);
         String startingTimeString = DateFormat.getTimeFormat(getApplicationContext()).format(startingDate);
 
         Date endingDate = new Date(endingTime);
+        String endingDayString = getDayOfWeek(endingDate);
         String endingDateString = DateFormat.getDateFormat(getApplicationContext()).format(endingDate);
-        String endingTimeString = DateFormat.getTimeFormat(getApplicationContext()).format(endingTime);
+        String endingTimeString = DateFormat.getTimeFormat(getApplicationContext()).format(endingDate);
 
-        startingTimeTextView.setText(startingTimeString);
-        endingTimeTextView.setText(endingTimeString);
-
-        if(calendar.getTimeInMillis() >= startingTime){
-            startingTimeTextView.setText(getResources().getText(R.string.now));
-            startingTimeTextView.setTextColor(getResources().getColor(R.color.green));
-            Animation animBlink = AnimationUtils.loadAnimation(this, R.anim.anim_blink);
-            startingTimeTextView.startAnimation(animBlink);
-        }else if(calendar.get(Calendar.DAY_OF_MONTH) != startingDate.getDate()){
-            startingDateTextView.setText(startingDateString);
-            startingDateTextView.setVisibility(View.VISIBLE);
+        if(startingTime <= endOfDay.getTimeInMillis()){
+            String today = getResources().getString(R.string.today);
+            startingTimeTextView.setText(getResources().getString(R.string.starting_time, today, startingTimeString));
+        }else if(startingTime <= endOfTomorrow.getTimeInMillis()){
+            String tomorrow = getResources().getString(R.string.tomorrow);
+            startingTimeTextView.setText(getResources().getString(R.string.starting_time, tomorrow, startingTimeString));
+        }else{
+            startingTimeTextView.setText(getResources().getString(R.string.starting_time, startingDayString + ", " + startingDateString, startingTimeString));
         }
 
-        if(calendar.get(Calendar.DAY_OF_MONTH) != endingDate.getDate()){
-            endingDateTextView.setText(endingDateString);
-            endingDateTextView.setVisibility(View.VISIBLE);
+        if(endingTime <= endOfDay.getTimeInMillis()){
+            String today = getResources().getString(R.string.today);
+            endingTimeTextView.setText(getResources().getString(R.string.ending_time, today, endingTimeString));
+        }else if(endingTime <= endOfTomorrow.getTimeInMillis()){
+            String tomorrow = getResources().getString(R.string.tomorrow);
+            endingTimeTextView.setText(getResources().getString(R.string.ending_time, tomorrow, endingTimeString));
+        }else{
+            endingTimeTextView.setText(getResources().getString(R.string.ending_time, endingDayString + ", " + endingDateString, endingTimeString));
         }
     }
 
@@ -302,5 +334,9 @@ public class EventActivity extends AppCompatActivity {
         return false;
     }
 
+    private String getDayOfWeek(Date date){
+        SimpleDateFormat simpleDateformat = new SimpleDateFormat("EEEE", getResources().getConfiguration().locale); // the day of the week spelled out completely
+        return simpleDateformat.format(date);
+    }
 
 }

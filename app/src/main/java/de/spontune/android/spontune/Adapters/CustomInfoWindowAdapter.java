@@ -36,11 +36,25 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         ImageView categoryImage = view.findViewById(R.id.fragment_image);
         TextView eventTitle = view.findViewById(R.id.fragment_title);
         TextView startingTimeView = view.findViewById(R.id.fragment_time);
-        TextView startingDateView = view.findViewById(R.id.fragment_date);
-        ImageView startingDateImageView = view.findViewById(R.id.fragment_image_date);
+        View background = view.findViewById(R.id.info_background);
 
         event = (Event) marker.getTag();
         assert event != null;
+
+        switch(event.getCategory()){
+            case 1:
+                background.setBackgroundColor(context.getResources().getColor(R.color.creative));
+                break;
+            case 2:
+                background.setBackgroundColor(context.getResources().getColor(R.color.party));
+                break;
+            case 3:
+                background.setBackgroundColor(context.getResources().getColor(R.color.happening));
+                break;
+            default:
+                background.setBackgroundColor(context.getResources().getColor(R.color.sports));
+                break;
+        }
 
         long startingTime = event.getStartingTime();
         long endingTime = event.getEndingTime();
@@ -53,13 +67,9 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         if(startingTime < nowMillis){
             String text = convertToHoursAndMinutes(endingTime - nowMillis);
             startingTimeView.setText(context.getResources().getString(R.string.remaining_time_until_end, text));
-            startingDateView.setVisibility(View.GONE);
-            startingDateImageView.setVisibility(View.GONE);
         }else if(startingTime > nowMillis && startingTime < endOfDayMillis) {
             String text = convertToHoursAndMinutes(startingTime - nowMillis);
             startingTimeView.setText(context.getResources().getString(R.string.remaining_time_until_start, text));
-            startingDateView.setVisibility(View.GONE);
-            startingDateImageView.setVisibility(View.GONE);
         }
 
         if(event.getPicture() != null){

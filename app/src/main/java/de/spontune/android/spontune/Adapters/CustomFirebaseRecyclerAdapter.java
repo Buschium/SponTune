@@ -50,7 +50,6 @@ public class CustomFirebaseRecyclerAdapter extends RecyclerView.Adapter<EventVie
                 b.putLong("endingTime", event.getEndingTime());
                 b.putInt("category", event.getCategory());
                 b.putInt("maxPersons", event.getMaxPersons());
-                b.putInt("currentPersons", event.getCurrentPersons());
                 b.putString("address", event.getAddress());
                 i.putExtras(b);
                 i.putExtra("participants", event.getParticipants());

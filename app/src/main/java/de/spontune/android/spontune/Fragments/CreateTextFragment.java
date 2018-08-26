@@ -1,7 +1,6 @@
 package de.spontune.android.spontune.Fragments;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
@@ -14,8 +13,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,9 +51,8 @@ public class CreateTextFragment extends Fragment implements DatePickerFragment.P
     public String mUserID;
     public String title;
     public String description;
-    public int maxPersons = 10;
+    public int maxPersons = 0;
     public int currentPersons = 1;
-    public int selectedCategory = 1;
     public double lat;
     public double lng;
 
@@ -69,12 +68,6 @@ public class CreateTextFragment extends Fragment implements DatePickerFragment.P
     public EditText mEndingTimeEdit;
     public EditText mMaxPersons;
     public EditText mCurrentPersons;
-
-    //category buttons
-    private ImageButton mButtonFoodAndDrink;
-    private ImageButton mButtonParty;
-    private ImageButton mButtonMusic;
-    private ImageButton mButtonSports;
 
     //Calendars for the starting and ending times
     public final Calendar mStartingCalendar = GregorianCalendar.getInstance();
@@ -106,7 +99,6 @@ public class CreateTextFragment extends Fragment implements DatePickerFragment.P
         setUpEndingButtons(rootView);
         setUpVisitorButtons(rootView);
         setUpAddressInput(rootView);
-        setUpCategoryButtons(rootView);
 
         return rootView;
     }
@@ -130,28 +122,10 @@ public class CreateTextFragment extends Fragment implements DatePickerFragment.P
             }
         });
 
-        mStartingDateEdit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    showStartingDateDialog();
-                }
-            }
-        });
-
         mStartingTimeEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showStartingTimeDialog();
-            }
-        });
-
-        mStartingTimeEdit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    showStartingTimeDialog();
-                }
             }
         });
     }
@@ -177,28 +151,10 @@ public class CreateTextFragment extends Fragment implements DatePickerFragment.P
             }
         });
 
-        mEndingDateEdit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    showEndingDateDialog();
-                }
-            }
-        });
-
         mEndingTimeEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showEndingTimeDialog();
-            }
-        });
-
-        mEndingTimeEdit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    showEndingTimeDialog();
-                }
             }
         });
     }
@@ -208,10 +164,25 @@ public class CreateTextFragment extends Fragment implements DatePickerFragment.P
      * Set up the input fields for the maximum number of visitors and the current number of visitors.
      */
     private void setUpVisitorButtons(View view){
+        CheckBox checkBox = view.findViewById(R.id.checkbox);
+        final TextView maxPersonsTextView = view.findViewById(R.id.max_persons_text_view);
         mMaxPersons = view.findViewById(R.id.max_persons);
-        mCurrentPersons = view.findViewById(R.id.current_persons);
         mMaxPersons.setText(String.format(Locale.GERMAN, "%d", maxPersons));
-        mCurrentPersons.setText(String.format(Locale.GERMAN, "%d", currentPersons));
+
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if(b){
+                    maxPersons = 10;
+                    maxPersonsTextView.setVisibility(View.VISIBLE);
+                    mMaxPersons.setVisibility(View.VISIBLE);
+                }else{
+                    maxPersons = 0;
+                    maxPersonsTextView.setVisibility(View.GONE);
+                    mMaxPersons.setVisibility(View.GONE);
+                }
+            }
+        });
 
         mMaxPersons.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -226,24 +197,6 @@ public class CreateTextFragment extends Fragment implements DatePickerFragment.P
             public void onFocusChange(View view, boolean hasFocus) {
                 if (hasFocus) {
                     isMaxPersons = true;
-                    showNumberPickerDialog();
-                }
-            }
-        });
-
-        mCurrentPersons.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                isMaxPersons = false;
-                showNumberPickerDialog();
-            }
-        });
-
-        mCurrentPersons.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean hasFocus) {
-                if(hasFocus) {
-                    isMaxPersons = false;
                     showNumberPickerDialog();
                 }
             }
@@ -325,29 +278,17 @@ public class CreateTextFragment extends Fragment implements DatePickerFragment.P
         final NumberPicker np = view.findViewById(R.id.number_picker);
         assert np != null;
 
-        if(!isMaxPersons){
-            TextView title = view.findViewById(R.id.number_picker_title);
-            TextView text = view.findViewById(R.id.number_picker_text);
-            title.setText(R.string.current_persons_title);
-            text.setText(R.string.current_persons_text);
-        }
-
-        np.setMaxValue(isMaxPersons? 200 : maxPersons - 1);
-        np.setMinValue(isMaxPersons? 1 : 0);
-        np.setValue(isMaxPersons? maxPersons : currentPersons);
+        np.setMaxValue(200);
+        np.setMinValue(1);
+        np.setValue(10);
         np.setWrapSelectorWheel(false);
 
         numberPickerSet.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v) {
-                if(isMaxPersons) {
-                    maxPersons = np.getValue();
-                    mMaxPersons.setText(String.format(Locale.GERMAN, "%d", maxPersons));
-                }else{
-                    currentPersons = np.getValue();
-                    mCurrentPersons.setText(String.format(Locale.GERMAN, "%d", currentPersons));
-                }
+                maxPersons = np.getValue();
+                mMaxPersons.setText(String.format(Locale.GERMAN, "%d", maxPersons));
                 d.dismiss();
             }
         });
@@ -405,81 +346,6 @@ public class CreateTextFragment extends Fragment implements DatePickerFragment.P
             mEndingDateEdit.getBackground().setColorFilter(null);
             mEndingTimeEdit.getBackground().setColorFilter(null);
         }
-    }
-
-
-    /**
-     * Set up the buttons for selecting the category the new event should belong to.
-     */
-    private void setUpCategoryButtons(View view){
-        mButtonFoodAndDrink = view.findViewById(R.id.create_category_creative);
-        mButtonParty = view.findViewById(R.id.create_category_party);
-        mButtonMusic = view.findViewById(R.id.create_category_happening);
-        mButtonSports = view.findViewById(R.id.create_category_sports);
-
-        mButtonFoodAndDrink.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                selectedCategory = 1;
-                toggleButtonsGreyed();
-            }
-        });
-
-        mButtonParty.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                selectedCategory = 2;
-                toggleButtonsGreyed();
-            }
-        });
-
-        mButtonMusic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                selectedCategory = 3;
-                toggleButtonsGreyed();
-            }
-        });
-
-        mButtonSports.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                selectedCategory = 4;
-                toggleButtonsGreyed();
-            }
-        });
-    }
-
-
-    /**
-     * Greys out category buttons based on which category is selected
-     */
-    private void toggleButtonsGreyed(){
-        Drawable creativeIcon = this.getResources().getDrawable(R.drawable.category_creative_light);
-        Drawable partyIcon = this.getResources().getDrawable(R.drawable.category_party_light);
-        Drawable happeningIcon = this.getResources().getDrawable(R.drawable.category_happening_light);
-        Drawable sportsIcon = this.getResources().getDrawable(R.drawable.category_sports_light);
-        Drawable foodAndDrinkIconDeactivated = this.getResources().getDrawable(R.drawable.category_creative_deactivated);
-        Drawable partyIconDeactivated = this.getResources().getDrawable(R.drawable.category_party_deactivated);
-        Drawable musicIconDeactivated = this.getResources().getDrawable(R.drawable.category_happening_deactivated);
-        Drawable sportsIconDeactivated = this.getResources().getDrawable(R.drawable.category_sports_deactivated);
-
-        Drawable newIcon = (selectedCategory == 1) ? creativeIcon : foodAndDrinkIconDeactivated;
-        mButtonFoodAndDrink.setImageDrawable(newIcon);
-
-        newIcon = (selectedCategory == 2) ? partyIcon : partyIconDeactivated;
-        mButtonParty.setImageDrawable(newIcon);
-
-        newIcon = (selectedCategory == 3) ? happeningIcon : musicIconDeactivated;
-        mButtonMusic.setImageDrawable(newIcon);
-
-        newIcon = (selectedCategory == 4) ? sportsIcon : sportsIconDeactivated;
-        mButtonSports.setImageDrawable(newIcon);
-    }
-
-
-    private long getUnixTime(Calendar calendar){
-        return calendar.getTime().getTime();
     }
 
 

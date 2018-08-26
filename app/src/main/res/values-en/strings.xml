@@ -4,8 +4,8 @@
     <string name="input_title">TITLE</string>
     <string name="input_description">Description</string>
     <string name="input_address">Address (optional)</string>
-    <string name="starting_time">Start:</string>
-    <string name="ending_time">End:</string>
+    <string name="starting_time">Start: %1$s at %2$s</string>
+    <string name="ending_time">End: %1$s at %2$s</string>
     <string name="max_persons_title">Max. Participants</string>
     <string name="max_persons_text">Choose the maximum number of participants for your event</string>
     <string name="current_persons_title">Current Participants</string>
@@ -49,4 +49,17 @@
     <string name="followers">Followers</string>
     <string name="remaining_time_until_end">%1$s remaining.</string>
     <string name="remaining_time_until_start">Starting in %1$s.</string>
+    <string name="monday">Monday</string>
+    <string name="tuesday">Tuesday</string>
+    <string name="wednesday">Wednesday</string>
+    <string name="thursday">Thursday</string>
+    <string name="friday">Friday</string>
+    <string name="saturday">Saturday</string>
+    <string name="sunday">Sunday</string>
+    <string name="num_participants">%1$d participants</string>
+    <string name="participants_limit">" (limited to %1$d)"</string>
+    <string name="delete_event">Delete event</string>
+    <string name="start">Start:</string>
+    <string name="end">End:</string>
+    <string name="max_persons">Limit number of participants</string>
 </resources>
