@@ -19,20 +19,15 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
     private Context context;
     private Event event;
+    private View view;
 
     public CustomInfoWindowAdapter(Context ctx){
         context = ctx;
+        view = ((Activity) context).getLayoutInflater().inflate(R.layout.fragment_info, null);
     }
 
     @Override
     public View getInfoWindow(Marker marker) {
-        return null;
-    }
-
-    @Override
-    public View getInfoContents(Marker marker) {
-        View view = ((Activity)context).getLayoutInflater().inflate(R.layout.fragment_info, null);
-
         ImageView categoryImage = view.findViewById(R.id.fragment_image);
         TextView eventTitle = view.findViewById(R.id.fragment_title);
         TextView startingTimeView = view.findViewById(R.id.fragment_time);
@@ -43,18 +38,20 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
         switch(event.getCategory()){
             case 1:
-                background.setBackgroundColor(context.getResources().getColor(R.color.creative));
+                background.setBackground(context.getResources().getDrawable(R.drawable.info_window_creative));
                 break;
             case 2:
-                background.setBackgroundColor(context.getResources().getColor(R.color.party));
+                background.setBackground(context.getResources().getDrawable(R.drawable.info_window_party));
                 break;
             case 3:
-                background.setBackgroundColor(context.getResources().getColor(R.color.happening));
+                background.setBackground(context.getResources().getDrawable(R.drawable.info_window_happening));
                 break;
             default:
-                background.setBackgroundColor(context.getResources().getColor(R.color.sports));
+                background.setBackground(context.getResources().getDrawable(R.drawable.info_window_sports));
                 break;
         }
+
+
 
         long startingTime = event.getStartingTime();
         long endingTime = event.getEndingTime();
@@ -79,6 +76,11 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         eventTitle.setText(event.getSummary());
 
         return view;
+    }
+
+    @Override
+    public View getInfoContents(Marker marker) {
+        return null;
     }
 
     private String convertToHoursAndMinutes(long millis){

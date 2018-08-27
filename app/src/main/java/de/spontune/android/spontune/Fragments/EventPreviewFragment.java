@@ -1,6 +1,5 @@
 package de.spontune.android.spontune.Fragments;
 
-import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -10,7 +9,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -28,7 +26,9 @@ public class EventPreviewFragment extends Fragment {
     public TextView mStartingTimeTextView;
     public TextView mEndingTimeTextView;
     public TextView mCreatorTextView;
+    public ImageView mParticipantsImageView;
     public TextView mParticipantsTextView;
+    public TextView mTitleTextView;
 
     private final int PICK_IMAGE_REQUEST = 71;
     public Uri filePath;
@@ -47,33 +47,14 @@ public class EventPreviewFragment extends Fragment {
             }
         });
 
+        mTitleTextView = rootView.findViewById(R.id.title_text_view);
+
         mCreatorTextView = rootView.findViewById(R.id.text_view_creator);
+        mParticipantsImageView = rootView.findViewById(R.id.icon_participants);
         mParticipantsTextView = rootView.findViewById(R.id.text_view_icon_participants);
 
         mEventDescriptionTextView = rootView.findViewById(R.id.event_description_textview);
         gradientView = rootView.findViewById(R.id.gradient);
-        final int collapsedMaxLines = 7;
-        final int expandedMaxLines = 20;
-        int lines = mEventDescriptionTextView.getLineCount();
-
-        if(lines > collapsedMaxLines){
-            gradientView.setVisibility(View.VISIBLE);
-
-            //The description expands when the user clicks on it (or shrinks when it's already expanded)
-            mEventDescriptionTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    ObjectAnimator animation = ObjectAnimator.ofInt(mEventDescriptionTextView, "maxLines", mEventDescriptionTextView.getMaxLines() == collapsedMaxLines? expandedMaxLines : collapsedMaxLines);
-                    animation.setInterpolator(new DecelerateInterpolator());
-                    animation.setDuration(200).start();
-                    if(mEventDescriptionTextView.getMaxLines() == collapsedMaxLines) {
-                        gradientView.setVisibility(View.GONE);
-                    }else{
-                        gradientView.setVisibility(View.VISIBLE);
-                    }
-                }
-            });
-        }
 
         mStartingTimeTextView = rootView.findViewById(R.id.text_view_starting_time);
         mEndingTimeTextView = rootView.findViewById(R.id.text_view_ending_time);

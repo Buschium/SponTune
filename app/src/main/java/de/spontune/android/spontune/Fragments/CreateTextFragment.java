@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.ResultReceiver;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.AppCompatCheckBox;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,9 +14,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,7 +32,6 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Locale;
 
 import de.spontune.android.spontune.Input.FetchLocationIntentService;
@@ -51,14 +50,16 @@ public class CreateTextFragment extends Fragment implements DatePickerFragment.P
     public String mUserID;
     public String title;
     public String description;
-    public int maxPersons = 0;
-    public int currentPersons = 1;
+    public int maxPersons;
     public double lat;
     public double lng;
+    public boolean now;
 
     private boolean isStartingTime = true;
     private boolean isStartingDate = true;
-    private boolean isMaxPersons = true;
+
+    private ImageView mStartingTimeIcon;
+    private ImageView mStartingDateIcon;
 
     public EditText mTitleEdit;
     public EditText mDescriptionEdit;
@@ -68,10 +69,14 @@ public class CreateTextFragment extends Fragment implements DatePickerFragment.P
     public EditText mEndingTimeEdit;
     public EditText mMaxPersons;
     public EditText mCurrentPersons;
+    private TextView maxPersonsTextView;
+
+    AppCompatCheckBox checkBoxMaxPersons;
+    AppCompatCheckBox checkBoxNow;
 
     //Calendars for the starting and ending times
-    public final Calendar mStartingCalendar = GregorianCalendar.getInstance();
-    public final Calendar mEndingCalendar = GregorianCalendar.getInstance();
+    public final Calendar mStartingCalendar = Calendar.getInstance();
+    public final Calendar mEndingCalendar = Calendar.getInstance();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -109,8 +114,13 @@ public class CreateTextFragment extends Fragment implements DatePickerFragment.P
     private void setUpStartingButtons(View view){
         mStartingDateEdit = view.findViewById(R.id.starting_date);
         mStartingTimeEdit = view.findViewById(R.id.starting_time);
+        mStartingTimeIcon = view.findViewById(R.id.starting_time_image);
+        mStartingDateIcon = view.findViewById(R.id.starting_date_image);
         mStartingCalendar.add(Calendar.MINUTE, 30);
         Date startingDate = new Date(mStartingCalendar.getTimeInMillis());
+
+        checkBoxNow = view.findViewById(R.id.checkbox_now);
+        checkBoxNow.setChecked(false);
 
         mStartingDateEdit.setText(DateFormat.getDateFormat(getActivity().getApplicationContext()).format(startingDate));
         mStartingTimeEdit.setText(DateFormat.getTimeFormat(getActivity().getApplicationContext()).format(startingDate));
@@ -164,41 +174,16 @@ public class CreateTextFragment extends Fragment implements DatePickerFragment.P
      * Set up the input fields for the maximum number of visitors and the current number of visitors.
      */
     private void setUpVisitorButtons(View view){
-        CheckBox checkBox = view.findViewById(R.id.checkbox);
-        final TextView maxPersonsTextView = view.findViewById(R.id.max_persons_text_view);
+        checkBoxMaxPersons = view.findViewById(R.id.checkbox_max);
+        checkBoxMaxPersons.setChecked(false);
+        maxPersonsTextView = view.findViewById(R.id.max_persons_text_view);
         mMaxPersons = view.findViewById(R.id.max_persons);
         mMaxPersons.setText(String.format(Locale.GERMAN, "%d", maxPersons));
-
-        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if(b){
-                    maxPersons = 10;
-                    maxPersonsTextView.setVisibility(View.VISIBLE);
-                    mMaxPersons.setVisibility(View.VISIBLE);
-                }else{
-                    maxPersons = 0;
-                    maxPersonsTextView.setVisibility(View.GONE);
-                    mMaxPersons.setVisibility(View.GONE);
-                }
-            }
-        });
 
         mMaxPersons.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                isMaxPersons = true;
                 showNumberPickerDialog();
-            }
-        });
-
-        mMaxPersons.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean hasFocus) {
-                if (hasFocus) {
-                    isMaxPersons = true;
-                    showNumberPickerDialog();
-                }
             }
         });
     }
@@ -345,6 +330,36 @@ public class CreateTextFragment extends Fragment implements DatePickerFragment.P
             mEndingTimeEdit.setText(DateFormat.getTimeFormat(getActivity().getApplicationContext()).format(new Date(mEndingCalendar.getTimeInMillis())));
             mEndingDateEdit.getBackground().setColorFilter(null);
             mEndingTimeEdit.getBackground().setColorFilter(null);
+        }
+    }
+
+
+    public void onCheckboxClicked(int id, boolean checked){
+        switch(id){
+            case R.id.checkbox_now:
+                checkBoxNow.setChecked(checked);
+                mStartingTimeEdit.setEnabled(!checked);
+                mStartingDateEdit.setEnabled(!checked);
+                if(checked){
+                    mStartingTimeIcon.setImageResource(R.drawable.ic_round_time_deactivated);
+                    mStartingDateIcon.setImageResource(R.drawable.ic_round_date_deactivated);
+                }else{
+                    mStartingTimeIcon.setImageResource(R.drawable.ic_round_time);
+                    mStartingDateIcon.setImageResource(R.drawable.ic_round_date);
+                }
+                break;
+            case R.id.checkbox_max:
+                checkBoxMaxPersons.setChecked(checked);
+                if(checked){
+                    maxPersons = 10;
+                    maxPersonsTextView.setVisibility(View.VISIBLE);
+                    mMaxPersons.setVisibility(View.VISIBLE);
+                    mMaxPersons.setText("" + maxPersons);
+                }else{
+                    maxPersons = 0;
+                    maxPersonsTextView.setVisibility(View.GONE);
+                    mMaxPersons.setVisibility(View.GONE);
+                }
         }
     }
 

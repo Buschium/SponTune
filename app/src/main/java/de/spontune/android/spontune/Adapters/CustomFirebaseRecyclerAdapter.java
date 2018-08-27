@@ -1,5 +1,6 @@
 package de.spontune.android.spontune.Adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ public class CustomFirebaseRecyclerAdapter extends RecyclerView.Adapter<EventVie
 
     private Context mContext;
     private List<Event> mEventList;
+    private int RC_LOCATION_CALLBACK = 2;
 
     public CustomFirebaseRecyclerAdapter(Context mContext, List<Event> mEventList){
         this.mEventList = mEventList;
@@ -53,7 +55,7 @@ public class CustomFirebaseRecyclerAdapter extends RecyclerView.Adapter<EventVie
                 b.putString("address", event.getAddress());
                 i.putExtras(b);
                 i.putExtra("participants", event.getParticipants());
-                mContext.startActivity(i);
+                ((Activity) mContext).startActivityForResult(i, RC_LOCATION_CALLBACK);
             }
         });
         viewHolder.bindToPost(event);

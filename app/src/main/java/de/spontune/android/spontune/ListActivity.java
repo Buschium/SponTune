@@ -1,6 +1,7 @@
 package de.spontune.android.spontune;
 
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -38,6 +39,8 @@ public class ListActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private EventFragment todayFragment;
     private EventFragment tomorrowFragment;
     private EventFragment weekFragment;
+
+    private static final int RC_LOCATION_CALLBACK = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -163,6 +166,26 @@ public class ListActivity extends AppCompatActivity implements TabLayout.OnTabSe
             mButtonSports.setImageDrawable(newIcon);
         }
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == RC_LOCATION_CALLBACK){
+            if(resultCode == RESULT_OK){
+                double lat = data.getDoubleExtra("lat", 0.0);
+                double lng = data.getDoubleExtra("lng", 0.0);
+                int category = data.getIntExtra("category", 0);
+                String id = data.getStringExtra("id");
+                Intent returnIntent = new Intent();
+                returnIntent.putExtra("lat", lat);
+                returnIntent.putExtra("lng", lng);
+                returnIntent.putExtra("category", category);
+                returnIntent.putExtra("id", id);
+                setResult(RESULT_OK, returnIntent);
+                finish();
+            }
+        }
     }
 
 

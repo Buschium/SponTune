@@ -12,12 +12,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatCheckBox;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -65,6 +64,7 @@ public class CreateEventActivity extends AppCompatActivity{
     private double lat;
     private double lng;
     private int selectedCategory = 1;
+    private boolean now;
 
     private ImageButton mButtonCreative;
     private ImageButton mButtonParty;
@@ -79,7 +79,7 @@ public class CreateEventActivity extends AppCompatActivity{
         setContentView(R.layout.activity_create);
 
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(getResources().getString(R.string.new_event));
+            getSupportActionBar().setTitle(getResources().getString(R.string.location_choose));
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
@@ -102,6 +102,7 @@ public class CreateEventActivity extends AppCompatActivity{
         setUpCategoryButtons();
 
         final TextView toolbarTitle = findViewById(R.id.title_text);
+        toolbarTitle.setText(getResources().getString(R.string.location_choose));
 
         ImageButton btnClose = findViewById(R.id.event_close);
         btnClose.setOnClickListener(new View.OnClickListener(){
@@ -142,7 +143,7 @@ public class CreateEventActivity extends AppCompatActivity{
                 }else if (viewPager.getCurrentItem() == 1) {
                     final EditText inputTitle = createTextFragment.mTitleEdit;
                     final EditText inputDescription = createTextFragment.mDescriptionEdit;
-                    Calendar now = Calendar.getInstance();
+                    Calendar nowCalendar = Calendar.getInstance();
                     title = inputTitle.getText().toString();
                     description = inputDescription.getText().toString();
                     long startingTime = getUnixTime(createTextFragment.mStartingCalendar);
@@ -197,7 +198,7 @@ public class CreateEventActivity extends AppCompatActivity{
 
                             }
                         });
-                    }else if (startingTime <= now.getTimeInMillis()) {
+                    }else if (startingTime <= nowCalendar.getTimeInMillis() && !now) {
                         Snackbar.make(view, getResources().getString(R.string.starting_time_over), Snackbar.LENGTH_LONG).show();
                         createTextFragment.mStartingTimeEdit.getBackground().setColorFilter(getResources().getColor(R.color.error), PorterDuff.Mode.SRC_ATOP);
                         createTextFragment.mStartingDateEdit.getBackground().setColorFilter(getResources().getColor(R.color.error), PorterDuff.Mode.SRC_ATOP);
@@ -206,13 +207,13 @@ public class CreateEventActivity extends AppCompatActivity{
                         createTextFragment.mEndingTimeEdit.getBackground().setColorFilter(getResources().getColor(R.color.error), PorterDuff.Mode.SRC_ATOP);
                         createTextFragment.mEndingDateEdit.getBackground().setColorFilter(getResources().getColor(R.color.error), PorterDuff.Mode.SRC_ATOP);
                     }else{
-                        if(createTextFragment.maxPersons != 0){
-                            String max = getResources().getString(R.string.participants_limit, createTextFragment.maxPersons);
-                            String current = getResources().getString(R.string.num_participants, 1);
-                            eventPreviewFragment.mParticipantsTextView.setText(current + max);
-                        }else{
-                            String current = getResources().getString(R.string.num_participants, 1);
-                            eventPreviewFragment.mParticipantsTextView.setText(current);
+                        eventPreviewFragment.mTitleTextView.setText(createTextFragment.mTitleEdit.getText().toString());
+
+                        if(createTextFragment.maxPersons != 0) {
+                            eventPreviewFragment.mParticipantsImageView.setVisibility(View.VISIBLE);
+                            eventPreviewFragment.mParticipantsTextView.setVisibility(View.VISIBLE);
+                            String max = getResources().getString(R.string.participants_limit_without_parentheses, createTextFragment.maxPersons);
+                            eventPreviewFragment.mParticipantsTextView.setText(max);
                         }
                         DatabaseReference creatorReference = FirebaseDatabase.getInstance().getReference().child("users").child(createTextFragment.mUserID).child("username");
                         creatorReference.addListenerForSingleValueEvent(new ValueEventListener(){
@@ -240,7 +241,12 @@ public class CreateEventActivity extends AppCompatActivity{
                         endOfTomorrow.set(Calendar.MINUTE, 59);
                         endOfTomorrow.set(Calendar.SECOND, 59);
 
-                        Date startingDate = new Date(startingTime);
+                        Date startingDate;
+                        if(now){
+                            startingDate = new Date();
+                        }else{
+                            startingDate = new Date(startingTime);
+                        }
                         String startingDayString = getDayOfWeek(startingDate);
                         String startingDateString = DateFormat.getDateFormat(getApplicationContext()).format(startingDate);
                         String startingTimeString = DateFormat.getTimeFormat(getApplicationContext()).format(startingDate);
@@ -278,10 +284,14 @@ public class CreateEventActivity extends AppCompatActivity{
                 }else{
                     final EditText inputTitle = createTextFragment.mTitleEdit;
                     final EditText inputDescription = createTextFragment.mDescriptionEdit;
-                    Calendar now = Calendar.getInstance();
                     title = inputTitle.getText().toString();
                     description = inputDescription.getText().toString();
-                    long startingTime = getUnixTime(createTextFragment.mStartingCalendar);
+                    long startingTime;
+                    if(now){
+                        startingTime = (new Date()).getTime();
+                    }else{
+                        startingTime = getUnixTime(createTextFragment.mStartingCalendar);
+                    }
                     long endingTime = getUnixTime(createTextFragment.mEndingCalendar);
 
                     AutoCompleteTextView inputAddress = findViewById(R.id.input_address);
@@ -443,6 +453,22 @@ public class CreateEventActivity extends AppCompatActivity{
             viewPager.setCurrentItem(0);
         }else{
             viewPager.setCurrentItem(1);
+        }
+    }
+
+    public void onCheckboxClicked(View view) {
+        // Is the view now checked?
+        boolean checked = ((AppCompatCheckBox) view).isChecked();
+
+        // Check which checkbox was clicked
+        switch(view.getId()) {
+            case R.id.checkbox_now:
+                createTextFragment.onCheckboxClicked(R.id.checkbox_now, checked);
+                now = checked;
+                break;
+            case R.id.checkbox_max:
+                createTextFragment.onCheckboxClicked(R.id.checkbox_max, checked);
+                break;
         }
     }
 

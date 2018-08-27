@@ -45,6 +45,7 @@
     <string name="created_by">Created by %1$s</string>
     <string name="num_participants">%1$d participants</string>
     <string name="participants_limit"> (limited to %1$d)</string>
+    <string name="participants_limit_without_parentheses">Limited to %1$d participants</string>
     <string name="participants">Participants</string>
     <string name="follow">Follow</string>
     <string name="unfollow">Unfollow</string>
@@ -53,6 +54,7 @@
     <string name="remaining_time_until_end">%1$s remaining.</string>
     <string name="remaining_time_until_start">Starting in %1$s.</string>
     <string name="delete_event">Delete event</string>
+    <string name="location_choose">Choose the location</string>
 
     <!-- Strings related to login -->
     <string name="action_sign_up">SIGN UP</string>

@@ -8,8 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateFormat;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -158,6 +156,7 @@ public class EventActivity extends AppCompatActivity {
         final Button joinEventButton = findViewById(R.id.event_join);
         final String creator = bundle.getString("creator");
         if(creator.equals(uid)){
+            isParticipating = true;
             joinEventButton.setText(getResources().getString(R.string.delete_event));
         }else if(participants.containsKey(uid)){
             isParticipating = true;
@@ -204,32 +203,55 @@ public class EventActivity extends AppCompatActivity {
             }
         });
 
+        ImageButton btnLocation = findViewById(R.id.event_map);
+        btnLocation.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                double lat = bundle.getDouble("lat");
+                double lng = bundle.getDouble("lng");
+                int category = bundle.getInt("category");
+                Intent returnIntent = new Intent();
+                returnIntent.putExtra("lat", lat);
+                returnIntent.putExtra("lng", lng);
+                returnIntent.putExtra("category", category);
+                returnIntent.putExtra("id", eventID);
+                setResult(RESULT_OK, returnIntent);
+                finish();
+            }
+        });
+
 
         mEventDescriptionTextView = findViewById(R.id.event_description_textview);
         mEventDescriptionTextView.setText(bundle.getString("description"));
         gradientView = findViewById(R.id.gradient);
         final int collapsedMaxLines = 7;
         final int expandedMaxLines = 20;
-        int lines = mEventDescriptionTextView.getLineCount();
 
-        if(lines > collapsedMaxLines){
-            gradientView.setVisibility(View.VISIBLE);
+        mEventDescriptionTextView.post(new Runnable() {
+            @Override
+            public void run() {
+                int lines = mEventDescriptionTextView.getLineCount();
+                if(lines > collapsedMaxLines){
+                    gradientView.setVisibility(View.VISIBLE);
+                    mEventDescriptionTextView.setMaxLines(7);
 
-            //The description expands when the user clicks on it (or shrinks when it's already expanded)
-            mEventDescriptionTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    ObjectAnimator animation = ObjectAnimator.ofInt(mEventDescriptionTextView, "maxLines", mEventDescriptionTextView.getMaxLines() == collapsedMaxLines? expandedMaxLines : collapsedMaxLines);
-                    animation.setInterpolator(new DecelerateInterpolator());
-                    animation.setDuration(200).start();
-                    if(mEventDescriptionTextView.getMaxLines() == collapsedMaxLines) {
-                        gradientView.setVisibility(View.GONE);
-                    }else{
-                        gradientView.setVisibility(View.VISIBLE);
-                    }
+                    //The description expands when the user clicks on it (or shrinks when it's already expanded)
+                    mEventDescriptionTextView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            ObjectAnimator animation = ObjectAnimator.ofInt(mEventDescriptionTextView, "maxLines", mEventDescriptionTextView.getMaxLines() == collapsedMaxLines? expandedMaxLines : collapsedMaxLines);
+                            animation.setInterpolator(new DecelerateInterpolator());
+                            animation.setDuration(200).start();
+                            if(mEventDescriptionTextView.getMaxLines() == collapsedMaxLines) {
+                                gradientView.setVisibility(View.GONE);
+                            }else{
+                                gradientView.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    });
                 }
-            });
-        }
+            }
+        });
 
         setUpTimeAndDate(bundle);
 

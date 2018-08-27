@@ -22,6 +22,7 @@ import android.transition.Slide;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -57,7 +58,6 @@ import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import de.spontune.android.spontune.Adapters.CustomInfoWindowAdapter;
@@ -90,10 +90,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final String KEY_LOCATION = "location";
 
     //Category selection button states
-    private boolean mCreativeActivated = false;
-    private boolean mPartyActivated = false;
-    private boolean mHappeningActivated = false;
-    private boolean mSportsActivated = false;
+    private boolean mCreativeActivated;
+    private boolean mPartyActivated;
+    private boolean mHappeningActivated;
+    private boolean mSportsActivated;
 
     private ImageButton mButtonCreative;
     private ImageButton mButtonParty;
@@ -106,7 +106,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static ChildEventListener mChildEventListener;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
-    private static final int RC_SIGN_IN = 123; //Request code for the Firebase UI sign in
+    private static final int RC_SIGN_IN = 1; //Request code for the Firebase UI sign in
+    private static final int RC_LOCATION_CALLBACK = 2; //Request code for handling the location button in EventActivity
 
     //Milliseconds for securing that only events which start today are shown on the map
     private long mNowMillis;
@@ -115,6 +116,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     //Lists of currently selected and unselected events
     private List<Event> mSelectedEvents = new ArrayList<>();
     private List<Event> mUnselectedEvents = new ArrayList<>();
+
+    private Marker temporaryMarker;
+    private int temporaryMarkerCategory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,8 +137,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         setUpCategoryButtons();
 
         //Set up the Calendar for now and the end of the day and set up the milliseconds
-        Calendar now = GregorianCalendar.getInstance();
-        Calendar endOfDay = GregorianCalendar.getInstance();
+        Calendar now = Calendar.getInstance();
+        Calendar endOfDay = Calendar.getInstance();
         endOfDay.set(Calendar.HOUR_OF_DAY, 23);
         endOfDay.set(Calendar.MINUTE, 59);
         endOfDay.set(Calendar.SECOND, 59);
@@ -191,6 +195,45 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             if(resultCode == RESULT_CANCELED){
                 onSignedOutCleanup();
                 Toast.makeText(this, "Anmeldung abgebrochen", Toast.LENGTH_SHORT).show();
+            }
+        }else if(requestCode == RC_LOCATION_CALLBACK){
+            if(resultCode == RESULT_OK){
+                double lat = data.getDoubleExtra("lat", 0.0);
+                double lng = data.getDoubleExtra("lng", 0.0);
+                int category = data.getIntExtra("category", 0);
+                String id = data.getStringExtra("id");
+                LatLng newPosition = new LatLng(lat, lng);
+                Event event = new Event();
+                event.setID(id);
+
+                if(!mSelectedEvents.contains(event) && !mUnselectedEvents.contains(event)) {
+                    setUpTemporaryActionBar();
+                    Drawable markerDrawable;
+                    switch (category) {
+                        case 1:
+                            markerDrawable = getResources().getDrawable(R.drawable.category_creative_marker);
+                            break;
+                        case 2:
+                            markerDrawable = getResources().getDrawable(R.drawable.category_party_marker);
+                            break;
+                        case 3:
+                            markerDrawable = getResources().getDrawable(R.drawable.category_happening_marker);
+                            break;
+                        default:
+                            markerDrawable = getResources().getDrawable(R.drawable.category_sports_marker);
+                    }
+
+                    int height = 150;
+                    int width = 150;
+                    Bitmap b = vectorToBitmap((VectorDrawable) markerDrawable);
+                    Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
+
+                    temporaryMarker = mMap.addMarker(new MarkerOptions().position(newPosition)
+                            .anchor(0.5f, 1.0f)
+                            .icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
+                    temporaryMarkerCategory = category;
+                }
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newPosition, 15.0f));
             }
         }
     }
@@ -292,7 +335,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     getWindow().setSharedElementEnterTransition(new ChangeTransform());
                     getWindow().setSharedElementEnterTransition(new ChangeTransform());
                     ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(MapsActivity.this, mButtonAdd, "add_event");
-                    startActivity(intent, options.toBundle());
+                    startActivityForResult(intent, RC_LOCATION_CALLBACK, options.toBundle());
                 }
             });
 
@@ -310,8 +353,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(MapsActivity.this).toBundle());
                 }
             });
-
         }
+    }
+
+
+    private void setUpTemporaryActionBar(){
+        ActionBar mActionBar = getSupportActionBar();
+        assert mActionBar != null;
+        mActionBar.setCustomView(null);
+        mActionBar.setDisplayHomeAsUpEnabled(true);
     }
 
 
@@ -433,7 +483,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         b.putString("address", clickedEvent.getAddress());
                         i.putExtras(b);
                         i.putExtra("participants", clickedEvent.getParticipants());
-                        startActivity(i);
+                        startActivityForResult(i, RC_LOCATION_CALLBACK);
                     }
                 }
             }
@@ -449,7 +499,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Point targetPoint = new Point(markerPoint.x, markerPoint.y - 100);
                 LatLng targetPosition = projection.fromScreenLocation(targetPoint);
                 mMap.animateCamera(CameraUpdateFactory.newLatLng(targetPosition), 300, null);
-                return true;
+                return false;
             }
         });
     }
@@ -591,31 +641,46 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void updateEventMarkers(){
         mMap.clear();
         for(Event event : mSelectedEvents){
-            Drawable markerDrawable;
+            drawEventMarker(event.getCategory(), event.getLat(), event.getLng(), event);
+        }
+        if(temporaryMarker != null){
+            if(temporaryMarkerCategory != 0){
+                drawEventMarker(temporaryMarkerCategory, temporaryMarker.getPosition().latitude, temporaryMarker.getPosition().longitude, null);
 
-            switch (event.getCategory()) {
-                case 1:
-                    markerDrawable = getResources().getDrawable(R.drawable.category_creative_marker);
-                    break;
-                case 2:
-                    markerDrawable = getResources().getDrawable(R.drawable.category_party_marker);
-                    break;
-                case 3:
-                    markerDrawable = getResources().getDrawable(R.drawable.category_happening_marker);
-                    break;
-                default:
-                    markerDrawable = getResources().getDrawable(R.drawable.category_sports_marker);
             }
+        }
+    }
 
-            int height = 150;
-            int width = 150;
-            Bitmap b= vectorToBitmap( (VectorDrawable) markerDrawable);
-            Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
 
-            Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(event.getLat(), event.getLng()))
-                    .anchor(0.5f, 1.0f)
-                    .icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
+    private void drawEventMarker(int category, double lat, double lng, Event event){
+        Drawable markerDrawable;
+
+        switch (category) {
+            case 1:
+                markerDrawable = getResources().getDrawable(R.drawable.category_creative_marker);
+                break;
+            case 2:
+                markerDrawable = getResources().getDrawable(R.drawable.category_party_marker);
+                break;
+            case 3:
+                markerDrawable = getResources().getDrawable(R.drawable.category_happening_marker);
+                break;
+            default:
+                markerDrawable = getResources().getDrawable(R.drawable.category_sports_marker);
+        }
+
+        int height = 150;
+        int width = 150;
+        Bitmap b= vectorToBitmap( (VectorDrawable) markerDrawable);
+        Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
+
+        Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng))
+                .anchor(0.5f, 1.0f)
+                .icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
+        if(event != null) {
             marker.setTag(event);
+        }else{
+            temporaryMarker = marker;
         }
     }
 
@@ -729,12 +794,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onResume(){
         super.onResume();
         //mSelectedEvents = new ArrayList<>();
+        /*
         if(mCameraPosition != null && mMap != null) {
             mMap.moveCamera(CameraUpdateFactory.newCameraPosition(mCameraPosition));
         }
+        */
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
         //mEventsDatabaseReference.addChildEventListener(mChildEventListener);
     }
+
 
     private void loadImage(final Event event){
         String categoryName;
@@ -754,6 +822,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         event.setPicture(resource);
                     }
                 });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (item.getItemId() == android.R.id.home) {
+            setUpActionBar();
+            if(temporaryMarker != null){
+                temporaryMarker.remove();
+                temporaryMarker = null;
+                temporaryMarkerCategory = 0;
+            }
+            return true;
+        }
+        return false;
     }
 
 }

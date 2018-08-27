@@ -56,31 +56,24 @@
                     android:id="@+id/event_chat"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
+                    android:padding="10dp"
                     android:layout_marginEnd="25dp"
                     android:background="?android:attr/selectableItemBackground"
                     android:src="@drawable/ic_round_chat_light"
                     app:layout_constraintBottom_toBottomOf="@id/event_join"
-                    app:layout_constraintEnd_toStartOf="@id/event_share"
+                    app:layout_constraintEnd_toStartOf="@id/event_map"
+                    android:scaleType="fitXY"
                     app:layout_constraintTop_toTopOf="@id/event_join" />
 
                 <ImageButton
-                    android:id="@+id/event_share"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="25dp"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:src="@drawable/ic_round_share_light"
-                    app:layout_constraintEnd_toStartOf="@id/event_map"
-                    app:layout_constraintTop_toTopOf="@id/event_join"
-                    app:layout_constraintBottom_toBottomOf="@id/event_join"/>
-
-                <ImageButton
                     android:id="@+id/event_map"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:padding="10dp"
                     android:layout_marginEnd="16dp"
                     android:background="?android:attr/selectableItemBackground"
                     android:src="@drawable/ic_round_place_light"
+                    android:scaleType="fitXY"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@id/event_join"
                     app:layout_constraintBottom_toBottomOf="@id/event_join"/>
@@ -89,8 +82,8 @@
 
             <ImageView
                 android:id="@+id/icon_creator"
-                android:layout_width="15dp"
-                android:layout_height="15dp"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
                 android:src="@drawable/ic_round_creator"
                 app:layout_constraintStart_toStartOf="parent"
                 android:layout_marginStart="16dp"
@@ -103,7 +96,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/onSurface"
-                android:textSize="14sp"
+                android:textSize="@dimen/default_text_size"
                 app:layout_constraintStart_toEndOf="@id/icon_creator"
                 app:layout_constraintTop_toTopOf="@id/icon_creator"
                 app:layout_constraintBottom_toBottomOf="@id/icon_creator"
@@ -111,8 +104,8 @@
 
             <ImageView
                 android:id="@+id/icon_time"
-                android:layout_width="15dp"
-                android:layout_height="15dp"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
                 android:src="@drawable/ic_round_time"
                 app:layout_constraintTop_toTopOf="@id/text_view_starting_time"
                 app:layout_constraintBottom_toBottomOf="@id/text_view_starting_time"
@@ -125,7 +118,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:textColor="@color/onSurface"
-                android:textSize="14sp"
+                android:textSize="@dimen/default_text_size"
                 app:layout_constraintStart_toEndOf="@id/icon_time"
                 app:layout_constraintTop_toBottomOf="@id/icon_creator"
                 android:layout_marginTop="3dp" />
@@ -137,14 +130,14 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="3dp"
                 android:textColor="@color/onSurface"
-                android:textSize="14sp"
+                android:textSize="@dimen/default_text_size"
                 app:layout_constraintStart_toEndOf="@id/icon_time"
                 app:layout_constraintTop_toBottomOf="@id/text_view_starting_time" />
 
             <ImageView
                 android:id="@+id/icon_participants"
-                android:layout_width="15dp"
-                android:layout_height="15dp"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
                 android:src="@drawable/ic_round_people"
                 app:layout_constraintTop_toBottomOf="@+id/text_view_ending_time"
                 android:layout_marginTop="3dp"
@@ -158,7 +151,7 @@
                 app:layout_constraintStart_toEndOf="@id/icon_participants"
                 android:layout_marginStart="16dp"
                 android:textColor="@color/onSurface"
-                android:textSize="14sp"
+                android:textSize="@dimen/default_text_size"
                 app:layout_constraintTop_toTopOf="@id/icon_participants"
                 app:layout_constraintBottom_toBottomOf="@id/icon_participants" />
 

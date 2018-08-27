@@ -62,4 +62,5 @@
     <string name="start">Start:</string>
     <string name="end">Ende:</string>
     <string name="max_persons">Teilnehmerzahl begrenzen</string>
+    <string name="location_choose">Wo geht der Shit down?</string>
 </resources>
